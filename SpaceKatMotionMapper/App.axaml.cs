@@ -127,8 +127,11 @@ public partial class App : Application
                 if (!ret)
                 {   
                     var wrongWindow = new SingletonWrongWindow();
-                    wrongWindow.Show();
-                    desktop.Shutdown();
+                    desktop.MainWindow = wrongWindow;
+                    desktop.MainWindow.Closed += (_, _) =>
+                    {
+                        desktop.Shutdown();
+                    };
                     return;
                 }
                 var mainWindow = GetService<MainWindow>();

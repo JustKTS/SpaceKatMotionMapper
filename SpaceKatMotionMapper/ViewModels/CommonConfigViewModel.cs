@@ -16,6 +16,10 @@ public partial class CommonConfigViewModel : ViewModelBase
 
     private readonly KatActionConfigVMManageService _katActionConfigVmManageService =
         App.GetRequiredService<KatActionConfigVMManageService>();
+    private readonly KatMotionTimeConfigService _katMotionTimeConfigService =
+        App.GetRequiredService<KatMotionTimeConfigService>();
+    private readonly KatDeadZoneConfigService _katDeadZoneConfigService =
+        App.GetRequiredService<KatDeadZoneConfigService>();
 
     private readonly ActivationStatusService _activationStatusService = App.GetRequiredService<ActivationStatusService>();
 
@@ -32,6 +36,8 @@ public partial class CommonConfigViewModel : ViewModelBase
                 if (!_activationStatusService.IsConfigGroupActivated(DefaultKatActionConfig.Id)) return true;
                 DefaultKatActionConfig.ActivateActionsCommand.Execute(null);
                 _katActionConfigVmManageService.RegisterDefaultConfig(DefaultKatActionConfig);
+                _katMotionTimeConfigService.ApplyDefaultMotionTimeConfig();
+                _katDeadZoneConfigService.ApplyDefaultDeadZoneConfig();
                 return true;
             },
             ex =>

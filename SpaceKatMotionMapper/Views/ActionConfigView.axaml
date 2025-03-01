@@ -92,7 +92,7 @@
                         <Grid ColumnDefinitions="Auto, *, Auto">
                             <StackPanel Orientation="Horizontal" Margin="5">
                                 <icon:Icon FontSize="20" Value="fa-solid fa-check"
-                                           Foreground="Green"
+                                           Foreground="Blue"
                                            HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"
                                            IsVisible="{Binding IsAvailable}">

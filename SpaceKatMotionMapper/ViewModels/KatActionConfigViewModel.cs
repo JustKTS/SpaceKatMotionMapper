@@ -147,12 +147,17 @@ public partial class KatActionConfigViewModel : ViewModelBase
         return Task.CompletedTask;
     }
 
+    private Result<bool> ValidateKatActionModeGraph()
+    {
+        // TODO: 需要实现模式节点验证
+        throw new NotImplementedException();
+    }
+    
     private Result<bool> ValidateKatActionConfig()
     {
         List<string> pressKeys = [];
         List<string> releaseKeys = [];
-        List<int> toModes = [];
-        List<int> modeNums = [];
+        
         
         var katActions = KatActionsWithMode.SelectMany(e => e.KatActions).ToList();
 
@@ -169,8 +174,7 @@ public partial class KatActionConfigViewModel : ViewModelBase
                     .Where(e => e.PressMode == PressModeEnum.Release)
                     .Select(e => e.Key)
                     .ToArray());
-            modeNums.Add(katAction.ModeNum);
-            toModes.Add(katAction.ToModeNum);
+           
         }
 
         var ret1 = pressKeys.All(key => releaseKeys.Contains(key));
