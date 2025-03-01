@@ -1,0 +1,53 @@
+<u:UrsaView
+    x:Class="SpaceKatMotionMapper.Views.ConfigCenterView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <u:UrsaView.Styles>
+        <Style Selector="Expander:down Border#ExpanderContent">
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:unchecked:pointerover">
+            <Setter Property="Background" Value="Transparent"></Setter>
+        </Style>
+        <Style Selector="Expander:down:expanded /template/ ToggleButton#ExpanderHeader:checked:pointerover">
+            <Setter Property="Background" Value="Transparent"></Setter>
+        </Style>
+        <Style Selector="ListBox">
+            <Setter Property="CornerRadius" Value="5" />
+        </Style>
+        <Style Selector="ListBoxItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+    </u:UrsaView.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,*">
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+            <TextBlock Margin="5"
+                       Classes="H4"
+                       VerticalAlignment="Center"
+                       Theme="{StaticResource TitleTextBlock}" HorizontalAlignment="Center">
+                配置中心
+            </TextBlock>
+            <TextBlock
+                Margin="5"
+                Classes="H7"
+                VerticalAlignment="Center"
+                Theme="{StaticResource TitleTextBlock}" HorizontalAlignment="Center">
+                （修改一项配置后需要重新关闭并打开左侧的开关才可生效）
+            </TextBlock>
+        </StackPanel>
+
+
+        <local:CommonConfigView Grid.Row="1"></local:CommonConfigView>
+        <local:OtherConfigsView Grid.Row="2"></local:OtherConfigsView>
+    </Grid>
+</u:UrsaView>

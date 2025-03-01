@@ -1,0 +1,138 @@
+﻿<u:UrsaView xmlns="https://github.com/avaloniaui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:u="https://irihi.tech/ursa"
+            xmlns:vms="clr-namespace:SpaceKatMotionMapper.ViewModels"
+            xmlns:cc="clr-namespace:SpaceKatMotionMapper.CustomControls"
+            mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+            x:Class="SpaceKatMotionMapper.Views.DeadZoneConfigView"
+            x:DataType="vms:DeadZoneConfigViewModel"
+            Background="Transparent">
+    <Design.DataContext>
+        <vms:DeadZoneConfigViewModel></vms:DeadZoneConfigViewModel>
+    </Design.DataContext>
+
+    <Border Theme="{StaticResource CardBorder}">
+        <Grid RowDefinitions="Auto, *, Auto">
+            <TextBlock
+                Classes="H5"
+                Theme="{StaticResource TitleTextBlock}" HorizontalAlignment="Center">
+                死区设置
+            </TextBlock>
+            <Grid Grid.Row="1" Grid.ColumnDefinitions="*, 5*" RowDefinitions="*,*,*,*,*,*">
+                <TextBlock Grid.Row="0" Grid.Column="0"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Text="X平移"
+                           Classes="H6"
+                           Theme="{StaticResource TitleTextBlock}" />
+                <TextBlock Grid.Row="1" Grid.Column="0"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Text="Y平移"
+                           Classes="H6"
+                           Theme="{StaticResource TitleTextBlock}" />
+                <TextBlock Grid.Row="2" Grid.Column="0"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Text="Z平移"
+                           Classes="H6"
+                           Theme="{StaticResource TitleTextBlock}" />
+                <TextBlock Grid.Row="3" Grid.Column="0"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Text="俯仰"
+                           Classes="H6"
+                           Theme="{StaticResource TitleTextBlock}" />
+                <TextBlock Grid.Row="4" Grid.Column="0"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Text="滚转"
+                           Classes="H6"
+                           Theme="{StaticResource TitleTextBlock}" />
+                <TextBlock Grid.Row="5" Grid.Column="0"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Text="偏航"
+                           Classes="H6"
+                           Theme="{StaticResource TitleTextBlock}" />
+
+                <cc:DeadZoneIndicator Grid.Row="0" Grid.Column="1"
+                                      HorizontalAlignment="Stretch"
+                                      CornerRadius="30"
+                                      Height="50"
+                                      Maximum="1.6" Minimum="-1.6"
+                                      DeadZoneLower="{Binding XDeadZoneLower, Mode=TwoWay}"
+                                      DeadZoneUpper="{Binding XDeadZoneUpper, Mode=TwoWay}"
+                                      Value="{Binding XData}" />
+                <cc:DeadZoneIndicator Grid.Row="1" Grid.Column="1"
+                                      HorizontalAlignment="Stretch"
+                                      CornerRadius="30"
+                                      Height="50"
+                                      Maximum="1.6" Minimum="-1.6"
+                                      DeadZoneLower="{Binding YDeadZoneLower, Mode=TwoWay}"
+                                      DeadZoneUpper="{Binding YDeadZoneUpper, Mode=TwoWay}"
+                                      Value="{Binding YData}" />
+                <cc:DeadZoneIndicator Grid.Row="2" Grid.Column="1"
+                                      HorizontalAlignment="Stretch"
+                                      CornerRadius="30"
+                                      Height="50"
+                                      Maximum="1.6" Minimum="-1.6"
+                                      DeadZoneLower="{Binding ZDeadZoneLower, Mode=TwoWay}"
+                                      DeadZoneUpper="{Binding ZDeadZoneUpper, Mode=TwoWay}"
+                                      Value="{Binding ZData}" />
+                <cc:DeadZoneIndicator Grid.Row="3" Grid.Column="1"
+                                      HorizontalAlignment="Stretch"
+                                      CornerRadius="30"
+                                      Height="50"
+                                      Maximum="1.6" Minimum="-1.6"
+                                      DeadZoneLower="{Binding PitchDeadZoneLower, Mode=TwoWay}"
+                                      DeadZoneUpper="{Binding PitchDeadZoneUpper, Mode=TwoWay}"
+                                      Value="{Binding PitchData}" />
+                <cc:DeadZoneIndicator Grid.Row="4" Grid.Column="1"
+                                      HorizontalAlignment="Stretch"
+                                      CornerRadius="30"
+                                      Height="50"
+                                      Maximum="1.6" Minimum="-1.6"
+                                      DeadZoneLower="{Binding RollDeadZoneLower, Mode=TwoWay}"
+                                      DeadZoneUpper="{Binding RollDeadZoneUpper, Mode=TwoWay}"
+                                      Value="{Binding RollData}" />
+                <cc:DeadZoneIndicator Grid.Row="5" Grid.Column="1"
+                                      HorizontalAlignment="Stretch"
+                                      CornerRadius="30"
+                                      Height="50"
+                                      Maximum="1.6" Minimum="-1.6"
+                                      DeadZoneLower="{Binding YawDeadZoneLower, Mode=TwoWay}"
+                                      DeadZoneUpper="{Binding YawDeadZoneUpper, Mode=TwoWay}"
+                                      Value="{Binding YawData}" />
+
+            </Grid>
+            <Grid Grid.Row="2" Grid.ColumnSpan="2" Grid.ColumnDefinitions="*, *, *">
+                <Button Grid.Column="0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Margin="10"
+                        Command="{Binding ApplyDeadZoneCommand}">
+                    测试
+                </Button>
+           
+                <Button Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Margin="10"
+                        Command="{Binding LoadDeadZoneAsyncCommand}">
+                    撤销
+                </Button>
+                <Button Grid.Column="2"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        Margin="10"
+                        Command="{Binding SaveDeadZoneCommand}">
+                    保存
+                </Button>
+            </Grid>
+
+        </Grid>
+    </Border>
+</u:UrsaView>

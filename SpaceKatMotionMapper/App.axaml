@@ -1,0 +1,29 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="SpaceKatMotionMapper.App"
+             xmlns:semi="https://irihi.tech/semi"
+             xmlns:u-semi="https://irihi.tech/ursa/themes/semi"
+             RequestedThemeVariant="Dark">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+  
+    <Application.Styles>
+        <semi:SemiTheme Locale="zh-CN" />
+        <u-semi:SemiTheme Locale="zh-CN"/>
+        <StyleInclude Source="avares://Semi.Avalonia.DataGrid/Index.axaml" />
+    </Application.Styles>
+     <TrayIcon.Icons>
+         <TrayIcons>
+             <TrayIcon Icon="/Assets/avalonia-logo.ico"
+                       ToolTipText="3D旋钮辅助工具"
+                       Clicked="ShowWindowMenuItem_OnClick">
+                 <TrayIcon.Menu>
+                     <NativeMenu>
+                         <NativeMenuItem Header="显示窗口" Click="ShowWindowMenuItem_OnClick" />
+                         <NativeMenuItemSeparator />
+                         <NativeMenuItem Header="退出" Click="ExitMenuItem_OnClick" />
+                     </NativeMenu>
+                 </TrayIcon.Menu>
+             </TrayIcon>
+         </TrayIcons>
+     </TrayIcon.Icons>
+</Application>

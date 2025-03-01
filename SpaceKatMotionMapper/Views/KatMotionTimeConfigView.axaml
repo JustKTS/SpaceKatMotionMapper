@@ -1,0 +1,130 @@
+﻿<u:UrsaView xmlns="https://github.com/avaloniaui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:u="https://irihi.tech/ursa"
+            xmlns:vms="clr-namespace:SpaceKatMotionMapper.ViewModels"
+            mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+            x:Class="SpaceKatMotionMapper.Views.KatMotionTimeConfigView"
+            x:DataType="vms:MotionTimeConfigViewModel"
+            Background="Transparent">
+    <Design.DataContext>
+        <vms:MotionTimeConfigViewModel></vms:MotionTimeConfigViewModel>
+    </Design.DataContext>
+
+    <u:UrsaView.Styles>
+        <Style Selector="ListBox.Transparent > ListBoxItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+        <Style Selector="ListBox.Transparent > ListBoxItem:pointerover">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="ListBox.Transparent > ListBoxItem:selected">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+    </u:UrsaView.Styles>
+
+    <Border Grid.Row="1" Theme="{StaticResource CardBorder}">
+        <Grid RowDefinitions="Auto, *, Auto">
+            <ToggleSwitch
+                HorizontalAlignment="Center"
+                OnContent="统一配置"
+                OffContent="统一配置"
+                IsChecked="{Binding UseUnifySetting, Mode=TwoWay}" />
+
+            <DataGrid Grid.Row="1" Height="350"
+                      Margin="8"
+                      CanUserReorderColumns="False"
+                      CanUserResizeColumns="True"
+                      CanUserSortColumns="False"
+                      HeadersVisibility="All"
+                      ScrollViewer.AllowAutoHide="True"
+                      ItemsSource="{Binding ConfigViewModels}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="1*"
+                        x:DataType="vms:MotionTimeSingleConfigViewModel"
+                        Binding="{Binding MotionName}"
+                        Header="动作名称" />
+
+                    <DataGridTemplateColumn
+                        Width="1*"
+                        Header="短触多击容差（毫秒）">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="vms:MotionTimeSingleConfigViewModel">
+                                <u:NumericIntUpDown Margin="5"
+                                                    AllowSpin="True"
+                                                    Minimum="80" Maximum="1500"
+                                                    EmptyInputValue="120"
+                                                    Value="{Binding ShortRepeatToleranceMs}">
+                                </u:NumericIntUpDown>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Width="1*" Header="长推触发延时（毫秒）">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="vms:MotionTimeSingleConfigViewModel">
+                                <u:NumericIntUpDown Margin="5"
+                                                    AllowSpin="True"
+                                                    Minimum="20" Maximum="2000"
+                                                    EmptyInputValue="800"
+                                                    Value="{Binding LongReachTimeoutMs}">
+                                </u:NumericIntUpDown>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Width="1*" Header="长推连续触发间隔（毫秒）">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="vms:MotionTimeSingleConfigViewModel">
+                                <u:NumericIntUpDown Margin="5"
+                                                    AllowSpin="True"
+                                                    Minimum="20" Maximum="3000"
+                                                    EmptyInputValue="120"
+                                                    Value="{Binding LongReachRepeatTimeSpanMs}">
+                                </u:NumericIntUpDown>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="1*" Header="长推多击触发缩放系数">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="vms:MotionTimeSingleConfigViewModel">
+                                <Grid ColumnDefinitions="Auto, *" Margin="5">
+                                    <CheckBox
+                                        Margin="5"
+                                        VerticalAlignment="Center"
+                                        Name="UseScaleCheckBox"
+                                        Grid.Column="0"
+                                        IsChecked="{Binding UseScaleFactor}">
+                                    </CheckBox>
+                                    <Slider
+                                        VerticalAlignment="Center"
+                                        IsEnabled="{Binding #UseScaleCheckBox.IsChecked}"
+                                        Grid.Column="1"
+                                        Minimum="1" Maximum="10"
+                                        Value="{Binding LongReachRepeatScaleFactor}">
+                                    </Slider>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+
+            </DataGrid>
+
+            <Grid Grid.Row="2" ColumnDefinitions="*,*,*">
+                <Button Grid.Column="0" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                        Content="测试"
+                        Command="{Binding ApplyTimeConfigCommand}" />
+                <Button Grid.Column="1" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                        Content="撤销"
+                        Command="{Binding LoadMotionTimeConfigsCommand}" />
+                <Button Grid.Column="2" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                        Content="保存"
+                        Command="{Binding SaveTimeConfigAsyncCommand}" />
+            </Grid>
+        </Grid>
+    </Border>
+</u:UrsaView>

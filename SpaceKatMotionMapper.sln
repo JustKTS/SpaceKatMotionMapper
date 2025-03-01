@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceKatMotionMapper", "SpaceKatMotionMapper\SpaceKatMotionMapper.csproj", "{3F10C181-BDD1-4860-BE02-2179D7039E55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceKatHIDWrapper", "SpaceKatHIDWrapper\SpaceKatHIDWrapper.csproj", "{F03CB158-40F1-4D23-824D-7C14D0A6BA4B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Win32Helpers", "Win32Helpers\Win32Helpers.csproj", "{F79CA2E8-97ED-4CD7-BA25-4E98DC6075B7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3F10C181-BDD1-4860-BE02-2179D7039E55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F10C181-BDD1-4860-BE02-2179D7039E55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F10C181-BDD1-4860-BE02-2179D7039E55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F10C181-BDD1-4860-BE02-2179D7039E55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F03CB158-40F1-4D23-824D-7C14D0A6BA4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F03CB158-40F1-4D23-824D-7C14D0A6BA4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F03CB158-40F1-4D23-824D-7C14D0A6BA4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F03CB158-40F1-4D23-824D-7C14D0A6BA4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F79CA2E8-97ED-4CD7-BA25-4E98DC6075B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F79CA2E8-97ED-4CD7-BA25-4E98DC6075B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F79CA2E8-97ED-4CD7-BA25-4E98DC6075B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F79CA2E8-97ED-4CD7-BA25-4E98DC6075B7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

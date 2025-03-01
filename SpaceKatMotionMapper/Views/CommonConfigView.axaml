@@ -1,0 +1,21 @@
+﻿<u:UrsaView xmlns="https://github.com/avaloniaui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:vms="clr-namespace:SpaceKatMotionMapper.ViewModels;assembly=SpaceKatMotionMapper"
+            xmlns:u="https://irihi.tech/ursa"
+            mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+            x:Class="SpaceKatMotionMapper.Views.CommonConfigView"
+            x:DataType="vms:CommonConfigViewModel">
+    <Design.DataContext>
+        <vms:CommonConfigViewModel></vms:CommonConfigViewModel>
+    </Design.DataContext>
+    <u:UrsaView.Styles>
+        <Style Selector="Expander:down Border#ExpanderContent">
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+    </u:UrsaView.Styles>
+    <ScrollViewer Name="ScrollViewer" Margin="10" VerticalScrollBarVisibility="Auto">
+       
+    </ScrollViewer>
+</u:UrsaView>

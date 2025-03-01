@@ -1,0 +1,15 @@
+﻿DispatchMessage
+GetClassName
+GetForegroundWindow
+GetMessage
+GetParent
+GetProcessImageFileName
+GetWindowText
+GetWindowThreadProcessId
+SetWinEventHook
+TranslateMessage
+EVENT_SYSTEM_FOREGROUND
+WINEVENT_OUTOFCONTEXT
+WINEVENT_SKIPOWNPROCESS
+EnumWindows
+IsWindowVisible

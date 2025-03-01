@@ -1,0 +1,215 @@
+﻿<u:UrsaView
+    x:Class="SpaceKatMotionMapper.Views.ActionConfigView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:SpaceKatMotionMapper.Helpers;assembly=SpaceKatMotionMapper"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:icon="https://github.com/projektanker/icons.avalonia"
+    xmlns:vms="clr-namespace:SpaceKatMotionMapper.ViewModels;assembly=SpaceKatMotionMapper"
+    Margin="5"
+    d:DesignHeight="720"
+    d:DesignWidth="1280"
+    x:DataType="vms:KeyActionConfigViewModel"
+    Background="Transparent"
+    mc:Ignorable="d">
+
+    <Design.DataContext>
+        <vms:KeyActionConfigViewModel />
+    </Design.DataContext>
+
+    <u:UrsaView.Resources>
+        <helpers:PressModeEnumConverter x:Key="PressModeEnumConverter" />
+        <helpers:ActionTypeConverter x:Key="ActionTypeConverter" />
+        <helpers:ActionTypeItemNamesConverter x:Key="ActionTypeItemNamesConverter" />
+        <helpers:ActionTypeKeyOrButtonConverter x:Key="ActionTypeKeyOrButtonConverter" />
+        <helpers:ShowBaseOnMouseScrollConverter x:Key="ShowBaseOnMouseScrollConverter" />
+        <helpers:HideBaseOnMouseScrollConverter x:Key="HideBaseOnMouseScrollConverter" />
+        <helpers:DoubleClickCheckConverter x:Key="DoubleClickCheckConverter" />
+    </u:UrsaView.Resources>
+
+    <u:UrsaView.Styles>
+        <Style Selector="ListBox.Transparent > ListBoxItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+        <Style Selector="ListBox.Transparent > ListBoxItem:pointerover">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="ListBox.Transparent > ListBoxItem:selected">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+    </u:UrsaView.Styles>
+    
+    <Border Classes="Shadow" Theme="{StaticResource CardBorder}"
+            Background="#FFA3691F">
+        <Grid ColumnDefinitions="*,auto" RowDefinitions="Auto,*">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" Classes="H4" Theme="{StaticResource TitleTextBlock}">按键配置</TextBlock>
+                <TextBlock VerticalAlignment="Center" Classes="H5" Theme="{StaticResource TitleTextBlock}"
+                           Margin="20 0 0 0">
+                    结束后跳转至：
+                </TextBlock>
+                <Border
+                    Margin="8,0"
+                    HorizontalAlignment="Left"
+                    Theme="{StaticResource RadioButtonGroupBorder}">
+                    <ListBox
+                        Theme="{DynamicResource PureCardRadioGroupListBox}"
+                        ItemsSource="{Binding CurrentConfigModeNums}"
+                        SelectionMode="AlwaysSelected"
+                        SelectedItem="{Binding Parent.ToModeNum, Mode=TwoWay}">
+                   
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="x:Int32">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock>模式</TextBlock>
+                                    <TextBlock Text="{Binding}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+            </StackPanel>
+
+            <Button Grid.Row="0"
+                    Grid.Column="1"
+                    Classes="Secendary" Theme="{DynamicResource SolidButton}"
+                    Command="{Binding AddActionConfigCommand}">
+                +
+            </Button>
+            <ListBox
+                x:Name="ShortKeyConfigLBox"
+                Classes="Transparent"
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                MaxHeight="300"
+                ItemsSource="{Binding ActionConfigGroups}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vms:KeyActionViewModel">
+                        <Grid ColumnDefinitions="Auto, *, Auto">
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                                <icon:Icon FontSize="20" Value="fa-solid fa-check"
+                                           Foreground="Green"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           IsVisible="{Binding IsAvailable}">
+                                </icon:Icon>
+                                <icon:Icon FontSize="20" Value="fa-solid fa-xmark"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           Foreground="Red"
+                                           IsVisible="{Binding !IsAvailable}">
+                                </icon:Icon>
+                            </StackPanel>
+                            <Grid Grid.Column="1" HorizontalAlignment="Stretch"
+                                  ColumnDefinitions="Auto, Auto, Auto, *, Auto, 1.5*">
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    Classes="H7"
+                                    Theme="{StaticResource TitleTextBlock}">
+                                    类型：
+                                </TextBlock>
+                                <Border
+                                    Grid.Column="1"
+                                    Margin="8,0"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Theme="{StaticResource RadioButtonGroupBorder}">
+                                    <u:SelectionList
+                                        x:Name="ActionTypeSelector"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Stretch"
+                                        ItemsSource="{x:Static helpers:ActionTypeHelper.ActionTypeNames}"
+                                        SelectedItem="{Binding ActionType, Converter={StaticResource ActionTypeConverter}}">
+                                        <u:SelectionList.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </u:SelectionList.ItemsPanel>
+                                    </u:SelectionList>
+                                </Border>
+                                <TextBlock
+                                    Grid.Column="2"
+                                    VerticalAlignment="Center"
+                                    Classes="H7"
+                                    Theme="{StaticResource TitleTextBlock}">
+                                    按键：
+                                </TextBlock>
+                                <u:AutoCompleteBox
+                                    x:Name="KeySelectionCBox"
+                                    Grid.Row="0"
+                                    Grid.Column="3"
+                                    Margin="5,0,5,0"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    ItemsSource="{Binding #ActionTypeSelector.SelectedItem, Converter={StaticResource ActionTypeItemNamesConverter}}"
+                                    Text="{Binding Key, Converter={StaticResource ActionTypeKeyOrButtonConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                    Watermark="请选择按键,留空则为无动作" />
+                                <TextBlock
+                                    Grid.Column="4"
+                                    VerticalAlignment="Center"
+                                    Classes="H7"
+                                    IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource HideBaseOnMouseScrollConverter}}"
+                                    Theme="{StaticResource TitleTextBlock}">
+                                    模式：
+                                </TextBlock>
+                                <Border
+                                    Grid.Column="5"
+                                    Margin="8,0"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource HideBaseOnMouseScrollConverter}}"
+                                    Theme="{StaticResource RadioButtonGroupBorder}">
+                                    <u:SelectionList
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Stretch"
+                                        ItemsSource="{Binding ActionType, Converter={StaticResource DoubleClickCheckConverter}}"
+                                        SelectedItem="{Binding PressMode, Converter={StaticResource PressModeEnumConverter}, Mode=TwoWay}">
+                                        <u:SelectionList.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </u:SelectionList.ItemsPanel>
+                                    </u:SelectionList>
+                                </Border>
+
+                                <TextBlock
+                                    Grid.Column="4"
+                                    VerticalAlignment="Center"
+                                    Classes="H7"
+                                    IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource ShowBaseOnMouseScrollConverter}}"
+                                    Theme="{StaticResource TitleTextBlock}">
+                                    滚动倍率：
+                                </TextBlock>
+
+                                <u:NumericIntUpDown
+                                    Grid.Column="5"
+                                    Margin="10 0 10 0"
+                                    Classes="Large"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Right"
+                                    VerticalAlignment="Stretch"
+                                    AllowDrag="True"
+                                    IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource ShowBaseOnMouseScrollConverter}}"
+                                    Maximum="100"
+                                    Minimum="-100"
+                                    Value="{Binding Multiplier}" />
+
+                            </Grid>
+                            <Button Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                    Classes="Secendary" Theme="{DynamicResource SolidButton}"
+                                    Command="{Binding RemoveCommand}">
+                                -
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+        </Grid>
+    </Border>
+
+</u:UrsaView>

@@ -1,0 +1,47 @@
+﻿<u:UrsaView xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:u="https://irihi.tech/ursa"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="100"
+             x:Class="SpaceKatMotionMapper.CustomControls.DeadZoneIndicator">
+    <u:UrsaView.Styles>
+        <Style Selector="Border">
+            <Setter Property="CornerRadius" Value="{Binding $self.CornerRadius}"></Setter>
+        </Style>
+    </u:UrsaView.Styles>
+
+    <Panel>
+        <!-- ~1~ 背景 @1@ -->
+        <!-- <Border Background="LightGreen" -->
+        <!--         HorizontalAlignment="Stretch" -->
+        <!--         VerticalAlignment="Stretch" -->
+        <!--         Margin="0, 10,0,10" /> -->
+
+        <!-- 死区指示 -->
+        <u:RangeSlider Name="DeadZoneRangeSlider" VerticalAlignment="Center"
+                       TickFrequency="0.05"
+                       ValueChanged="DeadZoneRangeSlider_OnValueChanged">
+            <u:RangeSlider.Styles>
+                <Style Selector=":horizontal /template/ Border#PART_LowerSection">
+                    <Setter Property="Height" Value="15"></Setter>
+                    <Setter Property="Background" Value="LightGreen"></Setter>
+                </Style>
+                <Style Selector=":horizontal /template/ Border#PART_UpperSection">
+                    <Setter Property="Height" Value="15"></Setter>
+                    <Setter Property="Background" Value="LightGreen"></Setter>
+                </Style>
+                <Style Selector=":horizontal /template/ Border#PART_InnerSection">
+                    <Setter Property="Height" Value="15"></Setter>
+                    <Setter Property="Background" Value="DarkSlateGray"></Setter>
+                </Style>
+            </u:RangeSlider.Styles>
+        </u:RangeSlider>
+
+        <!-- 当前值 -->
+        <Border Name="IndicatorBorder" Background="Red" Width="5" CornerRadius="5"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Stretch" />
+    </Panel>
+
+</u:UrsaView>

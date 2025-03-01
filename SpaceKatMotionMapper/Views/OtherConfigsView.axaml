@@ -1,0 +1,95 @@
+﻿<u:UrsaView xmlns="https://github.com/avaloniaui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+            xmlns:u="https://irihi.tech/ursa"
+            xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels;assembly=SpaceKatMotionMapper"
+            xmlns:icon="https://github.com/projektanker/icons.avalonia"
+            xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
+            x:Class="SpaceKatMotionMapper.Views.OtherConfigsView"
+            x:DataType="vm:OtherConfigsViewModel"
+            Background="Transparent">
+
+    <u:UrsaView.Styles>
+        <Style Selector="ListBox.Transparent > ListBoxItem:pointerover">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="ListBox.Transparent > ListBoxItem:selected">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+    </u:UrsaView.Styles>
+    <Grid RowDefinitions="Auto,*">
+        <u:Divider Grid.Row="0" Margin="20, 20 ,0,0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" Classes="H4" Theme="{StaticResource TitleTextBlock}">分应用配置</TextBlock>
+                <u:ButtonGroup Classes="Primary Solid" Margin="10 0 0 0">
+                    <Button Command="{Binding AddCommand}"
+                            ToolTip.Tip="新增配置">
+                        <icon:Icon HorizontalAlignment="Center" FontSize="20"
+                                   Value="fa-solid fa-plus" />
+                    </Button>
+                    <Button Command="{Binding SaveGroupsToConfigDirCommand}"
+                            ToolTip.Tip="保存下列所有配置至默认配置文件夹">
+                        <icon:Icon HorizontalAlignment="Center" FontSize="20"
+                                   Value="fa-solid fa-layer-group" />
+                    </Button>
+                    <Button>
+                        <icon:Icon FontSize="20" Value="fa-solid fa-ellipsis" />
+                        <Button.Flyout>
+                            <MenuFlyout>
+                                <MenuItem Command="{Binding ReloadConfigGroupsFromSysConfCommand}">
+                                    <MenuItem.Header>
+                                        <Grid ColumnDefinitions="Auto,*">
+                                            <icon:Icon HorizontalAlignment="Center" FontSize="20"
+                                                       Value="fa-solid fa-rotate-right" />
+                                            <TextBlock Grid.Column="1" HorizontalAlignment="Left"
+                                                       Margin="20,0,0,0">
+                                                从默认配置文件夹中重新导入所有自定义配置
+                                            </TextBlock>
+                                        </Grid>
+                                    </MenuItem.Header>
+                                </MenuItem>
+                                <MenuItem Command="{Binding LoadGroupFromFilesCommand}">
+                                    <MenuItem.Header>
+                                        <Grid ColumnDefinitions="Auto,*">
+                                            <icon:Icon HorizontalAlignment="Center" FontSize="20"
+                                                       Value="fa-solid fa-file-export" />
+                                            <TextBlock Grid.Column="1" HorizontalAlignment="Left"
+                                                       Margin="20,0,0,0">
+                                                从文件中导入配置（可多选）
+                                            </TextBlock>
+                                        </Grid>
+                                    </MenuItem.Header>
+                                </MenuItem>
+                                <MenuItem Command="{Binding SaveGroupToDirectoryCommand}">
+                                    <MenuItem.Header>
+                                        <Grid ColumnDefinitions="Auto,*">
+                                            <icon:Icon HorizontalAlignment="Center" FontSize="20"
+                                                       Value="fa-solid fa-file-import" />
+                                            <TextBlock Grid.Column="1" HorizontalAlignment="Left"
+                                                       Margin="20,0,0,0">
+                                                保存组到文件夹
+                                            </TextBlock>
+                                        </Grid>
+                                    </MenuItem.Header>
+                                </MenuItem>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                    </Button>
+                </u:ButtonGroup>
+
+            </StackPanel>
+        </u:Divider>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible">
+            <ListBox Classes="Transparent" ItemsSource="{Binding KatActionConfigGroups}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:KatActionConfigViewModel">
+                        <local:KatActionConfigView DataContext="{Binding }"></local:KatActionConfigView>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </ScrollViewer>
+    </Grid>
+</u:UrsaView>
