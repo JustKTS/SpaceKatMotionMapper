@@ -1,0 +1,1397 @@
+﻿License notice for Avalonia (v11.2.4)
+------------------------------------
+
+https://github.com/AvaloniaUI/Avalonia/ at 634014365673c4c3e3bf885f78da332ff75e1321
+
+https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+
+Copyright 2013-2025 © The AvaloniaUI Project
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Avalonia.Controls.DataGrid (v11.2.4)
+------------------------------------
+
+https://github.com/AvaloniaUI/Avalonia/ at 634014365673c4c3e3bf885f78da332ff75e1321
+
+https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+
+Copyright 2013-2025 © The AvaloniaUI Project
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Avalonia.Desktop (v11.2.4)
+------------------------------------
+
+https://github.com/AvaloniaUI/Avalonia/ at 634014365673c4c3e3bf885f78da332ff75e1321
+
+https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+
+Copyright 2013-2025 © The AvaloniaUI Project
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Avalonia.Win32.Interoperability (v11.2.4)
+------------------------------------
+
+https://github.com/AvaloniaUI/Avalonia/ at 634014365673c4c3e3bf885f78da332ff75e1321
+
+https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+
+Copyright 2013-2025 © The AvaloniaUI Project
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for CommunityToolkit.Mvvm (v8.4.0)
+------------------------------------
+
+https://github.com/CommunityToolkit/dotnet at 638b41dad30dffabb123a39aa38eabc7e3721371
+
+(c) .NET Foundation and Contributors. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for H.InputSimulator (v1.5.0)
+------------------------------------
+
+https://github.com/HavenDV/H.InputSimulator at 96aae739e04b34564c0173b8e62f844391f8eee5
+
+Licensed under MS-PL
+
+Available at https://licenses.nuget.org/MS-PL
+
+
+License notice for Irihi.Ursa (v1.7.0)
+------------------------------------
+
+https://github.com/irihitech/Ursa.Avalonia at 55180d9352d6767dce78b48f5afe7748e218217f
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Irihi.Ursa.Themes.Semi (v1.7.0)
+------------------------------------
+
+https://github.com/irihitech/Ursa.Avalonia at 55180d9352d6767dce78b48f5afe7748e218217f
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for LanguageExt.Core (v4.4.9)
+------------------------------------
+
+https://github.com/louthy/language-ext
+
+Copyright (c) Paul Louth. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for PySpaceMouse (v1.1.3)
+------------------------------------
+
+https://github.com/JakubAndrysek/PySpaceMouse
+
+Copyright (c) 2015 johnhw
+Copyright (c) 2021 Kuba Andrýsek
+
+All rights reserved.
+
+Licensed under MIT
+
+Available at https://github.com/JakubAndrysek/PySpaceMouse/blob/master/LICENSE
+
+
+License notice for Microsoft.Extensions.DependencyInjection (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Hosting (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Hosting.Abstractions (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.NET.ILLink.Tasks (v8.0.13)
+------------------------------------
+
+https://github.com/dotnet/runtime at eba546b0f0d448e0176a2222548fd7a2fbf464c0
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for NetEscapades.EnumGenerators (v1.0.0-beta11)
+------------------------------------
+
+https://github.com/andrewlock/NetEscapades.EnumGenerators at abc942713a615b977223ecaf36ebb9bad138cdeb
+
+Copyright © AndrewLock
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Newtonsoft.Json (v13.0.3)
+------------------------------------
+
+https://github.com/JamesNK/Newtonsoft.Json at 0a2e291c0d9c0c7675d445703e51750363a549ef
+
+https://www.newtonsoft.com/json
+
+Copyright © James Newton-King 2008
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Projektanker.Icons.Avalonia (v9.6.0)
+------------------------------------
+
+https://github.com/Projektanker/Icons.Avalonia at fb84e2d09ce681eadd088ca8789f0ae8f8ad8a1e
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Projektanker.Icons.Avalonia.FontAwesome (v9.6.0)
+------------------------------------
+
+https://github.com/Projektanker/Icons.Avalonia at fb84e2d09ce681eadd088ca8789f0ae8f8ad8a1e
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Semi.Avalonia (v11.2.1.4)
+------------------------------------
+
+https://github.com/irihitech/Semi.Avalonia at 78bc6c370b19513e64bebb40d9e4bbdcbebec86a
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Semi.Avalonia.DataGrid (v11.2.1.4)
+------------------------------------
+
+https://github.com/irihitech/Semi.Avalonia at 78bc6c370b19513e64bebb40d9e4bbdcbebec86a
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for ValueConverters.Avalonia (v3.1.22)
+------------------------------------
+
+https://github.com/emako/ValueConverters.Avalonia at 48e274a71a917fb663a6c9f90948d4abdb5785df
+
+Available at https://aka.ms/deprecateLicenseUrl
+
+LICENSE.txt
+
+
+License notice for Avalonia.Angle.Windows.Natives (v2.1.22045.20230930)
+------------------------------------
+
+https://github.com/AvaloniaUI/angle/ at 26406952a84f41c4be1e762884cda61fd2e022a9
+
+https://avaloniaui.net/
+
+Copyright 2013-2023 © The AvaloniaUI Project
+
+Available at https://aka.ms/deprecateLicenseUrl
+
+LICENSE
+
+
+License notice for Avalonia.BuildServices (v0.0.31)
+------------------------------------
+
+https://avaloniaui.net/
+
+Copyright 2023-2024 © The AvaloniaUI Project
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Avalonia.FreeDesktop (v11.2.4)
+------------------------------------
+
+https://github.com/AvaloniaUI/Avalonia/ at 634014365673c4c3e3bf885f78da332ff75e1321
+
+https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+
+Copyright 2013-2025 © The AvaloniaUI Project
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Avalonia.Native (v11.2.4)
+------------------------------------
+
+https://github.com/AvaloniaUI/Avalonia/ at 634014365673c4c3e3bf885f78da332ff75e1321
+
+https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+
+Copyright 2013-2025 © The AvaloniaUI Project
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Avalonia.Remote.Protocol (v11.2.4)
+------------------------------------
+
+https://github.com/AvaloniaUI/Avalonia/ at 634014365673c4c3e3bf885f78da332ff75e1321
+
+https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+
+Copyright 2013-2025 © The AvaloniaUI Project
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Avalonia.Skia (v11.2.4)
+------------------------------------
+
+https://github.com/AvaloniaUI/Avalonia/ at 634014365673c4c3e3bf885f78da332ff75e1321
+
+https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+
+Copyright 2013-2025 © The AvaloniaUI Project
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Avalonia.Win32 (v11.2.4)
+------------------------------------
+
+https://github.com/AvaloniaUI/Avalonia/ at 634014365673c4c3e3bf885f78da332ff75e1321
+
+https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+
+Copyright 2013-2025 © The AvaloniaUI Project
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Avalonia.X11 (v11.2.4)
+------------------------------------
+
+https://github.com/AvaloniaUI/Avalonia/ at 634014365673c4c3e3bf885f78da332ff75e1321
+
+https://avaloniaui.net/?utm_source=nuget&utm_medium=referral&utm_content=project_homepage_link
+
+Copyright 2013-2025 © The AvaloniaUI Project
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for HarfBuzzSharp (v7.3.0.3)
+------------------------------------
+
+https://github.com/mono/SkiaSharp at 9699cdf046a989423a5e5eca68e7fd813486d81c
+
+https://go.microsoft.com/fwlink/?linkid=868515
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for HarfBuzzSharp.NativeAssets.Linux (v7.3.0.3)
+------------------------------------
+
+https://github.com/mono/SkiaSharp at 9699cdf046a989423a5e5eca68e7fd813486d81c
+
+https://go.microsoft.com/fwlink/?linkid=868515
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for HarfBuzzSharp.NativeAssets.macOS (v7.3.0.3)
+------------------------------------
+
+https://github.com/mono/SkiaSharp at 9699cdf046a989423a5e5eca68e7fd813486d81c
+
+https://go.microsoft.com/fwlink/?linkid=868515
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for HarfBuzzSharp.NativeAssets.WebAssembly (v7.3.0.3)
+------------------------------------
+
+https://github.com/mono/SkiaSharp at 9699cdf046a989423a5e5eca68e7fd813486d81c
+
+https://go.microsoft.com/fwlink/?linkid=868515
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for HarfBuzzSharp.NativeAssets.Win32 (v7.3.0.3)
+------------------------------------
+
+https://github.com/mono/SkiaSharp at 9699cdf046a989423a5e5eca68e7fd813486d81c
+
+https://go.microsoft.com/fwlink/?linkid=868515
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for HidApi.Net (v1.1.0)
+------------------------------------
+
+https://github.com/badcel/HidApi.Net at ca300b23145f4c2689f382413f66e8c440562295
+
+Marcel Tiede
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Irihi.Avalonia.Shared (v0.2.1)
+------------------------------------
+
+https://github.com/irihitech/Irihi.Avalonia.Shared at 1ad82f8be813e0c74814cd641c5fb89b5a9138c7
+
+https://github.com/irihitech/Ursa.Avalonia
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Irihi.Avalonia.Shared.Contracts (v0.2.1)
+------------------------------------
+
+https://github.com/irihitech/Irihi.Avalonia.Shared at 1ad82f8be813e0c74814cd641c5fb89b5a9138c7
+
+https://github.com/irihitech/Ursa.Avalonia
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for MicroCom.Runtime (v0.11.0)
+------------------------------------
+
+https://github.com/kekekeks/MicroCom
+
+Copyright 2021 © Nikita Tsukanov
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Bcl.AsyncInterfaces (v7.0.0)
+------------------------------------
+
+https://github.com/dotnet/runtime at d099f075e45d2aa6007a22b71b45a08758559f80
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.CSharp (v4.7.0)
+------------------------------------
+
+https://github.com/dotnet/corefx
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Configuration (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Configuration.Abstractions (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Configuration.Binder (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Configuration.CommandLine (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Configuration.EnvironmentVariables (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Configuration.FileExtensions (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Configuration.Json (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Configuration.UserSecrets (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.DependencyInjection.Abstractions (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Diagnostics (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Diagnostics.Abstractions (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.FileProviders.Abstractions (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.FileProviders.Physical (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.FileSystemGlobbing (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Logging (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Logging.Abstractions (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Logging.Configuration (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Logging.Console (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Logging.Debug (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Logging.EventLog (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Logging.EventSource (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Options (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Options.ConfigurationExtensions (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Extensions.Primitives (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.NETCore.Platforms (v1.1.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for Microsoft.NETCore.Targets (v1.1.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for SkiaSharp (v2.88.9)
+------------------------------------
+
+https://github.com/mono/SkiaSharp at 9699cdf046a989423a5e5eca68e7fd813486d81c
+
+https://go.microsoft.com/fwlink/?linkid=868515
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for SkiaSharp.NativeAssets.Linux (v2.88.9)
+------------------------------------
+
+https://github.com/mono/SkiaSharp at 9699cdf046a989423a5e5eca68e7fd813486d81c
+
+https://go.microsoft.com/fwlink/?linkid=868515
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for SkiaSharp.NativeAssets.macOS (v2.88.9)
+------------------------------------
+
+https://github.com/mono/SkiaSharp at 9699cdf046a989423a5e5eca68e7fd813486d81c
+
+https://go.microsoft.com/fwlink/?linkid=868515
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for SkiaSharp.NativeAssets.WebAssembly (v2.88.9)
+------------------------------------
+
+https://github.com/mono/SkiaSharp at 9699cdf046a989423a5e5eca68e7fd813486d81c
+
+https://go.microsoft.com/fwlink/?linkid=868515
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for SkiaSharp.NativeAssets.Win32 (v2.88.9)
+------------------------------------
+
+https://github.com/mono/SkiaSharp at 9699cdf046a989423a5e5eca68e7fd813486d81c
+
+https://go.microsoft.com/fwlink/?linkid=868515
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for System.Collections (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Diagnostics.Contracts (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Diagnostics.Debug (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Diagnostics.DiagnosticSource (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for System.Diagnostics.EventLog (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for System.Globalization (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.IO (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.IO.Pipelines (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for System.Linq (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Linq.Expressions (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Linq.Queryable (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Memory (v4.5.5)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+License available at https://github.com/dotnet/corefx/blob/master/LICENSE.TXT
+
+
+License notice for System.ObjectModel (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Reflection (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Reflection.Emit (v4.7.0)
+------------------------------------
+
+https://github.com/dotnet/corefx
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for System.Reflection.Emit.ILGeneration (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Reflection.Emit.Lightweight (v4.7.0)
+------------------------------------
+
+https://github.com/dotnet/corefx
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for System.Reflection.Extensions (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Reflection.Primitives (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Reflection.TypeExtensions (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Resources.ResourceManager (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Runtime (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Runtime.Extensions (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Text.Encoding (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Text.Encodings.Web (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for System.Text.Json (v9.0.2)
+------------------------------------
+
+https://github.com/dotnet/runtime at 80aa709f5d919c6814726788dc6dabe23e79e672
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for System.Threading (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Threading.Tasks (v4.3.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at http://go.microsoft.com/fwlink/?LinkId=329770
+
+
+License notice for System.Threading.Tasks.Extensions (v4.5.4)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+License available at https://github.com/dotnet/corefx/blob/master/LICENSE.TXT
+
+
+License notice for System.ValueTuple (v4.5.0)
+------------------------------------
+
+https://dot.net/
+
+Copyright © Microsoft Corporation.  All rights reserved.
+
+License available at https://github.com/dotnet/corefx/blob/master/LICENSE.TXT
+
+
+License notice for Tmds.DBus.Protocol (v0.20.0)
+------------------------------------
+
+https://github.com/tmds/Tmds.DBus.git at db7af5a46d316dda9886663fd3a006f6199343e1
+
+Tom Deseyn
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for WCharT.Net (v0.1.2)
+------------------------------------
+
+https://github.com/badcel/WCharT.Net at 7645c37abbacf034a86209f58c68b4505c2f6259
+
+Marcel Tiede
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+
+﻿License notice for CommunityToolkit.Mvvm (v8.4.0)
+------------------------------------
+
+https://github.com/CommunityToolkit/dotnet at 638b41dad30dffabb123a39aa38eabc7e3721371
+
+(c) .NET Foundation and Contributors. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for HidApi.Net (v1.1.0)
+------------------------------------
+
+https://github.com/badcel/HidApi.Net at ca300b23145f4c2689f382413f66e8c440562295
+
+Marcel Tiede
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.NET.ILLink.Tasks (v8.0.13)
+------------------------------------
+
+https://github.com/dotnet/runtime at eba546b0f0d448e0176a2222548fd7a2fbf464c0
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for NetEscapades.EnumGenerators (v1.0.0-beta11)
+------------------------------------
+
+https://github.com/andrewlock/NetEscapades.EnumGenerators at abc942713a615b977223ecaf36ebb9bad138cdeb
+
+Copyright © AndrewLock
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for WCharT.Net (v0.1.2)
+------------------------------------
+
+https://github.com/badcel/WCharT.Net at 7645c37abbacf034a86209f58c68b4505c2f6259
+
+Marcel Tiede
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+﻿License notice for Microsoft.NET.ILLink.Tasks (v8.0.13)
+------------------------------------
+
+https://github.com/dotnet/runtime at eba546b0f0d448e0176a2222548fd7a2fbf464c0
+
+https://dot.net/
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Licensed under MIT
+
+Available at https://licenses.nuget.org/MIT
+
+
+License notice for Microsoft.Windows.SDK.Win32Docs (v0.1.42-alpha)
+------------------------------------
+
+https://github.com/microsoft/win32metadata
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+License available at https://aka.ms/WinSDKLicenseURL
+
+
+License notice for Microsoft.Windows.SDK.Win32Metadata (v60.0.34-preview)
+------------------------------------
+
+https://github.com/microsoft/win32metadata.git
+
+https://github.com/microsoft/win32metadata
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Available at https://aka.ms/deprecateLicenseUrl
+
+sdk_license.txt
+
+
+License notice for Microsoft.Windows.WDK.Win32Metadata (v0.11.4-experimental)
+------------------------------------
+
+https://github.com/microsoft/wdkmetadata.git
+
+https://github.com/microsoft/wdkmetadata
+
+Copyright © Microsoft Corporation. All rights reserved.
+
+Available at https://aka.ms/deprecateLicenseUrl
+
+sdk_license.txt
