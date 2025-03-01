@@ -19,8 +19,8 @@
                 <Flyout>
                     <StackPanel Margin="10">
                         <TextBlock> 作者:B站-暗光启天</TextBlock>
-                        <TextBlock> 版本：0.1.2</TextBlock>
-                        <TextBlock> Powered by AvaloniaUI/Semi.Avalonia/Ursa.Avalonia</TextBlock>
+                        <TextBlock> 版本：0.1.3</TextBlock>
+                        <TextBlock> Thanks for AvaloniaUI/Semi.Avalonia/Ursa.Avalonia</TextBlock>
                     </StackPanel>
                 </Flyout>
             </Button.Flyout>
