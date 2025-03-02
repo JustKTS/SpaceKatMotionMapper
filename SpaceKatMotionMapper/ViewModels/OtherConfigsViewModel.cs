@@ -47,6 +47,7 @@ public partial class OtherConfigsViewModel : ViewModelBase
         if (index < 0 || index >= KatActionConfigGroups.Count) return;
         _katActionConfigVmManageService.RemoveConfig(KatActionConfigGroups[index].Id);
         _activationStatusService.DeleteActivationStatus(KatActionConfigGroups[index].Id);
+        _katActionFileService.DeleteConfigGroupFromSysConf(KatActionConfigGroups[index].Id);
         KatActionConfigGroups.RemoveAt(index);
 
         if (KatActionConfigGroups.Count != 0) return;

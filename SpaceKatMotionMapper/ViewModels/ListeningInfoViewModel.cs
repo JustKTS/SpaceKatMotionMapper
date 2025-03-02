@@ -126,7 +126,7 @@ public partial class ListeningInfoViewModel : ViewModelBase
             UseAlt = hotKey.UseAlt;
             UseShift = hotKey.UseShift;
             HotKey = hotKey.HotKey;
-            // SelectedKatButton = hotKey.BindKatButtonEnum;
+            SelectedKatButton = hotKey.BindKatButtonEnum;
         });
     }
 
@@ -224,6 +224,14 @@ public partial class ListeningInfoViewModel : ViewModelBase
         _katActionRecognizeService.ConnectionChanged += (_, isConnected) =>
         {
             IsConnected = isConnected;
+            if (!isConnected)
+            {
+                _popUpNotificationService.Pop(NotificationType.Warning, "连接断开");
+            }
+            else
+            {
+                _popUpNotificationService.Pop(NotificationType.Success, "连接成功");
+            }
         };
 
     }
