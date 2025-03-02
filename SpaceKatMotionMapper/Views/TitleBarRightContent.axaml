@@ -20,7 +20,7 @@
                     <StackPanel Margin="10">
                         <TextBlock> 作者:B站-暗光启天</TextBlock>
                         <TextBlock> 版本：0.1.4</TextBlock>
-                        <TextBlock> Thanks for AvaloniaUI/Semi.Avalonia/Ursa.Avalonia</TextBlock>
+                        <TextBlock> Powered by AvaloniaUI/Semi.Avalonia/Ursa.Avalonia</TextBlock>
                     </StackPanel>
                 </Flyout>
             </Button.Flyout>
