@@ -58,7 +58,7 @@ public partial class MainWindow : UrsaWindow
     protected override void OnLoaded(RoutedEventArgs e)
     {
         base.OnLoaded(e);
-        App.GetRequiredService<OfficialMapperSwitchService>().RegisterHandleFunc();
+        App.GetRequiredService<OfficialMapperSwitchService>().RegisterHandle();
         App.GetRequiredService<ListeningInfoViewModel>().RegisterHotKeyCommand.Execute(null);
     }
 }

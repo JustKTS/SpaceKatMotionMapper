@@ -9,6 +9,7 @@ using SpaceKatHIDWrapper.DeviceWrappers;
 using SpaceKatHIDWrapper.Functions;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatHIDWrapper.Services;
+using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
@@ -101,12 +102,12 @@ public partial class ListeningInfoViewModel : ViewModelBase
     {
         if (value)
         {
-            _officialMapperSwitchService.CloseOfficialMapper();
+            OfficialWareConfigFunctions.CloseOfficialMapper();
             _katActionActivateService.IsActivated = true;
         }
         else
         {
-            _officialMapperSwitchService.OpenOfficialMapper();
+            OfficialWareConfigFunctions.OpenOfficialMapper();
             _katActionActivateService.IsActivated = false;
         }
     }

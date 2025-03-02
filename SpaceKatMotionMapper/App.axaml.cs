@@ -9,17 +9,22 @@ using Avalonia.Markup.Xaml;
 using HidApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Projektanker.Icons.Avalonia;
 using Projektanker.Icons.Avalonia.FontAwesome;
+using Serilog;
+using Serilog.Events;
 using SpaceKatHIDWrapper.DeviceWrappers;
 using SpaceKatHIDWrapper.Services;
+using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.ViewModels;
 using SpaceKatMotionMapper.Views;
-using Ursa.Controls;
 using Win32Helpers;
 using WindowsInput;
+using ILogger = Serilog.ILogger;
+using Path = System.IO.Path;
 
 namespace SpaceKatMotionMapper;
 
@@ -103,6 +108,23 @@ public partial class App : Application
                 services.AddSingleton<KatActionConfigVMManageService>();
                 services.AddSingleton<OfficialMapperSwitchService>();
             })
+            .UseSerilog()
+            .ConfigureLogging(logging =>
+            {
+                logging.ClearProviders();
+                var logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    nameof(SpaceKatMotionMapper), "Log.log");
+                Log.Logger = new LoggerConfiguration()
+                    .MinimumLevel.Debug()
+                    .Enrich.FromLogContext()
+                    .WriteTo.File(logPath,rollingInterval: RollingInterval.Day)
+                    // .WriteTo.Trace(
+                    //     outputTemplate:
+                    //     "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                    .MinimumLevel.Information()
+                    .CreateLogger();
+                logging.Services.AddSingleton<ILogger>(Log.Logger);
+            })
             .Build();
     }
 
@@ -125,15 +147,13 @@ public partial class App : Application
             case IClassicDesktopStyleApplicationLifetime desktop:
                 var ret = SetSingleton();
                 if (!ret)
-                {   
+                {
                     var wrongWindow = new SingletonWrongWindow();
                     desktop.MainWindow = wrongWindow;
-                    desktop.MainWindow.Closed += (_, _) =>
-                    {
-                        desktop.Shutdown();
-                    };
+                    desktop.MainWindow.Closed += (_, _) => { desktop.Shutdown(); };
                     return;
                 }
+
                 var mainWindow = GetService<MainWindow>();
                 desktop.MainWindow = mainWindow;
                 mainWindow.Closed += (_, _) =>
@@ -155,8 +175,8 @@ public partial class App : Application
                 var ofMs =
                     GetRequiredService<OfficialMapperSwitchService>();
                 ofMs.UnregisterHotKeyWrapper();
-                ofMs.UnregisterHandleFunc();
-                OfficialMapperSwitchService.CleanAllChange();
+                ofMs.UnregisterHandle();
+                OfficialWareConfigFunctions.CleanAllChange();
 
                 Hid.Exit();
                 _mutex?.WaitOne();
@@ -177,8 +197,9 @@ public partial class App : Application
         window.WindowState = WindowState.Normal;
         window.ShowInTaskbar = true;
     }
-    
+
     private static Mutex? _mutex;
+
     private static bool SetSingleton()
     {
         _mutex = new Mutex(true, "SpaceMotionMapper", out var ret);
