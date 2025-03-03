@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LanguageExt;
+using LanguageExt.ClassInstances.Const;
 using SpaceKatMotionMapper.Models;
 using WindowsInput;
 
@@ -44,6 +45,7 @@ public partial class KeyActionViewModel : ObservableObject
                     }
                     catch (Exception e)
                     {
+                        Console.WriteLine(e);
                         return false;
                     }
                   

@@ -80,6 +80,7 @@ public class ActionTypeKeyOrButtonConverter : IValueConverter
         }
         catch (Exception e)
         {
+            Console.WriteLine(e);
             return "None";
         }
        

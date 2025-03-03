@@ -40,7 +40,9 @@ public class KatActionConfigVMManageService
     
     public  Result<KatActionConfigViewModel> GetDefaultConfig()
     {
-        return _commonConfigGuid == Guid.Empty ? new Result<KatActionConfigViewModel>(new Exception("全局配置未设置")) : _configs[_commonConfigGuid];
+        return _commonConfigGuid == Guid.Empty 
+            ? new Result<KatActionConfigViewModel>(new Exception("全局配置未设置")) 
+            : _configs[_commonConfigGuid];
     }
 
 

@@ -38,6 +38,23 @@ public partial class ListeningInfoViewModel : ViewModelBase
         }
     }
 
+    private void ConnectionChangeHandle(object? obj, bool isConnected)
+    {
+        IsConnected = isConnected;
+        if (!isConnected)
+        {
+            const string message = "连接断开";
+            _transparentInfoService.DisplayOtherInfo(message);
+            _popUpNotificationService.Pop(NotificationType.Warning, message);
+        }
+        else
+        {
+            const string message = "连接成功";
+            _transparentInfoService.DisplayOtherInfo(message);
+            _popUpNotificationService.Pop(NotificationType.Success, message);
+        }
+    }
+
     private async Task ConnectDeviceAsync()
     {
         var device = await KatDeviceFunction.FindKatDevice();
@@ -92,11 +109,11 @@ public partial class ListeningInfoViewModel : ViewModelBase
     [ObservableProperty] private HotKeyCodeEnum _hotKey = HotKeyCodeEnum.D;
 
     [ObservableProperty] private KatButtonEnum _selectedKatButton = KatButtonEnum.None;
-    
+
     public static KatButtonEnum[] KatButtonList => KatButtonEnumExtensions.GetValues();
 
     public static HotKeyCodeEnum[] HotKeyCodes => HotKeyCodeEnumExtensions.GetValues();
-    
+
 
     partial void OnIsOfficialMapperOffChanged(bool value)
     {
@@ -136,7 +153,8 @@ public partial class ListeningInfoViewModel : ViewModelBase
     {
         if (UseShift || UseAlt || UseCtrl)
         {
-            var ret = _officialMapperSwitchService.RegisterHotKeyWrapper(UseCtrl, UseAlt, UseShift, HotKey, SelectedKatButton);
+            var ret = _officialMapperSwitchService.RegisterHotKeyWrapper(UseCtrl, UseAlt, UseShift, HotKey,
+                SelectedKatButton);
             var ret2 = ret.Match(s =>
             {
                 if (!s)
@@ -174,9 +192,20 @@ public partial class ListeningInfoViewModel : ViewModelBase
     {
         _katActionRecognizeService.DataReceived += (_, data) =>
         {
-            KatMotion = data.Motion.ToStringFast();
-            PressMode = data.KatPressMode.ToStringFast();
-            RepeatCount = data.RepeatCount;
+            Dispatcher.UIThread.Invoke(() =>
+            {
+                KatMotion = data.Motion.ToStringFast();
+                PressMode = data.KatPressMode.ToStringFast();
+                RepeatCount = data.RepeatCount;
+                try
+                {
+                    _transparentInfoService.DisplayKatAction(data);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            });
         };
     }
 
@@ -196,9 +225,10 @@ public partial class ListeningInfoViewModel : ViewModelBase
 
 
     private readonly PopUpNotificationService _popUpNotificationService;
+    private readonly TransparentInfoService _transparentInfoService;
 
 #if DEBUG
-    public ListeningInfoViewModel() : this(null!, null!, null!, null!, null!, null!, null!)
+    public ListeningInfoViewModel() : this(null!, null!, null!, null!, null!, null!, null!, null!)
     {
     }
 #endif
@@ -210,7 +240,8 @@ public partial class ListeningInfoViewModel : ViewModelBase
         KatActionRecognizeService katActionRecognizeService,
         OfficialMapperSwitchService officialMapperSwitchService,
         KatActionActivateService katActionActivateService,
-        ILocalSettingsService localSettingsService)
+        ILocalSettingsService localSettingsService,
+        TransparentInfoService transparentInfoService)
     {
         _deviceDataWrapper = deviceDataWrapper;
         _katActionRecognizeService = katActionRecognizeService;
@@ -219,23 +250,17 @@ public partial class ListeningInfoViewModel : ViewModelBase
         _katActionActivateService = katActionActivateService;
         _localSettingsService = localSettingsService;
         _currentForeProgramHelper = currentForeProgramHelper;
+        _transparentInfoService = transparentInfoService;
         _currentForeProgramHelper.ForeProgramChanged += ForeProgramChangedCallback;
         StartKatListening();
         LoadHotKey();
-        _katActionRecognizeService.ConnectionChanged += (_, isConnected) =>
-        {
-            IsConnected = isConnected;
-            if (!isConnected)
-            {
-                _popUpNotificationService.Pop(NotificationType.Warning, "连接断开");
-            }
-            else
-            {
-                _popUpNotificationService.Pop(NotificationType.Success, "连接成功");
-            }
-        };
-
+        _katActionRecognizeService.ConnectionChanged += ConnectionChangeHandle;
     }
 }
 
-public record HotKeyRecord(bool UseCtrl, bool UseAlt, bool UseShift, HotKeyCodeEnum HotKey, KatButtonEnum BindKatButtonEnum);
+public record HotKeyRecord(
+    bool UseCtrl,
+    bool UseAlt,
+    bool UseShift,
+    HotKeyCodeEnum HotKey,
+    KatButtonEnum BindKatButtonEnum);

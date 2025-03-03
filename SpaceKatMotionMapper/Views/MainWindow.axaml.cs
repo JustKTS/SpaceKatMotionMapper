@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.Messaging;
 using SpaceKatMotionMapper.Services;
@@ -38,14 +39,16 @@ public partial class MainWindow : UrsaWindow
 
     private void PopupNotification(object sender, PopupNotificationData e)
     {
-        _manager.Show(
+     
+        Dispatcher.UIThread.Invoke(() => {_manager.Show(
             new Notification()
             {
                 Content = e.Message,
                 ShowIcon = true,
                 Title = e.NotificationType.ToString(),
                 Type = e.NotificationType
-            });
+            }); });
+        
     }
 
     private void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)

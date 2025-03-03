@@ -69,6 +69,9 @@ public partial class App : Application
             .ConfigureServices(services =>
             {
                 services.AddSingleton<MainWindow>();
+                services.AddSingleton<TransparentInfoWindow>();
+                services.AddSingleton<TransparentInfoViewModel>();
+                
                 services.AddSingleton<MainView>();
                 services.AddSingleton<MainViewModel>();
 
@@ -87,7 +90,9 @@ public partial class App : Application
                 services.AddSingleton<DeadZoneConfigView>();
                 services.AddSingleton<DeadZoneConfigViewModel>();
                 services.AddSingleton<TimeAndDeadZoneVMService>();
-
+                
+                services.AddSingleton<PopUpNotificationService>();
+                services.AddSingleton<TransparentInfoService>();
 
                 services.AddSingleton<ITopLevelHelper, TopLevelHelper>();
                 services.AddSingleton<IStorageProviderService, StorageProviderService>();
@@ -98,7 +103,6 @@ public partial class App : Application
                 services.AddSingleton<InputSimulator>();
                 services.AddSingleton<KatActionActivateService>();
                 services.AddSingleton<KatActionFileService>();
-                services.AddSingleton<PopUpNotificationService>();
                 services.AddSingleton<CommonConfigViewModel>();
                 services.AddTransient<KatActionConfigViewModel>();
                 services.AddSingleton<OtherConfigsViewModel>();

@@ -14,14 +14,14 @@ public class KatDeadZoneConfigService(
     public KatDeadZoneConfig LoadDefaultDeadZoneConfigs()
     {
         var configRet = katActionConfigVmManageService.GetDefaultConfig();
-        var config = configRet.Match<KatDeadZoneConfig?>(config => config.DeadZoneConfig with {}, ex => null);
+        var config = configRet.Match<KatDeadZoneConfig?>(config => config.DeadZoneConfig with { }, ex => null);
         return config ?? new KatDeadZoneConfig();
     }
 
     public KatDeadZoneConfig? LoadDeadZoneConfigs(Guid configGroupId)
     {
         var configRet = katActionConfigVmManageService.GetConfig(configGroupId);
-        return configRet.Match<KatDeadZoneConfig?>(config => config.DeadZoneConfig with {}, ex => null);
+        return configRet.Match<KatDeadZoneConfig?>(config => config.DeadZoneConfig with { }, ex => null);
     }
 
     public Result<bool> SaveDefaultDeadZoneConfig(KatDeadZoneConfig deadZoneConfig)
@@ -70,6 +70,7 @@ public class KatDeadZoneConfigService(
         vmRet.IfSucc(vm => katActionRecognizeService.SetDeadZone(vm.DeadZoneConfig.Upper, vm.DeadZoneConfig.Lower));
         return true;
     }
+
     public bool ApplyDefaultDeadZoneConfig()
     {
         var vmRet = katActionConfigVmManageService.GetDefaultConfig();

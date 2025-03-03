@@ -1,0 +1,93 @@
+﻿<u:UrsaWindow
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:views="clr-namespace:SpaceKatMotionMapper.Views"
+    xmlns:icon="https://github.com/projektanker/icons.avalonia"
+    xmlns:vms="clr-namespace:SpaceKatMotionMapper.ViewModels"
+    x:Class="SpaceKatMotionMapper.Views.TransparentInfoWindow"
+    Title="信息窗口"
+    Background="Transparent"
+    ShowInTaskbar="False"
+    ShowActivated="False"
+    ExtendClientAreaToDecorationsHint="False"
+    ExtendClientAreaChromeHints="NoChrome"
+    ExtendClientAreaTitleBarHeightHint="-1"
+    SystemDecorations="None"
+    Topmost="True"
+    IsMinimizeButtonVisible="False"
+    IsFullScreenButtonVisible="False"
+    IsCloseButtonVisible="False"
+    IsManagedResizerVisible="False"
+    IsRestoreButtonVisible="False"
+    IsHitTestVisible="False"
+    x:DataType="vms:TransparentInfoViewModel">
+
+    <u:UrsaWindow.Styles>
+        <Style Selector="Panel#InfoPanel">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.15" Easing="CubicEaseInOut" />
+                </Transitions>
+            </Setter>
+        </Style>
+    </u:UrsaWindow.Styles>
+
+    <Panel Name="InfoPanel" Opacity="0" >
+        <Border CornerRadius="10" Background="Gray" Opacity="0.4"
+                PointerPressed="InputElement_OnPointerPressed">
+            <Border.Effect>
+                <DropShadowEffect></DropShadowEffect>
+            </Border.Effect>
+        </Border>
+        <Button
+            Classes="Primary" Theme="{DynamicResource BorderlessButton}"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Margin="5"
+            IsVisible="{Binding IsAdjustMode}"
+            Command="{Binding SaveConfigCommand}">
+            <icon:Icon HorizontalAlignment="Center" FontSize="20"
+                       Value="fa-solid fa-lock" />
+        </Button>
+        <StackPanel HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IsVisible="{Binding !IsOtherInfo}"
+                    Orientation="Horizontal" Spacing="20"
+                    IsHitTestVisible="False">
+            <TextBlock
+                VerticalAlignment="Center"
+                Classes="H4"
+                Theme="{StaticResource TitleTextBlock}"
+                Text="{Binding MotionName}"
+                
+            />
+            <TextBlock
+                VerticalAlignment="Center"
+                Classes="H4"
+                Theme="{StaticResource TitleTextBlock}"
+                Text="{Binding PressModeName}" />
+            <TextBlock
+                VerticalAlignment="Center"
+                Classes="H4"
+                Theme="{StaticResource TitleTextBlock}"
+                Text="触发次数：" />
+            <TextBlock
+                VerticalAlignment="Center"
+                Classes="H4"
+                Theme="{StaticResource TitleTextBlock}"
+                Text="{Binding KatAction.RepeatCount}" />
+        </StackPanel>
+        <TextBlock
+            IsHitTestVisible="False"
+            TextWrapping="Wrap"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            Classes="H4"
+            Theme="{StaticResource TitleTextBlock}"
+            IsVisible="{Binding IsOtherInfo}"
+            Text="{Binding OtherInfo}" />
+    </Panel>
+</u:UrsaWindow>
