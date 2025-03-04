@@ -41,6 +41,11 @@
                       HeadersVisibility="All"
                       ScrollViewer.AllowAutoHide="True"
                       ItemsSource="{Binding ConfigViewModels}">
+                <DataGrid.Styles>
+                    <Style Selector="TextBlock">
+                        <Setter Property="TextWrapping" Value="WrapWithOverflow" />
+                    </Style>
+                </DataGrid.Styles>
                 <DataGrid.Columns>
                     <DataGridTextColumn
                         Width="1*"
@@ -88,10 +93,10 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Width="1*" Header="长推多击触发缩放系数">
+                    <DataGridTemplateColumn Width="1.5*" Header="长推多击触发缩放系数">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate x:DataType="vms:MotionTimeSingleConfigViewModel">
-                                <Grid ColumnDefinitions="Auto, *" Margin="5">
+                                <Grid ColumnDefinitions="Auto, 3*, *" Margin="5">
                                     <CheckBox
                                         Margin="5"
                                         VerticalAlignment="Center"
@@ -104,8 +109,15 @@
                                         IsEnabled="{Binding #UseScaleCheckBox.IsChecked}"
                                         Grid.Column="1"
                                         Minimum="1" Maximum="10"
+                                        TickFrequency="0.1"
+                                        IsSnapToTickEnabled="True"
                                         Value="{Binding LongReachRepeatScaleFactor}">
                                     </Slider>
+                                    <TextBlock
+                                        Grid.Column="2"
+                                        VerticalAlignment="Center"
+                                        Text="{Binding LongReachRepeatScaleFactor, StringFormat=0.0}">
+                                    </TextBlock>
                                 </Grid>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

@@ -13,6 +13,13 @@ public static class KatDeviceFunction
             .Select(deviceInfo => deviceInfo.ConnectToDevice())).FirstOrDefault();
     }
 
+    public static async Task<Device?> FindKatDeviceById(int vendorId, int productId)
+    {
+        var devices = await Task.Run(() => Hid.Enumerate());
+        return (devices.Where(deviceInfo => deviceInfo.VendorId == vendorId && deviceInfo.ProductId == productId)
+            .Select(deviceInfo => deviceInfo.ConnectToDevice())).FirstOrDefault();
+    }
+
     public static void StopDevice()
     {
         Hid.Exit();

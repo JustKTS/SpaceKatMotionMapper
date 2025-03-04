@@ -13,6 +13,8 @@ using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
+using SpaceKatMotionMapper.Views;
+using Ursa.Controls;
 using Win32Helpers;
 
 namespace SpaceKatMotionMapper.ViewModels;
@@ -46,19 +48,36 @@ public partial class ListeningInfoViewModel : ViewModelBase
             const string message = "连接断开";
             _transparentInfoService.DisplayOtherInfo(message);
             _popUpNotificationService.Pop(NotificationType.Warning, message);
+            DisconnectDevice();
         }
         else
         {
+            IsConnected = _deviceDataWrapper.IsConnected;
             const string message = "连接成功";
             _transparentInfoService.DisplayOtherInfo(message);
             _popUpNotificationService.Pop(NotificationType.Success, message);
+
+            _listenTask = Task.Run(async () =>
+            {
+                _katActionRecognizeService.ExitEvent.Reset();
+
+                try
+                {
+                    await _katActionRecognizeService.StartRecognizeMotionAsync();
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
+            });
         }
     }
 
     private async Task ConnectDeviceAsync()
     {
-        var device = await KatDeviceFunction.FindKatDevice();
-        if (device == null)
+        var isConnected = await _deviceDataWrapper.Connect();
+
+        if (!isConnected)
         {
             _popUpNotificationService.Pop(NotificationType.Warning, "未搜索到设备，是否已连接好？");
             IsConnected = true;
@@ -66,22 +85,7 @@ public partial class ListeningInfoViewModel : ViewModelBase
             return;
         }
 
-        _deviceDataWrapper.SetDevice(device);
-
         IsConnected = _deviceDataWrapper.IsConnected;
-        _listenTask = Task.Run(async () =>
-        {
-            _katActionRecognizeService.ExitEvent.Reset();
-
-            try
-            {
-                await _katActionRecognizeService.StartRecognizeMotionAsync();
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-            }
-        });
     }
 
     private void DisconnectDevice()
@@ -121,11 +125,13 @@ public partial class ListeningInfoViewModel : ViewModelBase
         {
             OfficialWareConfigFunctions.CloseOfficialMapper();
             _katActionActivateService.IsActivated = true;
+            _transparentInfoService.DisplayOtherInfo("官方映射已禁用");
         }
         else
         {
             OfficialWareConfigFunctions.OpenOfficialMapper();
             _katActionActivateService.IsActivated = false;
+            _transparentInfoService.DisplayOtherInfo("官方映射已启用");
         }
     }
 
@@ -192,6 +198,7 @@ public partial class ListeningInfoViewModel : ViewModelBase
     {
         _katActionRecognizeService.DataReceived += (_, data) =>
         {
+            if (!_katActionActivateService.IsActivated) return;
             Dispatcher.UIThread.Invoke(() =>
             {
                 KatMotion = data.Motion.ToStringFast();
@@ -223,12 +230,39 @@ public partial class ListeningInfoViewModel : ViewModelBase
 
     # endregion
 
+    # region 自动禁用
+
+    private readonly AutoDisableService _autoDisableService;
+    private readonly OverlayDialogOptions _options = new()
+    {
+        FullScreen = false,
+        HorizontalAnchor = HorizontalPosition.Center,
+        VerticalAnchor = VerticalPosition.Center,
+        HorizontalOffset = 0.0,
+        VerticalOffset = 0.0,
+        Mode = DialogMode.None,
+        Buttons = DialogButton.None,
+        Title = "",
+        CanLightDismiss = true,
+        CanDragMove = true,
+        IsCloseButtonVisible = true,
+        CanResize = true
+    };
+    
+    [RelayCommand]
+    private async Task ShowAutoDisplay()
+    {
+        await OverlayDialog.ShowModal<AutoDisableConfigView, AutoDisableViewModel>(
+            App.GetRequiredService<AutoDisableViewModel>(), MainWindow.LocalHost, options: _options);
+    }
+
+    #endregion
 
     private readonly PopUpNotificationService _popUpNotificationService;
     private readonly TransparentInfoService _transparentInfoService;
 
 #if DEBUG
-    public ListeningInfoViewModel() : this(null!, null!, null!, null!, null!, null!, null!, null!)
+    public ListeningInfoViewModel() : this(null!,null!, null!, null!, null!, null!, null!, null!, null!)
     {
     }
 #endif
@@ -241,7 +275,8 @@ public partial class ListeningInfoViewModel : ViewModelBase
         OfficialMapperSwitchService officialMapperSwitchService,
         KatActionActivateService katActionActivateService,
         ILocalSettingsService localSettingsService,
-        TransparentInfoService transparentInfoService)
+        TransparentInfoService transparentInfoService,
+        AutoDisableService autoDisableService)
     {
         _deviceDataWrapper = deviceDataWrapper;
         _katActionRecognizeService = katActionRecognizeService;
@@ -251,6 +286,7 @@ public partial class ListeningInfoViewModel : ViewModelBase
         _localSettingsService = localSettingsService;
         _currentForeProgramHelper = currentForeProgramHelper;
         _transparentInfoService = transparentInfoService;
+        _autoDisableService = autoDisableService;
         _currentForeProgramHelper.ForeProgramChanged += ForeProgramChangedCallback;
         StartKatListening();
         LoadHotKey();

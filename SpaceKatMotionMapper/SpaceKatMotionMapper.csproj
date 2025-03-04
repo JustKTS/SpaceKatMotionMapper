@@ -9,6 +9,7 @@
         <EnableEnumGeneratorInterceptor>true</EnableEnumGeneratorInterceptor>
         <AssemblyVersion>0.1.0</AssemblyVersion>
         <FileVersion>0.1.0</FileVersion>
+        <ApplicationIcon>Assets\SpaceKatDevice.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -61,6 +62,10 @@
       </Compile>
       <Compile Update="Views\TimeAndDeadZoneSettingView.axaml.cs">
         <DependentUpon>TimeAndDeadZoneSettingView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\RunningProgramSelector.axaml.cs">
+        <DependentUpon>CurrentRunningProgramSelector.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
     </ItemGroup>

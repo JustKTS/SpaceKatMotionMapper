@@ -76,6 +76,7 @@ public partial class App : Application
                 services.AddSingleton<MainViewModel>();
 
                 services.AddSingleton<ListeningInfoViewModel>();
+                services.AddSingleton<AutoDisableViewModel>();
 
                 services.AddSingleton<ConfigCenterViewModel>();
 
@@ -90,6 +91,7 @@ public partial class App : Application
                 services.AddSingleton<DeadZoneConfigView>();
                 services.AddSingleton<DeadZoneConfigViewModel>();
                 services.AddSingleton<TimeAndDeadZoneVMService>();
+                services.AddSingleton<AutoDisableService>();
                 
                 services.AddSingleton<PopUpNotificationService>();
                 services.AddSingleton<TransparentInfoService>();

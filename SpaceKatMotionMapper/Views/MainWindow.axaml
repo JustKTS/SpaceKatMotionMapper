@@ -9,7 +9,7 @@
     Title="SpaceKat动作映射工具"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    Icon="/Assets/avalonia-logo.ico"
+    Icon="/Assets/SpaceKatDevice.png"
     mc:Ignorable="d">
     <u:UrsaWindow.RightContent>
         <views:TitleBarRightContent />

@@ -40,7 +40,7 @@
                                Text="{Binding IsConnected, Converter={StaticResource BoolToStringConverter}}" />
                 </Panel>
             </ToggleButton>
-            <Grid Grid.Row="1" ColumnDefinitions="*, Auto">
+            <Grid Grid.Row="1" ColumnDefinitions="*, Auto,Auto">
                 <ToggleButton Grid.Column="0"
                               Margin="5"
                               HorizontalAlignment="Stretch"
@@ -49,7 +49,6 @@
                     启用(禁用官方驱动)
                 </ToggleButton>
                 <Button Grid.Column="1" HorizontalAlignment="Stretch"
-
                         VerticalAlignment="Stretch" Margin="5">
                     <icon:Icon FontSize="20" Value="fa-solid fa-gear" />
                     <Button.Flyout>
@@ -81,7 +80,7 @@
                                           ItemsSource="{Binding HotKeyCodes}"
                                           SelectedItem="{Binding HotKey}">
                                 </ComboBox>
-                                <Grid Margin="5"  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4"
+                                <Grid Margin="5" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4"
                                       HorizontalAlignment="Center"
                                       RowDefinitions="Auto, *">
                                     <TextBlock
@@ -90,7 +89,8 @@
                                         Theme="{StaticResource TitleTextBlock}">
                                         绑定快捷键到Kat按键
                                     </TextBlock>
-                                    <Border Grid.Row="1" HorizontalAlignment="Center" Theme="{StaticResource RadioButtonGroupBorder}">
+                                    <Border Grid.Row="1" HorizontalAlignment="Center"
+                                            Theme="{StaticResource RadioButtonGroupBorder}">
                                         <ListBox Margin="5" Theme="{DynamicResource ButtonRadioGroupListBox}"
                                                  ItemsSource="{Binding KatButtonList}"
                                                  SelectedItem="{Binding SelectedKatButton, Mode=TwoWay}">
@@ -104,109 +104,113 @@
                                         </ListBox>
                                     </Border>
                                 </Grid>
-                           
-                            <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"
-                                    HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                                    Command="{Binding RegisterHotKeyCommand}">
-                                应用
-                            </Button>
+
+                                <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"
+                                        HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                        Command="{Binding RegisterHotKeyCommand}">
+                                    应用
+                                </Button>
+                            </Grid>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+                <Button Grid.Column="2" HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch" Margin="5" Command="{Binding ShowAutoDisplayCommand}">
+                    <icon:Icon FontSize="20" Value="fa-solid fa-list" />
+                </Button>
             </Grid>
-            </Flyout>
-            </Button.Flyout>
-            </Button>
+
         </Grid>
 
-    </Grid>
-
-    <Border Grid.Column="1" Theme="{StaticResource CardBorder}">
-        <Grid RowDefinitions="Auto,*">
-            <TextBlock
-                Classes="H4"
-                Theme="{StaticResource TitleTextBlock}" HorizontalAlignment="Center">
-                当前Kat状态
-            </TextBlock>
-            <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                  ColumnDefinitions="*,*,*"
-                  RowDefinitions="*,*"
-                  Margin="10">
-                <TextBlock Grid.Row="0" Grid.Column="0"
-                           Classes="H6" Theme="{StaticResource TitleTextBlock}"
-                           HorizontalAlignment="Center">
-                    触发动作：
+        <Border Grid.Column="1" Theme="{StaticResource CardBorder}">
+            <Grid RowDefinitions="Auto,*">
+                <TextBlock
+                    Classes="H4"
+                    Theme="{StaticResource TitleTextBlock}" HorizontalAlignment="Center">
+                    当前Kat状态
                 </TextBlock>
-                <TextBlock Grid.Row="1" Grid.Column="0"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Text="{Binding KatMotion}" />
+                <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                      ColumnDefinitions="*,*,*"
+                      RowDefinitions="*,*"
+                      Margin="10">
+                    <TextBlock Grid.Row="0" Grid.Column="0"
+                               Classes="H6" Theme="{StaticResource TitleTextBlock}"
+                               HorizontalAlignment="Center">
+                        触发动作：
+                    </TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="0"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Text="{Binding KatMotion}" />
 
-                <TextBlock Grid.Row="0" Grid.Column="1"
-                           Classes="H6" Theme="{StaticResource TitleTextBlock}"
-                           HorizontalAlignment="Center">
-                    触发状态：
-                </TextBlock>
-                <TextBlock Grid.Row="1" Grid.Column="1"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Text="{Binding PressMode}" />
+                    <TextBlock Grid.Row="0" Grid.Column="1"
+                               Classes="H6" Theme="{StaticResource TitleTextBlock}"
+                               HorizontalAlignment="Center">
+                        触发状态：
+                    </TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="1"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Text="{Binding PressMode}" />
 
-                <TextBlock Grid.Row="0" Grid.Column="2"
-                           Classes="H6" Theme="{StaticResource TitleTextBlock}"
-                           HorizontalAlignment="Center">
-                    多击次数：
-                </TextBlock>
-                <TextBlock Grid.Row="1" Grid.Column="2"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Text="{Binding RepeatCount}" />
+                    <TextBlock Grid.Row="0" Grid.Column="2"
+                               Classes="H6" Theme="{StaticResource TitleTextBlock}"
+                               HorizontalAlignment="Center">
+                        多击次数：
+                    </TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="2"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Text="{Binding RepeatCount}" />
+                </Grid>
             </Grid>
-        </Grid>
-    </Border>
-    <Border Grid.Column="2" Theme="{StaticResource CardBorder}">
-        <Grid RowDefinitions="Auto,*">
-            <TextBlock
-                Classes="H4"
-                Theme="{StaticResource TitleTextBlock}" HorizontalAlignment="Center">
-                前台程序信息
-            </TextBlock>
-            <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                  ColumnDefinitions="Auto, *, Auto, *" RowDefinitions="*,*">
-                <TextBlock Grid.Row="0" Grid.Column="0"
-                           Margin="5"
-                           Classes="H6"
-                           HorizontalAlignment="Left"
-                           VerticalAlignment="Center"
-                           Theme="{StaticResource TitleTextBlock}"
-                           Text="进程名" />
-                <TextBlock Grid.Row="0" Grid.Column="1"
-                           Margin="5"
-                           HorizontalAlignment="Left"
-                           VerticalAlignment="Center"
-                           Text="{Binding CurrentForeProgramInfo.ProcessName}" />
-                <TextBlock Grid.Row="0" Grid.Column="2"
-                           Margin="5"
-                           Classes="H6"
-                           HorizontalAlignment="Left"
-                           VerticalAlignment="Center"
-                           Theme="{StaticResource TitleTextBlock}"
-                           Text="标题" />
-                <TextBlock Grid.Row="0" Grid.Column="3" 
-                           HorizontalAlignment="Left"
-                           VerticalAlignment="Center" Text="{Binding CurrentForeProgramInfo.Title}" />
-                <TextBlock Grid.Row="1" Grid.Column="0"
-                           Margin="5"
-                           Classes="H6"
-                           HorizontalAlignment="Left"
-                           VerticalAlignment="Center"
-                           Theme="{StaticResource TitleTextBlock}"
-                           Text="路径" />
-                <TextBlock Grid.Row="1" Grid.Column="1"
-                           Grid.ColumnSpan="3"
-                           Margin="5"
-                           HorizontalAlignment="Left"
-                           VerticalAlignment="Center"
-                           Text="{Binding CurrentForeProgramInfo.ProcessFileAddress}" />
+        </Border>
+        <Border Grid.Column="2" Theme="{StaticResource CardBorder}">
+            <Grid RowDefinitions="Auto,*">
+                <TextBlock
+                    Classes="H4"
+                    Theme="{StaticResource TitleTextBlock}" HorizontalAlignment="Center">
+                    前台程序信息
+                </TextBlock>
+                <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                      ColumnDefinitions="Auto, *, Auto, *" RowDefinitions="*,*">
+                    <TextBlock Grid.Row="0" Grid.Column="0"
+                               Margin="5"
+                               Classes="H6"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Theme="{StaticResource TitleTextBlock}"
+                               Text="进程名" />
+                    <TextBlock Grid.Row="0" Grid.Column="1"
+                               Margin="5"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Text="{Binding CurrentForeProgramInfo.ProcessName}" />
+                    <TextBlock Grid.Row="0" Grid.Column="2"
+                               Margin="5"
+                               Classes="H6"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Theme="{StaticResource TitleTextBlock}"
+                               Text="标题" />
+                    <TextBlock Grid.Row="0" Grid.Column="3"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center" Text="{Binding CurrentForeProgramInfo.Title}" />
+                    <TextBlock Grid.Row="1" Grid.Column="0"
+                               Margin="5"
+                               Classes="H6"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Theme="{StaticResource TitleTextBlock}"
+                               Text="路径" />
+                    <TextBlock Grid.Row="1" Grid.Column="1"
+                               Grid.ColumnSpan="3"
+                               Margin="5"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Text="{Binding CurrentForeProgramInfo.ProcessFileAddress}" />
+                </Grid>
             </Grid>
-        </Grid>
-    </Border>
+        </Border>
     </Grid>
 </u:UrsaView>

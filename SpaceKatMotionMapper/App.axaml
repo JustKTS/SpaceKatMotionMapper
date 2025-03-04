@@ -13,7 +13,7 @@
     </Application.Styles>
      <TrayIcon.Icons>
          <TrayIcons>
-             <TrayIcon Icon="/Assets/avalonia-logo.ico"
+             <TrayIcon Icon="/Assets/SpaceKatDevice.png"
                        ToolTipText="3D旋钮辅助工具"
                        Clicked="ShowWindowMenuItem_OnClick">
                  <TrayIcon.Menu>

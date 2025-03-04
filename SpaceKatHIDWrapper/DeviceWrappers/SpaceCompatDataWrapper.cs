@@ -11,9 +11,9 @@ public class SpaceCompatDataWrapper : IDeviceDataWrapper
     private const string Name = "SpaceMouse Compact";
 
     public event EventHandler<bool>? ConnectionChanged;
-    
+
     // vendor ID and product ID
-    private int[] _hidId = [0x256F, 0xC635];
+    private readonly int[] _hidId = [0x256F, 0xC635];
 
     // private readonly FrozenDictionary<MotionAxis, AxisSpecs> _axesMappings = new Dictionary<MotionAxis, AxisSpecs>()
     // {
@@ -24,7 +24,7 @@ public class SpaceCompatDataWrapper : IDeviceDataWrapper
     //     [MotionAxis.Roll] = new(2, 3, 4, -1),
     //     [MotionAxis.Yaw] = new(2, 5, 6, 1),
     // }.ToFrozenDictionary();
-    
+
     private readonly FrozenDictionary<MotionAxis, AxisSpecs> _axesMappings = new Dictionary<MotionAxis, AxisSpecs>()
     {
         [MotionAxis.X] = new(1, 1, 2, 1),
@@ -48,12 +48,40 @@ public class SpaceCompatDataWrapper : IDeviceDataWrapper
 
     private KatDeviceData _katDeviceData = new();
 
+    private int _readFailedCount;
+
     public bool IsConnected => _device != null;
 
-    public void SetDevice(Device device)
+    private void RetryConnect(object? obj, bool isConnected)
     {
+        if (IsConnected) return;
+        const int maxRetry = 5;
+        Task.Run(async () =>
+        {
+            for (var i = 0; i < maxRetry; i++)
+            {
+                await Task.Delay(2000);
+                var device = await KatDeviceFunction.FindKatDeviceById(_hidId[0], _hidId[1]);
+                if (device == null) continue;
+                return device;
+            }
+
+            return null;
+        }).ContinueWith(t =>
+        {
+            if (t.Result == null) return;
+            _device = t.Result;
+            ConnectionChanged?.Invoke(this, IsConnected);
+        });
+    }
+
+    public async Task<bool> Connect()
+    {
+        var device = await KatDeviceFunction.FindKatDeviceById(_hidId[0], _hidId[1]);
+        if (device == null) return false;
         _device = device;
         ConnectionChanged?.Invoke(this, IsConnected);
+        return true;
     }
 
     private readonly int _readLength;
@@ -61,28 +89,36 @@ public class SpaceCompatDataWrapper : IDeviceDataWrapper
     public SpaceCompatDataWrapper()
     {
         _readLength = ReadFunctions.GetReadBytesCount(_axesMappings);
+        ConnectionChanged += RetryConnect;
     }
 
-    public KatDeviceData? Read()    
+    public KatDeviceData? Read()
     {
         if (_device == null) return null;
 
         try
         {
-            var rawData =_device.ReadTimeout(_readLength, 200);
-            // var rawData = _device.Read(_readLength);
+            var rawData = _device.ReadTimeout(_readLength, 300);
 
             ReadFunctions.UpdateDeviceData(rawData, ref _katDeviceData, _axesMappings, AxisScale, _buttonMappings);
-            
+
             return _katDeviceData;
         }
         catch (Exception e)
         {
+            _readFailedCount += 1;
+            if (_readFailedCount < 5) return null;
             Console.WriteLine(e);
             Hid.Exit();
             _device = null;
             ConnectionChanged?.Invoke(this, IsConnected);
+            _readFailedCount = 0;
             return null;
         }
+    }
+
+    public void Disconnect()
+    {
+        KatDeviceFunction.StopDevice();
     }
 }

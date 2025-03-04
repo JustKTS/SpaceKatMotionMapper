@@ -1,0 +1,65 @@
+﻿<u:UrsaView
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:SpaceKatMotionMapper.Helpers;assembly=SpaceKatMotionMapper"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
+    xmlns:view="clr-namespace:SpaceKatMotionMapper.Views"
+    Width="800"
+    Height="600"
+    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+    x:Class="SpaceKatMotionMapper.Views.AutoDisableConfigView"
+    x:DataType="vm:AutoDisableViewModel"
+    Background="Transparent">
+    <Grid RowDefinitions="Auto, Auto, *" Margin="10">
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto"
+              HorizontalAlignment="Center">
+            <TextBlock Grid.Column="0"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Classes="H4"
+                       Theme="{StaticResource TitleTextBlock}">
+                自动恢复官方配置设置页面
+            </TextBlock>
+            <ToggleSwitch
+                Theme="{StaticResource SimpleToggleSwitch}" Classes="Large"
+                Margin="10" Grid.Column="1"
+                OnContent="开" OffContent="关"
+                IsChecked="{Binding IsEnable}">
+            </ToggleSwitch>
+        </Grid>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
+            <TextBlock Margin="5"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Classes="H4"
+                       Theme="{StaticResource TitleTextBlock}">
+                程序列表
+            </TextBlock>
+            <Button Margin="5" Content="+">
+                <Button.Flyout>
+                    <Flyout>
+                        <view:RunningProgramSelector></view:RunningProgramSelector>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+        </StackPanel>
+        <Border Grid.Row="2" Classes="Shadow" Theme="{StaticResource CardBorder}">
+            <ListBox
+                ItemsSource="{Binding AutoDisableInfos}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:AutoDisableProgramViewModel">
+                        <Grid ColumnDefinitions="*, 3*, Auto">
+                            <TextBlock Grid.Column="0" Text="{Binding Name}"></TextBlock>
+                            <TextBlock Grid.Column="1" Text="{Binding ProgramPath}"></TextBlock>
+                            <Button Grid.Column="2" Command="{Binding RemoveSelfCommand}">-</Button>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+    </Grid>
+
+</u:UrsaView>
