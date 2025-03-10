@@ -5,18 +5,16 @@
             xmlns:u="https://irihi.tech/ursa"
             xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
             xmlns:view="clr-namespace:SpaceKatMotionMapper.Views"
-            mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+            mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="600"
             x:Class="SpaceKatMotionMapper.Views.MainView"
             x:DataType="vm:MainViewModel">
     <Design.DataContext>
         <vm:MainViewModel></vm:MainViewModel>
     </Design.DataContext>
-
-    <Grid RowDefinitions="Auto, *" Margin="10 40 10 10 ">
-        <view:ListeningInfoView></view:ListeningInfoView>
-        <Border Grid.Row="1" Theme="{StaticResource CardBorder}">
-            <view:ConfigCenterView></view:ConfigCenterView>
-        </Border>
+    
+    <Grid RowDefinitions="Auto, *">
+        <view:ListeningInfoView Grid.Row="0"></view:ListeningInfoView>
+        <view:ConfigCenterView Grid.Row="1"></view:ConfigCenterView>
     </Grid>
-
+    
 </u:UrsaView>

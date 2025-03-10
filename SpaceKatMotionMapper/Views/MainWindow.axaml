@@ -5,17 +5,34 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:u="https://irihi.tech/ursa"
-    xmlns:views="clr-namespace:SpaceKatMotionMapper.Views"
+    xmlns:view="clr-namespace:SpaceKatMotionMapper.Views"
+    xmlns:navVm="clr-namespace:SpaceKatMotionMapper.NavVMs"
     Title="SpaceKat动作映射工具"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignHeight="1000"
+    d:DesignWidth="600" 
+    MinWidth="500"
+    Height="1000"
+    Width="600"
     Icon="/Assets/SpaceKatDevice.png"
-    mc:Ignorable="d">
+    TitleBarMargin="200 0 0 0"
+    mc:Ignorable="d"
+    x:DataType="navVm:NavViewModel">
+    
     <u:UrsaWindow.RightContent>
-        <views:TitleBarRightContent />
+        <view:TitleBarRightContent />
     </u:UrsaWindow.RightContent>
-    <Panel>
-        <views:MainView></views:MainView>
-        <u:OverlayDialogHost HostId="{x:Static views:MainWindow.LocalHost}" /> 
-    </Panel>
+ 
+    <Grid RowDefinitions="Auto, *">
+        <view:ConnectAndEnableView Grid.Row="0" MaxWidth="200" HorizontalAlignment="Left" />
+        
+        <TransitioningContentControl
+            Grid.Row="1" Margin="5"
+            Content="{Binding Content}" >
+            <TransitioningContentControl.PageTransition>
+                <CrossFade Duration="0:00:00.100" />
+            </TransitioningContentControl.PageTransition>
+        </TransitioningContentControl>
+        <u:OverlayDialogHost Grid.Row="1" HostId="{x:Static view:MainWindow.LocalHost}" /> 
+
+    </Grid>
 </u:UrsaWindow>

@@ -18,14 +18,6 @@ public partial class ListeningInfoView : UrsaView
         DataContext = App.GetService<ListeningInfoViewModel>();
         InitializeComponent();
     }
-
-    protected override void OnLoaded(RoutedEventArgs e)
-    {
-        base.OnLoaded(e);
-        if (DataContext is not ListeningInfoViewModel vm) return ;
-        vm.ConnectBtnCommand.Execute(null);
-        vm.IsOfficialMapperOff = true;
-    }
 }
 
 public class KatButtonEnumToStrConverter : IValueConverter

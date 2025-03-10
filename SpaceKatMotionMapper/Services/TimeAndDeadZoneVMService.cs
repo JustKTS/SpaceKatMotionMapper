@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using SpaceKatMotionMapper.ViewModels;
 using SpaceKatMotionMapper.Views;
 using Ursa.Controls;
@@ -30,17 +31,11 @@ public class TimeAndDeadZoneVMService(
         deadZoneConfigViewModel.LoadDeadZoneAsyncCommand.Execute(null);
     }
 
-    private readonly OverlayDialogOptions _options = new()
+    private readonly DialogOptions _options = new()
     {
-        FullScreen = false,
-        HorizontalAnchor = HorizontalPosition.Center,
-        VerticalAnchor = VerticalPosition.Center,
-        HorizontalOffset = 0.0,
-        VerticalOffset = 0.0,
         Mode = DialogMode.None,
-        Buttons = DialogButton.None,
-        Title = "触发时间与死区设置",
-        CanLightDismiss = true,
+        StartupLocation = WindowStartupLocation.CenterScreen,
+        ShowInTaskBar = true,
         CanDragMove = true,
         IsCloseButtonVisible = true,
         CanResize = true
@@ -50,9 +45,8 @@ public class TimeAndDeadZoneVMService(
     {
         timeAndDeadZoneSettingViewModel.StartKatListening();
         deadZoneConfigViewModel.StartAxesDataDisplay();
-        await OverlayDialog.ShowModal<TimeAndDeadZoneSettingView, TimeAndDeadZoneSettingViewModel>(
-            timeAndDeadZoneSettingViewModel, MainWindow.LocalHost, options: _options);
-
+        await Dialog.ShowCustomModal<TimeAndDeadZoneSettingView, TimeAndDeadZoneSettingViewModel, object>(
+            timeAndDeadZoneSettingViewModel, options: _options);
         timeAndDeadZoneSettingViewModel.StopKatListening();
         deadZoneConfigViewModel.StopAxesDataDisplay();
     }

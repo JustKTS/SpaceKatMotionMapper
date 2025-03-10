@@ -9,7 +9,8 @@
             x:Class="SpaceKatMotionMapper.Views.TimeAndDeadZoneSettingView"
             x:DataType="vm:TimeAndDeadZoneSettingViewModel"
             Width="1400"
-            Background="Transparent">
+            Background="Transparent"
+            Margin="50">
     <Grid RowDefinitions="*,Auto">
         <Grid ColumnDefinitions="1.5*,*">
             <Grid RowDefinitions="Auto, *" Margin="10">
@@ -32,7 +33,7 @@
                     IsEnabled="{Binding #TimeToggleSwitch.IsChecked}" />
             </Grid>
             <Grid Grid.Column="1" RowDefinitions="Auto, *" Margin="10">
-                <Grid ColumnDefinitions="*,Auto" Margin="30 0 30 0">
+                <Grid ColumnDefinitions="*,Auto" >
                     <TextBlock
                         Classes="H5"
                         Theme="{StaticResource TitleTextBlock}" HorizontalAlignment="Center">
@@ -51,7 +52,8 @@
                     IsEnabled="{Binding #DeadZoneToggleSwitch.IsChecked}" />
             </Grid>
         </Grid>
-        <Border Grid.Row="1" Grid.Column="1" Theme="{StaticResource CardBorder}">
+        <Border Grid.Row="1" Theme="{StaticResource CardBorder}"
+                Margin="15, 0,15,0">
             <Grid RowDefinitions="Auto,*">
                 <TextBlock
                     Classes="H4"

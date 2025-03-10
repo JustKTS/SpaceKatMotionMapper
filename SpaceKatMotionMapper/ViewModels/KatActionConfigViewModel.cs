@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -15,6 +16,8 @@ using LanguageExt.Common;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Defines;
 using SpaceKatMotionMapper.Services.Contract;
+using SpaceKatMotionMapper.Views;
+using Ursa.Controls;
 using Dispatcher = Avalonia.Threading.Dispatcher;
 
 namespace SpaceKatMotionMapper.ViewModels;
@@ -407,4 +410,38 @@ public partial class KatActionConfigViewModel : ViewModelBase
 
         await _timeAndDeadZoneVmService.ShowDialogAsync();
     }
+    
+    
+    # region 开启独立配置框
+    
+    private readonly DialogOptions _options = new()
+    {
+        Mode = DialogMode.None,
+        StartupLocation = WindowStartupLocation.CenterScreen,
+        ShowInTaskBar = true,
+        CanDragMove = true,
+        IsCloseButtonVisible = true,
+        CanResize = true
+    };
+
+    
+    [RelayCommand]
+    private void OpenEditDialog()
+    {
+        var title = IsDefault ? ConfigName : ProcessFilename;
+        var options = new DialogOptions()
+        {
+            Title = title,
+            Button = DialogButton.None,
+            Mode = DialogMode.None,
+            StartupLocation = WindowStartupLocation.CenterScreen,
+            ShowInTaskBar = true,
+            CanDragMove = true,
+            IsCloseButtonVisible = true,
+            CanResize = true
+        };
+        Dialog.ShowCustom<KatMotionGroupConfigView, KatActionConfigViewModel>(
+            this, options: options);
+    }
+    #endregion
 }

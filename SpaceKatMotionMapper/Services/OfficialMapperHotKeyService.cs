@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Xml;
 using LanguageExt.Common;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services.Contract;
 using Avalonia.Controls;
 using SpaceKatMotionMapper.Functions;
+using SpaceKatMotionMapper.States;
 using SpaceKatMotionMapper.ViewModels;
 using Win32Helpers;
 
 namespace SpaceKatMotionMapper.Services;
 
-public class OfficialMapperSwitchService(ITopLevelHelper topLevelHelper)
+public class OfficialMapperHotKeyService(ITopLevelHelper topLevelHelper)
 {
     # region 热键注册
 
@@ -72,8 +69,8 @@ public class OfficialMapperSwitchService(ITopLevelHelper topLevelHelper)
                 switch (wParam.ToInt32())
                 {
                     case HotKeyEventId:
-                        var vm = App.GetRequiredService<ListeningInfoViewModel>();
-                        vm.IsOfficialMapperOff = !vm.IsOfficialMapperOff;
+                        var globalStates = App.GetRequiredService<GlobalStates>();
+                        globalStates.IsMapperEnable = !globalStates.IsMapperEnable;
                         break;
                 }
 

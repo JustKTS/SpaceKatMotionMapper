@@ -11,4 +11,6 @@ public enum ActionType
     KeyBoard,
     [Display(Name="鼠标")]
     Mouse,
+    [Display(Name="延时")]
+    Delay
 }

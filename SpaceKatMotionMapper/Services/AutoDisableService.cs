@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using Avalonia.Threading;
 using SpaceKatHIDWrapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
+using SpaceKatMotionMapper.States;
 using SpaceKatMotionMapper.ViewModels;
 using Win32Helpers;
 
@@ -52,7 +54,7 @@ public class AutoDisableService
             IsEnable = t.Result ?? false;
         });
     }
-    
+
     public void AddProgramPath(string programPath)
     {
         if (_autoDisablePrograms.Contains(programPath)) return;
@@ -76,11 +78,14 @@ public class AutoDisableService
     {
         return _autoDisablePrograms.ToArray();
     }
-    
+
     private void ForeProgramChangedHandle(object? obj, ForeProgramInfo info)
     {
         if (string.IsNullOrEmpty(info.ProcessFileAddress)) return;
-        var vm = App.GetRequiredService<ListeningInfoViewModel>();
-        vm.IsOfficialMapperOff = !_autoDisablePrograms.Contains(info.ProcessFileAddress);
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            App.GetRequiredService<GlobalStates>().IsMapperEnable =
+                !_autoDisablePrograms.Contains(info.ProcessFileAddress);
+        });
     }
 }

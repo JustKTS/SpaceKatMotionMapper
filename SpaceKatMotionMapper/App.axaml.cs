@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using Avalonia;
 using Avalonia.Controls;
@@ -10,10 +11,7 @@ using HidApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Projektanker.Icons.Avalonia;
-using Projektanker.Icons.Avalonia.FontAwesome;
 using Serilog;
-using Serilog.Events;
 using SpaceKatHIDWrapper.DeviceWrappers;
 using SpaceKatHIDWrapper.Services;
 using SpaceKatMotionMapper.Functions;
@@ -25,6 +23,9 @@ using Win32Helpers;
 using WindowsInput;
 using ILogger = Serilog.ILogger;
 using Path = System.IO.Path;
+using HotAvalonia;
+using SpaceKatMotionMapper.NavVMs;
+using SpaceKatMotionMapper.States;
 
 namespace SpaceKatMotionMapper;
 
@@ -51,7 +52,20 @@ public partial class App : Application
     {
         try
         {
-            return (App.Current as App)!.Host.Services.GetRequiredService<T>();
+            return (Current as App)!.Host.Services.GetRequiredService<T>();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex);
+            throw;
+        }
+    }
+
+    public static object GetRequiredView(Type type)
+    {
+        try
+        {
+            return (Current as App)!.Host.Services.GetRequiredService(type);
         }
         catch (Exception ex)
         {
@@ -62,20 +76,24 @@ public partial class App : Application
 
     public App()
     {
-        IconProvider.Current.Register<FontAwesomeIconProvider>();
-
         Host = Microsoft
             .Extensions.Hosting.Host.CreateDefaultBuilder()
             .ConfigureServices(services =>
             {
                 services.AddSingleton<MainWindow>();
+                services.AddSingleton<NavViewModel>();
+                services.AddSingleton<ViewRegister>();                
+                
                 services.AddSingleton<TransparentInfoWindow>();
                 services.AddSingleton<TransparentInfoViewModel>();
                 
                 services.AddSingleton<MainView>();
                 services.AddSingleton<MainViewModel>();
+                services.AddSingleton<SettingsView>();
+                services.AddSingleton<SettingsViewModel>();
 
                 services.AddSingleton<ListeningInfoViewModel>();
+                services.AddSingleton<ConnectAndEnableViewModel>();
                 services.AddSingleton<AutoDisableViewModel>();
 
                 services.AddSingleton<ConfigCenterViewModel>();
@@ -95,6 +113,7 @@ public partial class App : Application
                 
                 services.AddSingleton<PopUpNotificationService>();
                 services.AddSingleton<TransparentInfoService>();
+                services.AddSingleton<GlobalStates>();
 
                 services.AddSingleton<ITopLevelHelper, TopLevelHelper>();
                 services.AddSingleton<IStorageProviderService, StorageProviderService>();
@@ -112,14 +131,18 @@ public partial class App : Application
                 services.AddSingleton<ModeChangeService>();
                 services.AddSingleton<ConflictKatActionService>();
                 services.AddSingleton<KatActionConfigVMManageService>();
-                services.AddSingleton<OfficialMapperSwitchService>();
+                services.AddSingleton<OfficialMapperHotKeyService>();
             })
             .UseSerilog()
             .ConfigureLogging(logging =>
             {
                 logging.ClearProviders();
-                var logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    nameof(SpaceKatMotionMapper), "Log.log");
+              
+                if (!Directory.Exists(GlobalPaths.AppLogPath))
+                {
+                    Directory.CreateDirectory(GlobalPaths.AppLogPath);
+                }
+                var logPath = Path.Combine(GlobalPaths.AppLogPath, "Log.log");
                 Log.Logger = new LoggerConfiguration()
                     .MinimumLevel.Debug()
                     .Enrich.FromLogContext()
@@ -136,6 +159,7 @@ public partial class App : Application
 
     public override void Initialize()
     {
+        this.EnableHotReload();
         var activateStatusService = GetService<ActivationStatusService>();
         activateStatusService.WaitForActivationStatusLoaded();
         DataContext = this;
@@ -179,7 +203,7 @@ public partial class App : Application
         {
             case IClassicDesktopStyleApplicationLifetime desktop:
                 var ofMs =
-                    GetRequiredService<OfficialMapperSwitchService>();
+                    GetRequiredService<OfficialMapperHotKeyService>();
                 ofMs.UnregisterHotKeyWrapper();
                 ofMs.UnregisterHandle();
                 OfficialWareConfigFunctions.CleanAllChange();

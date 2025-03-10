@@ -2,11 +2,10 @@
 
 namespace SpaceKatMotionMapper.Views;
 
-public partial class ActionConfigView : UrsaView
+public partial class KatMotionGroupConfigView : UrsaView
 {
-    public ActionConfigView()
+    public KatMotionGroupConfigView()
     {
         InitializeComponent();
     }
 }
-

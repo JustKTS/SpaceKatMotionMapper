@@ -55,14 +55,7 @@ public partial class MotionTimeConfigViewModel(
         var configs = IsDefault
             ? katMotionTimeConfigService.LoadDefaultTimeConfigs()
             : katMotionTimeConfigService.LoadMotionTimeConfigs(Id);
-        if (configs == null)
-        {
-            _configs = katMotionTimeConfigService.LoadDefaultTimeConfigs();
-        }
-        else
-        {
-            _configs = configs;
-        }
+        _configs = configs ?? katMotionTimeConfigService.LoadDefaultTimeConfigs();
 
         ReloadConfigs();
     }

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatHIDWrapper.Services;
 using SpaceKatMotionMapper.Models;
+using SpaceKatMotionMapper.States;
 using WindowsInput;
 
 namespace SpaceKatMotionMapper.Services;
@@ -27,6 +30,8 @@ public class KatActionActivateService
 
     private readonly KatActionRecognizeService _katActionRecognizeService;
     private readonly InputSimulator _inputSimulator;
+    
+    private GlobalStates GlobalStates => App.GetRequiredService<GlobalStates>();
 
     public KatActionActivateService(InputSimulator inputSimulator,
         KatActionRecognizeService katActionRecognizeService)
@@ -41,6 +46,12 @@ public class KatActionActivateService
                     _modeChangeService.CurrentActivatedConfig, _modeChangeService.CurrentMode,
                     data));
         };
+        GlobalStates.IsMapperEnableChanged += ChangeIsActivated;
+    }
+
+    private void ChangeIsActivated(object? sender, bool e)
+    {
+        IsActivated = e;
     }
 
 
@@ -100,7 +111,8 @@ public class KatActionActivateService
                 if (dataWithInfo.Mode != config.ModeNum) return;
 
                 if (configGroup.IsDefault && !dataWithInfo.ConfigIsDefault &&
-                    _conflictKatActionService.IsConflict(dataWithInfo.ActivatedConfigId, config.Action.Motion, config.Action.KatPressMode,
+                    _conflictKatActionService.IsConflict(dataWithInfo.ActivatedConfigId, config.Action.Motion,
+                        config.Action.KatPressMode,
                         config.Action.RepeatCount)) return;
 
                 foreach (var actionConfig in config.ActionConfigs)
@@ -113,6 +125,11 @@ public class KatActionActivateService
                     if (actionConfig.TryToKeyBoardActionConfig(out var keyboardActionConfig))
                     {
                         KeyBoardActionHandler(keyboardActionConfig);
+                    }
+                    // TODO:验证延时的可靠性
+                    if (actionConfig.TryToDelayActionConfig(out var delayActionConfig))
+                    {
+                        Thread.Sleep(delayActionConfig.Milliseconds);
                     }
                 }
 

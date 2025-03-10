@@ -4,33 +4,21 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:u="https://irihi.tech/ursa"
-    xmlns:icon="https://github.com/projektanker/icons.avalonia"
-    d:DesignHeight="450"
+    d:DesignHeight="50"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <StackPanel Orientation="Horizontal">
-        <!-- <u:ThemeToggleButton IsThreeState="True" Mode="Controller" /> -->
-        <Button Margin="5" Classes="Primary" Theme="{DynamicResource BorderlessButton}" VerticalAlignment="Center">
-            <icon:Icon FontSize="15" Value="fa-solid fa-info"
-                       HorizontalAlignment="Stretch"
-                       VerticalAlignment="Stretch" />
-            <Button.Flyout>
-                <Flyout>
-                    <StackPanel Margin="10">
-                        <TextBlock> 作者:B站-暗光启天</TextBlock>
-                        <TextBlock> 版本：0.1.7</TextBlock>
-                        <TextBlock> Powered by AvaloniaUI/Semi.Avalonia/Ursa.Avalonia</TextBlock>
-                        <Button Margin="10" Click="Button_OnClick">复制配置文件夹地址</Button>
-                        <CheckBox Name="CheckBox" Margin="10" IsCheckedChanged="ToggleButton_OnIsCheckedChanged"
-                                  IsChecked="True"
-                                  HorizontalAlignment="Center">
-                            <TextBlock>显示透明浮窗</TextBlock>
-                        </CheckBox>
-                        <Button Margin="10" Name="InfoWindowModeButton" Click="InfoWindowMode_OnClick">透明信息窗调整模式</Button>
-                    </StackPanel>
-                </Flyout>
-            </Button.Flyout>
-        </Button>
-    </StackPanel>
+    
+    <UserControl.Styles>
+        <Style Selector="ToggleButton.Second:unchecked /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonBorderlessBackground}"></Setter>
+        </Style>
+        <!-- -->
+        <Style Selector="ToggleButton.Second:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}"></Setter>
+        </Style>
+    </UserControl.Styles>
+    
+    <ToggleButton Click="Button_OnClick" Classes="Second" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <PathIcon Data="{StaticResource SemiIconSetting}" Theme="{DynamicResource InnerPathIcon}"></PathIcon>
+    </ToggleButton>
 </UserControl>

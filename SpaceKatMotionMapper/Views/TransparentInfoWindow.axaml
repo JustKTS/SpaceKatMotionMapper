@@ -4,8 +4,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:u="https://irihi.tech/ursa"
-    xmlns:views="clr-namespace:SpaceKatMotionMapper.Views"
-    xmlns:icon="https://github.com/projektanker/icons.avalonia"
     xmlns:vms="clr-namespace:SpaceKatMotionMapper.ViewModels"
     x:Class="SpaceKatMotionMapper.Views.TransparentInfoWindow"
     Title="信息窗口"
@@ -35,23 +33,45 @@
         </Style>
     </u:UrsaWindow.Styles>
 
-    <Panel Name="InfoPanel" Opacity="0" >
-        <Border CornerRadius="10" Background="Gray" Opacity="0.4"
+    <Panel Name="InfoPanel" Opacity="0">
+        <Border CornerRadius="10"
+                Background="{Binding BackgroundBrush}"
                 PointerPressed="InputElement_OnPointerPressed">
             <Border.Effect>
                 <DropShadowEffect></DropShadowEffect>
             </Border.Effect>
         </Border>
-        <Button
-            Classes="Primary" Theme="{DynamicResource BorderlessButton}"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Margin="5"
-            IsVisible="{Binding IsAdjustMode}"
-            Command="{Binding SaveConfigCommand}">
-            <icon:Icon HorizontalAlignment="Center" FontSize="20"
-                       Value="fa-solid fa-lock" />
-        </Button>
+        <Grid HorizontalAlignment="Left"
+              VerticalAlignment="Top"
+              ColumnDefinitions="Auto, Auto">
+            <u:IconButton
+                Grid.Column="0"
+                Height="30" Width="30"
+                Theme="{StaticResource BorderlessIconButton}"
+                Margin="5"
+                IsVisible="{Binding IsAdjustMode}"
+                Icon="{StaticResource SemiIconLock}"
+                Click="SaveConfigButton_OnClick">
+               <!-- <PathIcon Data="{StaticResource SemiIconLock}"></PathIcon> -->
+            </u:IconButton>
+            <u:IconButton
+                Grid.Column="1"
+                Height="30" Width="30"
+                Theme="{StaticResource BorderlessIconButton}"
+                Margin="5"
+                IsVisible="{Binding IsAdjustMode}"
+                Icon="{StaticResource SemiIconColorPalette}">
+                <!-- <PathIcon Data="{StaticResource SemiIconColorPalette}"></PathIcon> -->
+                <Button.Flyout>
+                    <Flyout>
+                        <Grid>
+                            <ColorView ColorSpectrumShape="Ring" Color="{Binding BackgroundColor, Mode=TwoWay}" />
+                        </Grid>
+                    </Flyout>
+                </Button.Flyout>
+            </u:IconButton>
+        </Grid>
+
         <StackPanel HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     IsVisible="{Binding !IsOtherInfo}"
@@ -61,9 +81,7 @@
                 VerticalAlignment="Center"
                 Classes="H4"
                 Theme="{StaticResource TitleTextBlock}"
-                Text="{Binding MotionName}"
-                
-            />
+                Text="{Binding MotionName}" />
             <TextBlock
                 VerticalAlignment="Center"
                 Classes="H4"

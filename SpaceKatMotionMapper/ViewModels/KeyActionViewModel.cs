@@ -10,7 +10,7 @@ namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class KeyActionViewModel : ObservableObject
 {
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsAvailable))]
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsAvailable))] [NotifyPropertyChangedFor(nameof(IsDelay))]
     private ActionType _actionType;
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsAvailable))]
@@ -21,7 +21,9 @@ public partial class KeyActionViewModel : ObservableObject
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsAvailable))]
     private int _multiplier;
-    
+
+    public bool IsDelay => ActionType == ActionType.Delay;
+
     public bool IsAvailable
     {
         get
@@ -48,7 +50,8 @@ public partial class KeyActionViewModel : ObservableObject
                         Console.WriteLine(e);
                         return false;
                     }
-                  
+                case ActionType.Delay:
+                    return Multiplier >= 15;
                 default:
                     return false;
             }
@@ -57,14 +60,7 @@ public partial class KeyActionViewModel : ObservableObject
 
 
     private readonly KeyActionConfigViewModel _parent;
-
-
-#pragma warning disable CS8625 // 无法将 null 字面量转换为非 null 的引用类型。
-    public KeyActionViewModel() : this(null, Models.ActionType.KeyBoard, VirtualKeyCode.None.ToString(), PressModeEnum.None, 1)
-    {
-    }
-#pragma warning restore CS8625 // 无法将 null 字面量转换为非 null 的引用类型。
-
+    
     public KeyActionViewModel(KeyActionConfigViewModel parent, ActionType actionType, string key,
         PressModeEnum pressMode, int multiplier)
     {
@@ -79,13 +75,27 @@ public partial class KeyActionViewModel : ObservableObject
         VirtualKeyCode.None.ToString(), PressModeEnum.None, 1)
     {
     }
-    
+
 
     [RelayCommand]
     private void Remove()
     {
         var index = _parent.ActionConfigGroups.IndexOf(this);
         _parent.RemoveActionConfigCommand.Execute(index);
+    }
+
+    [RelayCommand]
+    private void InsertNextAction()
+    {
+        var index = _parent.ActionConfigGroups.IndexOf(this);
+        _parent.InsertNextActionConfig(index);
+    }
+    
+    [RelayCommand]
+    private void InsertNextDelay()
+    {
+        var index = _parent.ActionConfigGroups.IndexOf(this);
+        _parent.InsertNextDelayConfig(index);
     }
 
     public KeyActionConfig ToKeyActionConfig()

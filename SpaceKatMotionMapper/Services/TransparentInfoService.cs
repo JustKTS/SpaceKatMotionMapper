@@ -1,11 +1,10 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Avalonia.Controls;
-using Avalonia.Platform;
+﻿using System.Threading.Tasks;
+using Avalonia.Media;
 using Avalonia.Threading;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services.Contract;
+using SpaceKatMotionMapper.States;
 using SpaceKatMotionMapper.ViewModels;
 using SpaceKatMotionMapper.Views;
 using Timer = System.Timers.Timer;
@@ -14,6 +13,8 @@ namespace SpaceKatMotionMapper.Services;
 
 public class TransparentInfoService
 {
+    private const string EnableStr = "IsTransparentInfoEnable";
+    private const string ConfigStr = "TransparentInfoWindowConfig";
     public bool IsTransparentInfoEnable { get; set; } = true;
     private bool _isWindowShow;
 
@@ -24,19 +25,22 @@ public class TransparentInfoService
     };
 
     private readonly TransparentInfoWindow _transparentInfoWindow;
-    private readonly TransparentInfoViewModel _transparentInfoViewModel;
     private readonly ILocalSettingsService _localSettingsService;
 
     public TransparentInfoService(
         TransparentInfoWindow transparentInfoWindow,
-        TransparentInfoViewModel transparentInfoViewModel,
         ILocalSettingsService localSettingsService)
     {
         _transparentInfoWindow = transparentInfoWindow;
-        _transparentInfoViewModel = transparentInfoViewModel;
         _localSettingsService = localSettingsService;
 
-        _timer.Elapsed += (sender, args) =>
+        App.GetRequiredService<GlobalStates>().IsTransparentInfoEnableChanged += (_, value) =>
+        {
+            IsTransparentInfoEnable = value;
+            _localSettingsService.SaveSettingAsync(EnableStr, value);
+        };
+
+        _timer.Elapsed += (_, _) =>
         {
             Dispatcher.UIThread.InvokeAsync(async () =>
             {
@@ -45,7 +49,6 @@ public class TransparentInfoService
                 transparentInfoWindow.Hide();
             });
             _isWindowShow = false;
-            // _timer.Enabled = false;
         };
     }
 
@@ -59,8 +62,9 @@ public class TransparentInfoService
     {
         Dispatcher.UIThread.Invoke(() =>
         {
-            _transparentInfoViewModel.KatAction = action;
-            _transparentInfoViewModel.IsOtherInfo = false;
+            var vm = App.GetRequiredService<TransparentInfoViewModel>();
+            vm.KatAction = action;
+            vm.IsOtherInfo = false;
         });
         UpdateWindowState();
     }
@@ -69,8 +73,9 @@ public class TransparentInfoService
     {
         Dispatcher.UIThread.Invoke(() =>
         {
-            _transparentInfoViewModel.OtherInfo = info;
-            _transparentInfoViewModel.IsOtherInfo = true;
+            var vm = App.GetRequiredService<TransparentInfoViewModel>();
+            vm.OtherInfo = info;
+            vm.IsOtherInfo = true;
         });
         UpdateWindowState();
     }
@@ -79,7 +84,8 @@ public class TransparentInfoService
     {
         if (!IsTransparentInfoEnable) return;
 
-        if (_transparentInfoViewModel.IsAdjustMode) return;
+        var vm = App.GetRequiredService<TransparentInfoViewModel>();
+        if (vm.IsAdjustMode) return;
 
         if (_isWindowShow)
         {
@@ -102,7 +108,8 @@ public class TransparentInfoService
     {
         Dispatcher.UIThread.Invoke(() =>
         {
-            _transparentInfoViewModel.IsAdjustMode = true;
+            var vm = App.GetRequiredService<TransparentInfoViewModel>();
+            vm.IsAdjustMode = true;
             _transparentInfoWindow.ShowActivated = true;
             _transparentInfoWindow.IsManagedResizerVisible = true;
             _transparentInfoWindow.IsHitTestVisible = true;
@@ -115,21 +122,35 @@ public class TransparentInfoService
     {
         Dispatcher.UIThread.Invoke(() =>
         {
-            var position = _transparentInfoWindow.Position;
-
-            _localSettingsService.SaveSettingAsync("TransparentInfoWindowConfig",
-                new TransparentInfoWindowConfig(
-                    position.X,
-                    position.Y,
-                    _transparentInfoWindow.Width,
-                    _transparentInfoWindow.Height
-                ));
+            var vm = App.GetRequiredService<TransparentInfoViewModel>();
             _transparentInfoWindow.IsHitTestVisible = false;
             _transparentInfoWindow.IsManagedResizerVisible = false;
             _transparentInfoWindow.ShowActivated = false;
-            _transparentInfoViewModel.IsAdjustMode = false;
+            vm.IsAdjustMode = false;
             _transparentInfoWindow.SetOpacity(0);
             _transparentInfoWindow.Hide();
         });
+    }
+
+    public async Task SaveConfigsAsync(int x, int y, double width, double height, Color color)
+    {
+        await _localSettingsService.SaveSettingAsync(ConfigStr,
+            new TransparentInfoWindowConfig(
+                x,
+                y,
+                width,
+                height,
+                color.ToUInt32()
+            ));
+    }
+
+    public async Task<TransparentInfoWindowConfig?> LoadConfigs()
+    {
+        var isEnable = await _localSettingsService.ReadSettingAsync<bool?>(EnableStr);
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            App.GetRequiredService<GlobalStates>().IsTransparentInfoEnable = isEnable ?? true;
+        });
+        return await _localSettingsService.ReadSettingAsync<TransparentInfoWindowConfig>(ConfigStr);
     }
 }

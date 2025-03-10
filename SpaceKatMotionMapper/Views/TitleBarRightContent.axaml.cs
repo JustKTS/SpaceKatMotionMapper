@@ -4,11 +4,13 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
+using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using Serilog;
+using SpaceKatMotionMapper.NavVMs;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.ViewModels;
 using Ursa.Controls;
@@ -21,43 +23,42 @@ public partial class TitleBarRightContent : UserControl
     {
         InitializeComponent();
     }
+    // private readonly OverlayDialogOptions _options = new()
+    // {
+    //     FullScreen = true,
+    //     HorizontalAnchor = HorizontalPosition.Center,
+    //     VerticalAnchor = VerticalPosition.Center,
+    //     HorizontalOffset = 0.0,
+    //     VerticalOffset = 0.0,
+    //     Mode = DialogMode.None,
+    //     Buttons = DialogButton.None,
+    //     Title = "设置",
+    //     CanLightDismiss = true,
+    //     CanDragMove = true,
+    //     IsCloseButtonVisible = true,
+    //     CanResize = false
+    // };
+    //
+    // private void Button_OnClick(object? sender, RoutedEventArgs e)
+    // {
+    //     OverlayDialog.ShowModal<SettingsView, SettingsViewModel>(
+    //         App.GetRequiredService<SettingsViewModel>(), MainWindow.LocalHost, options: _options);
+    // }
 
     private void Button_OnClick(object? sender, RoutedEventArgs e)
     {
-        var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
-        if (clipboard is null)
+        var navVm = App.GetRequiredService<NavViewModel>();
+        if (e.Source is not ToggleButton tb) return;
+        switch (tb.IsChecked)
         {
-            App.GetRequiredService<PopUpNotificationService>().Pop(NotificationType.Error, "获取系统剪贴板权限失败");
-            return;
+            case null:
+                return;
+            case true:
+                navVm.OnNavigation(navVm, typeof(SettingsView).FullName!);
+                break;
+            case false:
+                navVm.OnNavigation(navVm, typeof(MainView).FullName!);
+                break;
         }
-
-        _ = clipboard.SetTextAsync(
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                nameof(SpaceKatMotionMapper))
-        ).ContinueWith(_ =>
-        {
-            Dispatcher.UIThread.Invoke(() =>
-                App.GetRequiredService<PopUpNotificationService>().Pop(NotificationType.Success, "已复制到剪贴板"));
-        });
-    }
-
-    private void InfoWindowMode_OnClick(object? sender, RoutedEventArgs e)
-    {
-        var infoVm = App.GetRequiredService<TransparentInfoViewModel>();
-        if (infoVm.IsAdjustMode)
-        {
-            return;
-        }
-
-        var infoService = App.GetRequiredService<TransparentInfoService>();
-
-        infoService.StartAdjustInfoWindow();
-    }
-
-    private void ToggleButton_OnIsCheckedChanged(object? sender, RoutedEventArgs e)
-    {
-        if (CheckBox?.IsChecked is not { } isChecked) return;
-        var infoService = App.GetRequiredService<TransparentInfoService>();
-        infoService.IsTransparentInfoEnable = isChecked;
     }
 }

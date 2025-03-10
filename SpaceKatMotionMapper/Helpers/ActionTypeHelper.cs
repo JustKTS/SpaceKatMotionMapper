@@ -11,7 +11,7 @@ namespace SpaceKatMotionMapper.Helpers;
 public static class ActionTypeHelper
 {
     public static IReadOnlyList<string> ActionTypeNames { get; } = ActionTypeExtensions.GetValues()
-        .Select(type => type.ToStringFast()).ToList().AsReadOnly();
+        .Where(t => t != ActionType.Delay).Select(t => t.ToStringFast()).ToList().AsReadOnly();
 
     public static ActionType Parse(string actionTypeStr)
     {

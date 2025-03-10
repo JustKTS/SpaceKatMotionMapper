@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.Messaging;
+using SpaceKatMotionMapper.NavVMs;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.ViewModels;
 using Ursa.Controls;
@@ -17,11 +18,11 @@ namespace SpaceKatMotionMapper.Views;
 public partial class MainWindow : UrsaWindow
 {
     private readonly WindowNotificationManager _manager;
-
     public const string LocalHost = "LocalHost";
 
     public MainWindow()
     {
+        DataContext = App.GetRequiredService<NavViewModel>();
         InitializeComponent();
         PropertyChanged += OnPropertyChanged;
         var topLevel = GetTopLevel(this);
@@ -39,16 +40,17 @@ public partial class MainWindow : UrsaWindow
 
     private void PopupNotification(object sender, PopupNotificationData e)
     {
-     
-        Dispatcher.UIThread.Invoke(() => {_manager.Show(
-            new Notification()
-            {
-                Content = e.Message,
-                ShowIcon = true,
-                Title = e.NotificationType.ToString(),
-                Type = e.NotificationType
-            }); });
-        
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            _manager.Show(
+                new Notification()
+                {
+                    Content = e.Message,
+                    ShowIcon = true,
+                    Title = e.NotificationType.ToString(),
+                    Type = e.NotificationType
+                });
+        });
     }
 
     private void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
@@ -61,7 +63,9 @@ public partial class MainWindow : UrsaWindow
     protected override void OnLoaded(RoutedEventArgs e)
     {
         base.OnLoaded(e);
-        App.GetRequiredService<OfficialMapperSwitchService>().RegisterHandle();
-        App.GetRequiredService<ListeningInfoViewModel>().RegisterHotKeyCommand.Execute(null);
+        App.GetRequiredService<OfficialMapperHotKeyService>().RegisterHandle();
+        App.GetRequiredService<SettingsViewModel>().RegisterHotKeyCommand.Execute(null);
+        var navVm = App.GetRequiredService<NavViewModel>();
+        navVm.OnNavigation(navVm, typeof(MainView).FullName!);
     }
 }

@@ -41,4 +41,12 @@ public record KeyActionConfig(ActionType ActionType, string Key, PressModeEnum P
         mouseActionConfig = new MouseActionConfig(MouseButtonHelper.Parse(Key), PressMode, Multiplier);
         return true;
     }
+    
+    public bool TryToDelayActionConfig([NotNullWhen(true)] out DelayActionConfig? delayActionConfig)
+    {
+        delayActionConfig = null;
+        if (ActionType is not ActionType.Delay) return false;
+        delayActionConfig = new DelayActionConfig(Multiplier);
+        return true;
+    }
 }

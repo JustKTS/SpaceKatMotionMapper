@@ -3,18 +3,16 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:helpers="clr-namespace:SpaceKatMotionMapper.Helpers;assembly=SpaceKatMotionMapper"
     xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:u="https://irihi.tech/ursa"
-    xmlns:vms="clr-namespace:SpaceKatMotionMapper.ViewModels;assembly=SpaceKatMotionMapper"
-    xmlns:icon="https://github.com/projektanker/icons.avalonia"
+    xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels;assembly=SpaceKatMotionMapper"
     d:DesignHeight="720"
     d:DesignWidth="1280"
-    x:DataType="vms:KatActionConfigViewModel"
+    x:DataType="vm:KatActionConfigViewModel"
     mc:Ignorable="d">
     <Design.DataContext>
-        <vms:KatActionConfigViewModel />
+        <vm:KatActionConfigViewModel />
     </Design.DataContext>
 
     <u:UrsaView.Styles>
@@ -39,251 +37,130 @@
         </Style>
     </u:UrsaView.Styles>
 
-    <u:UrsaView.Resources>
-        <local:ModeNumToBoolConverter x:Key="ModeNumToBoolConverter"></local:ModeNumToBoolConverter>
-        <local:ShortTriggerToBoolConverter x:Key="ShortTriggerToBoolConverter"></local:ShortTriggerToBoolConverter>
-        <helpers:KatMotionConverter x:Key="KatMotionConverter"></helpers:KatMotionConverter>
-        <helpers:KatPressModeConverter x:Key="KatPressModeConverter"></helpers:KatPressModeConverter>
-
-        <DataTemplate x:Key="KatActionSelector" x:DataType="vms:KatActionViewModel">
-
-            <StackPanel
-                HorizontalAlignment="Left"
-                Orientation="Horizontal"
-                Spacing="20">
-                <Button VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                        Command="{Binding RemoveSelfCommand}"
-                        Classes="Primary" Theme="{DynamicResource SolidButton}"
-                        FontSize="20" FontWeight="Heavy"
-                        Margin="5">
-                    -
-                </Button>
-                <TextBlock
-                    VerticalAlignment="Center"
-                    Classes="H5"
-                    Theme="{StaticResource TitleTextBlock}">
-                    运动方式
-                </TextBlock>
-                <ComboBox
-                    x:Name="KatActionComboBox"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Stretch"
-                    ItemsSource="{x:Static helpers:KatMotionHelper.KatMotionNames}"
-                    SelectedItem="{Binding KatMotion, Converter={StaticResource KatMotionConverter}, Mode=TwoWay}" />
-                <TextBlock
-                    VerticalAlignment="Center"
-                    Classes="H5"
-                    Theme="{StaticResource TitleTextBlock}">
-                    触发状态:
-                </TextBlock>
-                <Border
-                    Margin="8,0"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"
-                    Theme="{StaticResource RadioButtonGroupBorder}">
-                    <u:SelectionList
-                        x:Name="KatPressModeSelector"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Stretch"
-                        ItemsSource="{x:Static helpers:KatMotionHelper.KatPressModeNames}"
-                        SelectedItem="{Binding KatPressMode, Converter={StaticResource KatPressModeConverter}}">
-                        <u:SelectionList.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" />
-                            </ItemsPanelTemplate>
-                        </u:SelectionList.ItemsPanel>
-                    </u:SelectionList>
-                </Border>
-                <!-- <StackPanel> -->
-                <StackPanel Orientation="Horizontal"
-                            IsEnabled="{Binding #KatPressModeSelector.SelectedItem, Converter={StaticResource ShortTriggerToBoolConverter}}">
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        Classes="H5"
-                        Theme="{StaticResource TitleTextBlock}">
-                        触发次数：
-                    </TextBlock>
-
-                    <u:NumericIntUpDown
-                        Minimum="1" Maximum="5"
-                        EmptyInputValue="1"
-                        Value="{Binding RepeatCount, Mode=TwoWay}">
-                    </u:NumericIntUpDown>
-                </StackPanel>
-            </StackPanel>
-        </DataTemplate>
-    </u:UrsaView.Resources>
-
     <ScrollViewer
         MaxHeight="600"
         Margin="5"
         VerticalScrollBarVisibility="Auto">
         <Border Classes="Hover"
                 Theme="{StaticResource CardBorder}"
-                Padding="2" Margin="0">
-            <Expander>
-                <Expander.Header>
-                    <Grid ColumnDefinitions="*, Auto">
-                        <StackPanel
-                            VerticalAlignment="Center"
-                            Orientation="Horizontal"
-                            Spacing="10">
-                            <ToggleSwitch VerticalAlignment="Center" Classes="Large"
-                                          IsChecked="{Binding IsActivated, Mode=OneWay}"
-                                          Command="{Binding ActivateActionsCommand}" OnContent="" OffContent="" />
+                Padding="10" Margin="0">
 
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Classes="H5" VerticalAlignment="Center"
-                                           Theme="{StaticResource TitleTextBlock}"
-                                           Text="{Binding ConfigName}" IsVisible="{Binding !IsConfigNameEditing}" />
-                                <TextBox Text="{Binding ConfigName}" IsVisible="{Binding IsConfigNameEditing}"></TextBox>
-                                <ToggleButton
-                                    IsVisible="{Binding !IsDefault}"
-                                    IsChecked="{Binding IsConfigNameEditing, Mode=TwoWay}"
-                                    Theme="{DynamicResource BorderlessButton}">
-                                    <icon:Icon FontSize="20" Value="fa-solid fa-pen-to-square" />
-                                </ToggleButton>
-                            </StackPanel>
-
-                            <u:ButtonGroup Classes="Primary Solid" VerticalAlignment="Center">
-                                <Button
-                                    ToolTip.Tip="保存至默认配置文件夹"
-                                    Command="{Binding SaveToSystemConfigCommand}">
-                                    <icon:Icon FontSize="20" Value="fa-solid fa-download" />
-                                </Button>
-                                <Button
-                                    ToolTip.Tip="触发时间、死区配置"
-                                    Command="{Binding SetTimeAndDeadZoneCommand}">
-                                    <icon:Icon FontSize="20" Value="fa-solid fa-gear" />
-                                </Button>
-                                <Button>
-                                    <icon:Icon FontSize="20" Value="fa-solid fa-ellipsis" />
-                                    <Button.Flyout>
-                                        <MenuFlyout>
-                                            <MenuItem Command="{Binding LoadFromFileCommand}">
-                                                <MenuItem.Header>
-                                                    <Grid ColumnDefinitions="Auto,*">
-                                                        <icon:Icon HorizontalAlignment="Center" FontSize="20"
-                                                                   Value="fa-solid fa-file-export" />
-                                                        <TextBlock Grid.Column="1" HorizontalAlignment="Left"
-                                                                   Margin="20,0,0,0">
-                                                            从文件中导入
-                                                        </TextBlock>
-                                                    </Grid>
-                                                </MenuItem.Header>
-                                            </MenuItem>
-                                            <MenuItem Command="{Binding SaveToFileCommand}">
-                                                <MenuItem.Header>
-                                                    <Grid ColumnDefinitions="Auto,*">
-                                                        <icon:Icon HorizontalAlignment="Center" FontSize="20"
-                                                                   Value="fa-solid fa-file-import" />
-                                                        <TextBlock Grid.Column="1" HorizontalAlignment="Left"
-                                                                   Margin="20,0,0,0">
-                                                            另存为到文件
-                                                        </TextBlock>
-                                                    </Grid>
-                                                </MenuItem.Header>
-                                            </MenuItem>
-                                        </MenuFlyout>
-                                    </Button.Flyout>
-                                </Button>
-                            </u:ButtonGroup>
-
-                            <TextBlock Classes="H5" Theme="{StaticResource TitleTextBlock}"
+            <Grid
+                RowDefinitions="Auto,*"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Stretch">
+                <Grid Grid.Row="0" Grid.Column="0"
+                      ColumnDefinitions="Auto, * ,Auto"
+                      HorizontalAlignment="Stretch">
+                    <TextBlock Grid.Column="1" Classes="H5" VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Theme="{StaticResource TitleTextBlock}"
+                               Text="{Binding ConfigName}" IsVisible="{Binding IsDefault}" />
+                    <Button Grid.Column="0" Classes="Primary"
+                            IsVisible="{Binding !IsDefault}">
+                        <Grid ColumnDefinitions="Auto, *">
+                            <PathIcon Data="{StaticResource SemiIconLink}"></PathIcon>
+                            <TextBlock Grid.Column="1" Classes="H5" Theme="{StaticResource TitleTextBlock}"
                                        VerticalAlignment="Center"
-                                       Margin="20, 0,0, 0"
+                                       Margin="5, 0,0, 0"
                                        IsVisible="{Binding !IsDefault}">
-                                关联程序:
+                                关联程序
                             </TextBlock>
-                            <Button Classes="Primary" Theme="{DynamicResource SolidButton}"
-                                    IsVisible="{Binding !IsDefault}">
-                                <icon:Icon FontSize="20" Value="fa-solid fa-link" />
-                                <Button.Flyout>
-                                    <Flyout>
-                                        <local:CurrentRunningProcessSelector Margin="10"></local:CurrentRunningProcessSelector>
-                                    </Flyout>
-                                </Button.Flyout>
-                            </Button>
-                            <TextBlock Classes="Underline H6"
-                                       Theme="{StaticResource TitleTextBlock}"
-                                       VerticalAlignment="Center" Margin="20, 0,20, 0"
-                                       IsVisible="{Binding !IsDefault}"
-                                       Text="{Binding ProcessFilename}"
-                                       ToolTip.Tip="{Binding ProcessPath}" />
+                        </Grid>
+                        <Button.Flyout>
+                            <Flyout>
+                                <local:CurrentRunningProcessSelector Margin="10"></local:CurrentRunningProcessSelector>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                    <TextBlock Grid.Column="1" Classes="Underline H6"
+                               HorizontalAlignment="Stretch"
+                               Theme="{StaticResource TitleTextBlock}"
+                               VerticalAlignment="Center" Margin="20, 0,20, 0"
+                               IsVisible="{Binding !IsDefault}"
+                               Text="{Binding ProcessFilename}"
+                               ToolTip.Tip="{Binding ProcessPath}" />
+                    <Button Grid.Column="2"
+                            Classes="Warning"
+                            Theme="{StaticResource BorderlessButton}"
+                            ToolTip.Tip="删除当前配置"
+                            IsVisible="{Binding !IsDefault}"
+                            Command="{Binding RemoveSelfCommand}">
+                        <PathIcon Data="{StaticResource SemiIconCheckBoxIndeterminate}" />
+                    </Button>
+                </Grid>
 
-                        </StackPanel>
-                        <Button Grid.Column="1"
-                                FontSize="20"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Right"
-                                IsVisible="{Binding !IsDefault}"
-                                Command="{Binding RemoveSelfCommand}">
-                            -
-                        </Button>
-                    </Grid>
+                <Grid Grid.Row="1"
+                      ColumnDefinitions="Auto, *"
+                      Margin="0,10,0,0">
+                    <ToggleSwitch
+                        HorizontalAlignment="Left"
+                        Grid.Column="0" VerticalAlignment="Center" Classes="Large"
+                        IsChecked="{Binding IsActivated, Mode=OneWay}"
+                        Command="{Binding ActivateActionsCommand}" OnContent="" OffContent="" />
 
-                </Expander.Header>
 
-                <TabControl Theme="{DynamicResource ScrollTabControl}"
-                            ItemsSource="{Binding KatActionsWithMode}">
-                    <TabControl.ItemTemplate>
-                        <DataTemplate DataType="vms:KatActionsWithModeViewModel">
+                    <u:ButtonGroup
+
+                        Grid.Column="1"
+                        Classes="Primary"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right">
+                        <Button
+                            Command="{Binding OpenEditDialogCommand}">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Classes="H6"
-                                           Theme="{StaticResource TitleTextBlock}"
-                                           VerticalAlignment="Center">
-                                    模式
-                                </TextBlock>
-                                <TextBlock Classes="H6"
-                                           Theme="{StaticResource TitleTextBlock}"
-                                           VerticalAlignment="Center" Text="{Binding ModeNum}" />
-                                <Button x:Name="ModeRemoveBtn" Margin="5" Classes="Primary"
-                                        Theme="{DynamicResource OutlineButton}"
-                                        Command="{Binding RemoveSelfCommand}"
-                                        IsVisible="{Binding ModeNum, Converter={StaticResource ModeNumToBoolConverter}}">
-                                    -
-                                </Button>
-                                <Button Margin="5" Classes="Primary" Theme="{DynamicResource OutlineButton}"
-                                        Command="{Binding AddOtherCommand}"
-                                        IsVisible="{Binding !#ModeRemoveBtn.IsVisible}">
-                                    +
-                                </Button>
+                                <PathIcon Data="{StaticResource SemiIconEdit}" />
+                                <TextBlock Margin="5,0,0,0">修改配置</TextBlock>
                             </StackPanel>
-                        </DataTemplate>
-                    </TabControl.ItemTemplate>
-                    <TabControl.ContentTemplate>
-                        <DataTemplate DataType="vms:KatActionsWithModeViewModel">
-                            <Grid ColumnDefinitions="Auto, *">
-                                <Button Grid.Column="0" Margin="5"
-                                        VerticalAlignment="Stretch"
-                                        FontSize="20" FontWeight="Heavy"
-                                        Classes="Primary" Theme="{DynamicResource SolidButton}"
-                                        Command="{Binding AddKatActionConfigCommand}">
-                                    +
-                                </Button>
-                                <TabControl Grid.Column="1"
-                                            MaxHeight="300"
-                                            TabStripPlacement="Left"
-                                            Theme="{DynamicResource ScrollTabControl}"
-                                            ItemsSource="{Binding KatActions}"
-                                            ItemTemplate="{StaticResource KatActionSelector}">
-                                    <TabControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel></StackPanel>
-                                        </ItemsPanelTemplate>
-                                    </TabControl.ItemsPanel>
-                                    <TabControl.ContentTemplate>
-                                        <DataTemplate x:DataType="vms:KatActionViewModel">
-                                            <local:ActionConfigView DataContext="{Binding KeyActionConfigGroup}"></local:ActionConfigView>
-                                        </DataTemplate>
-                                    </TabControl.ContentTemplate>
-                                </TabControl>
-                            </Grid>
-                        </DataTemplate>
+                            
+                        </Button>
+                        <Button
+                            Command="{Binding SetTimeAndDeadZoneCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <PathIcon Data="{StaticResource SemiIconSetting}" />
+                                <TextBlock Margin="5,0,0,0">配置触发时间/死区</TextBlock>
+                            </StackPanel>
+                        </Button>
+                        <Button
+                            ToolTip.Tip="保存至默认配置文件夹"
+                            Command="{Binding SaveToSystemConfigCommand}">
+                            <PathIcon Data="{StaticResource SemiIconSave}" />
+                        </Button>
 
-                    </TabControl.ContentTemplate>
-                </TabControl>
-            </Expander>
+                        <Button
+                            ToolTip.Tip="导入导出">
+                            <PathIcon Data="{StaticResource SemiIconMore}" />
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuItem Command="{Binding LoadFromFileCommand}">
+                                        <MenuItem.Header>
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <PathIcon Data="{StaticResource SemiIconExport}" />
+                                                <TextBlock Grid.Column="1" HorizontalAlignment="Left"
+                                                           Margin="20,0,0,0">
+                                                    从文件中导入
+                                                </TextBlock>
+                                            </Grid>
+                                        </MenuItem.Header>
+                                    </MenuItem>
+                                    <MenuItem Command="{Binding SaveToFileCommand}">
+                                        <MenuItem.Header>
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <PathIcon Data="{StaticResource SemiIconImport}" />
+                                                <TextBlock Grid.Column="1" HorizontalAlignment="Left"
+                                                           Margin="20,0,0,0">
+                                                    另存为到文件
+                                                </TextBlock>
+                                            </Grid>
+                                        </MenuItem.Header>
+                                    </MenuItem>
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+                    </u:ButtonGroup>
+                </Grid>
+
+            </Grid>
         </Border>
 
     </ScrollViewer>

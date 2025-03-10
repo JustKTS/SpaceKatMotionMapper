@@ -1,3 +1,5 @@
-﻿namespace SpaceKatMotionMapper.Models;
+﻿using Avalonia.Media;
 
-public record TransparentInfoWindowConfig(int X, int Y, double Width, double Height);
+namespace SpaceKatMotionMapper.Models;
+
+public record TransparentInfoWindowConfig(int X, int Y, double Width, double Height, uint BackgroundColor);
