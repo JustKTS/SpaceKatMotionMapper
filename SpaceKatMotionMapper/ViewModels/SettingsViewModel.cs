@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -11,6 +12,7 @@ using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.States;
+using SpaceKatMotionMapper.Views;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
@@ -22,11 +24,30 @@ public partial class SettingsViewModel : ObservableObject
     private readonly PopUpNotificationService _popUpNotificationService =
         App.GetRequiredService<PopUpNotificationService>();
 
+    public SettingsViewModel()
+    {
+        DisappearTimeMs = _transparentInfoViewModel.DisappearTimeMs;
+        AnimationTimeMs = _transparentInfoViewModel.AnimationTimeMs;
+    }
+    
     # region 透明通知窗设置
-
     private readonly TransparentInfoViewModel _transparentInfoViewModel =
         App.GetRequiredService<TransparentInfoViewModel>();
 
+    [ObservableProperty] private int _disappearTimeMs;
+    [ObservableProperty] private int _animationTimeMs;
+
+    [RelayCommand]
+    private async Task SetTransparentInfoWindowTimes()
+    {
+        // TODO: 此处时间设置冗余，window打开时会重新读取LocalConfig
+        var infoService = App.GetRequiredService<TransparentInfoService>();
+        _transparentInfoViewModel.DisappearTimeMs = DisappearTimeMs;
+        _transparentInfoViewModel.AnimationTimeMs = AnimationTimeMs;
+        await infoService.UpdateTimeConfigs(DisappearTimeMs, AnimationTimeMs);
+       
+    }
+    
     [RelayCommand]
     private void AdjustTransparentInfoWindow()
     {

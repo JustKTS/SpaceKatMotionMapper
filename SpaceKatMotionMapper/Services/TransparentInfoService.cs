@@ -1,4 +1,6 @@
 ﻿using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
 using SpaceKatHIDWrapper.Models;
@@ -19,7 +21,7 @@ public class TransparentInfoService
 
     private TransparentInfoWindow? _window = null;
     private bool _isWindowShow;
-    
+
     public int AnimationTimeMs { get; set; } = 250;
 
 
@@ -141,7 +143,8 @@ public class TransparentInfoService
         });
     }
 
-    public async Task SaveConfigsAsync(int x, int y, double width, double height, double fontSize, Color color,
+    public async Task SaveConfigsAsync(int x, int y, double width, double height, Color backgroundColor,
+        Color fontColor, double fontSize,
         int disappearTimeMs, int animationTimeMs)
     {
         await _localSettingsService.SaveSettingAsync(ConfigStr,
@@ -150,7 +153,8 @@ public class TransparentInfoService
                 y,
                 width,
                 height,
-                color.ToUInt32(),
+                backgroundColor.ToUInt32(),
+                fontColor.ToUInt32(),
                 fontSize,
                 disappearTimeMs,
                 animationTimeMs
@@ -165,5 +169,27 @@ public class TransparentInfoService
             App.GetRequiredService<GlobalStates>().IsTransparentInfoEnable = isEnable ?? true;
         });
         return await _localSettingsService.ReadSettingAsync<TransparentInfoWindowConfig>(ConfigStr);
+    }
+
+    public async Task UpdateTimeConfigs(int disappearTimeMs, int animationTimeMs)
+    {
+        var config = await LoadConfigs();
+        if (config is null)
+        {
+            var window = App.GetRequiredService<TransparentInfoWindow>();
+            var screen = window.Screens.Primary;
+            if (screen == null) return;
+            var area = screen.WorkingArea;
+            var windowHeight = area.Height / 20;
+            var width = windowHeight * 5;
+            var position = new PixelPoint(area.X + area.Width - (int)width - 10,
+                area.Y + area.Height - (int)windowHeight - 10);
+
+            config = new TransparentInfoWindowConfig(position.X, position.Y, width, windowHeight,
+                new Color(0x66, 0xD3, 0xD3, 0xD3).ToUInt32(), Colors.White.ToUInt32(), 15, 1500, 250);
+        }
+
+        var newConfig = config with { DisappearTimeMs = disappearTimeMs, AnimationTimeMs = animationTimeMs };
+        await _localSettingsService.SaveSettingAsync(ConfigStr, newConfig);
     }
 }

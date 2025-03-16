@@ -77,7 +77,16 @@ public class LocalSettingsService : ILocalSettingsService
     public async Task SaveSettingAsync<T>(string key, T value)
     {
         await InitializeAsync();
-        _settings[key] = JsonSerializer.Serialize(value, JsonSgOption.Default);
-        _fileService.Save(_applicationDataFolder, _localSettingsFile, _settings);
+        try
+        {
+            _settings[key] = JsonSerializer.Serialize(value, JsonSgOption.Default);
+            _fileService.Save(_applicationDataFolder, _localSettingsFile, _settings);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+       
     }
 }

@@ -4,14 +4,17 @@
 
 ## 介绍视频
 
-v0.1.x [https://www.bilibili.com/video/BV1rs9bYoEXG](https://www.bilibili.com/video/BV1rs9bYoEXG)
-v0.2.x 待添加
+### v0.1.x
+[https://www.bilibili.com/video/BV1rs9bYoEXG](https://www.bilibili.com/video/BV1rs9bYoEXG)
+
+### v0.2.x
+[https://www.bilibili.com/video/BV1Y3QaYjEKv](https://www.bilibili.com/video/BV1Y3QaYjEKv)
 
 ## 视频所述之外新特性
 1. 添加顶层透明浮窗提示，并可自定义大小及位置（v0.1.6+)
 2. 可手动添加程序，识别其位于顶层时自动启动官方映射, 其余程序自动启动本程序映射（v0.1.7+)
 3. 按键定义支持快速添加快捷键组合（v0.2.3+)
-4. 按键定义支持延时，键盘宏get（v0.2.3+)
+4. 按键定义支持延时，键盘宏get√（v0.2.3+)
 
 ## TODO
 - [x] 模式切换的验证

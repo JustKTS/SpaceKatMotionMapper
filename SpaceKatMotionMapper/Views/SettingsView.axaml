@@ -74,7 +74,7 @@
                     </TextBlock>
                     <TextBlock Classes="H6"
                                Theme="{StaticResource TitleTextBlock}">
-                        版本: 0.2.3
+                        版本: 0.2.4
                     </TextBlock>
                     <TextBlock Classes="H6"
                                Theme="{StaticResource TitleTextBlock}">
@@ -107,22 +107,47 @@
                             </ToggleSwitch>
                         </Grid>
                     </Expander.Header>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
-                        <Button
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding AdjustTransparentInfoWindowCommand}">
-                            <TextBlock Classes="SettingTitle" HorizontalAlignment="Left">透明提示窗设置</TextBlock>
-                        </Button>
-                        <Button
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding HideTransparentInfoWindowCommand}">
-                            <TextBlock Classes="SettingTitle" HorizontalAlignment="Left">关闭透明提示窗设置</TextBlock>
-                        </Button>
+                    <StackPanel HorizontalAlignment="Center" Spacing="5">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                            <Button
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"
+                                Command="{Binding AdjustTransparentInfoWindowCommand}">
+                                <TextBlock Classes="SettingTitle" HorizontalAlignment="Left">透明提示窗设置</TextBlock>
+                            </Button>
+                            <Button
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"
+                                Command="{Binding HideTransparentInfoWindowCommand}">
+                                <TextBlock Classes="SettingTitle" HorizontalAlignment="Left">关闭透明提示窗设置</TextBlock>
+                            </Button>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                            <TextBlock Margin="10 0 10 0"
+                                       VerticalAlignment="Center"
+                                       Classes="H6"
+                                       Theme="{StaticResource TitleTextBlock}"
+                                       Text="消失延时(毫秒):" />
+                            <u:NumericIntUpDown Minimum="300" Maximum="3000" VerticalAlignment="Center"
+                                                EmptyInputValue="1000"
+                                                Value="{Binding DisappearTimeMs , Mode=TwoWay}">
+                            </u:NumericIntUpDown>
+            
+                            <TextBlock Margin="10 0 10 0"
+                                       VerticalAlignment="Center"
+                                       Classes="H6"
+                                       Theme="{StaticResource TitleTextBlock}"
+                                       Text="淡入淡出时间(毫秒):" />
+                            <u:NumericIntUpDown Minimum="0" Maximum="1000" VerticalAlignment="Center"
+                                                EmptyInputValue="250"
+                                                Value="{Binding AnimationTimeMs, Mode=TwoWay}">
+                            </u:NumericIntUpDown>
+                            <Button Command="{Binding SetTransparentInfoWindowTimesCommand}">应用</Button>
+                        </StackPanel>
                     </StackPanel>
+                   
                 </Expander>
             </Border>
 

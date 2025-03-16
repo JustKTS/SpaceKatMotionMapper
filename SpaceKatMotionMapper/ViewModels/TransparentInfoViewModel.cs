@@ -32,12 +32,16 @@ public partial class TransparentInfoViewModel : ViewModelBase
 
     
     [ObservableProperty]
-
-  
     [NotifyPropertyChangedFor(nameof(BackgroundBrush))]
     private Color _backgroundColor = Colors.Gray;
 
     public IBrush BackgroundBrush => new SolidColorBrush(BackgroundColor);
+    
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FontBrush))]
+    private Color _fontColor = Colors.White;
+
+    public IBrush FontBrush => new SolidColorBrush(FontColor);
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(MotionName))]
@@ -46,13 +50,14 @@ public partial class TransparentInfoViewModel : ViewModelBase
 
     public string MotionName => KatMotion.Motion.ToStringFast();
     public string PressModeName => KatMotion.KatPressMode.ToStringFast();
-    
+
+ 
     
     public void SaveConfig(int x, int y, double width, double height)
     {
         var service = App.GetRequiredService<TransparentInfoService>();
         service.SaveConfigsAsync(
-            x, y, width, height, FontSize, BackgroundColor, DisappearTimeMs, AnimationTimeMs).ContinueWith(t =>
+            x, y, width, height, BackgroundColor, FontColor, FontSize, DisappearTimeMs, AnimationTimeMs).ContinueWith(t =>
         {
             service.StopAdjustInfoWindow();
         });

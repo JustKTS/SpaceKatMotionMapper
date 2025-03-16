@@ -29,7 +29,7 @@ public partial class KatMotionsWithModeViewModel: ViewModelBase
     {
         Parent = parent;
         ModeNum = modeNum;
-        KatMotions = [new KatMotionViewModel(this, ModeNum)];
+        KatMotions = [];
         KatMotions.CollectionChanged += (_, e) =>
         {
             // 处理新增项：订阅PropertyChanged
@@ -49,6 +49,7 @@ public partial class KatMotionsWithModeViewModel: ViewModelBase
                 item.PropertyChanged -= ChildPropertyChanged;
             }
         };
+        KatMotions.Add(new KatMotionViewModel(this, ModeNum));
     }
     
     private void ChildPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
