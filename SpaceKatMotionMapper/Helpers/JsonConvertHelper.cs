@@ -9,12 +9,12 @@ public static class JsonConvertHelper
         await Task.Run<T>(() =>
         {
 #pragma warning disable CS8603 // 可能返回 null 引用。
-            return JsonSerializer.Deserialize<T>(value);
+            return JsonSerializer.Deserialize<T>(value,JsonSgOption.Default);
 #pragma warning restore CS8603 // 可能返回 null 引用。
         });
 
     public static async Task<string> StringifyAsync(object value)
     {
-        return await Task.Run(() => JsonSerializer.Serialize(value));
+        return await Task.Run(() => JsonSerializer.Serialize(value, JsonSgOption.Default));
     }
 }

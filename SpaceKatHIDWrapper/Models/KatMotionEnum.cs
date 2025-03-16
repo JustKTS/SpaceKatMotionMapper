@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using NetEscapades.EnumGenerators;
 
 namespace SpaceKatHIDWrapper.Models;
@@ -29,4 +30,19 @@ public enum KatPressModeEnum
     [Display(Name = "长推保持")] LongReach = 1,
     [Display(Name = "长推结束")] LongDown = 2,
     Null = 999
+}
+
+[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSerializable(typeof(KatMotionEnum))]
+[JsonSerializable(typeof(int))]
+public partial class KatMotionEnumJsonSgContext : JsonSerializerContext
+{
+}
+
+
+[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSerializable(typeof(KatPressModeEnum))]
+[JsonSerializable(typeof(int))]
+public partial class KatPressModeEnumJsonSgContext : JsonSerializerContext
+{
 }

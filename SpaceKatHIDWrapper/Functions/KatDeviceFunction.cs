@@ -16,8 +16,16 @@ public static class KatDeviceFunction
     public static async Task<Device?> FindKatDeviceById(int vendorId, int productId)
     {
         var devices = await Task.Run(() => Hid.Enumerate());
-        return (devices.Where(deviceInfo => deviceInfo.VendorId == vendorId && deviceInfo.ProductId == productId)
-            .Select(deviceInfo => deviceInfo.ConnectToDevice())).FirstOrDefault();
+        try
+        {
+            return devices.Where(deviceInfo => deviceInfo.VendorId == vendorId && deviceInfo.ProductId == productId)
+                .Select(deviceInfo => deviceInfo.ConnectToDevice()).FirstOrDefault();
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+       
     }
 
     public static void StopDevice()

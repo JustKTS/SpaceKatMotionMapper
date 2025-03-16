@@ -29,7 +29,7 @@ using SpaceKatMotionMapper.States;
 
 namespace SpaceKatMotionMapper;
 
-public partial class App : Application
+public class App : Application
 {
     private IHost Host { get; }
 
@@ -69,7 +69,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            Debug.WriteLine(ex);
+            GetRequiredService<ILogger>().Fatal(ex, "");
             throw;
         }
     }
@@ -82,11 +82,13 @@ public partial class App : Application
             {
                 services.AddSingleton<MainWindow>();
                 services.AddSingleton<NavViewModel>();
-                services.AddSingleton<ViewRegister>();                
-                
-                services.AddSingleton<TransparentInfoWindow>();
+                services.AddSingleton<ViewRegister>();
+
+                services.AddTransient<KatMotionGroupConfigWindow>();
+
+                services.AddTransient<TransparentInfoWindow>();
                 services.AddSingleton<TransparentInfoViewModel>();
-                
+
                 services.AddSingleton<MainView>();
                 services.AddSingleton<MainViewModel>();
                 services.AddSingleton<SettingsView>();
@@ -96,10 +98,8 @@ public partial class App : Application
                 services.AddSingleton<ConnectAndEnableViewModel>();
                 services.AddSingleton<AutoDisableViewModel>();
 
-                services.AddSingleton<ConfigCenterViewModel>();
-
                 services.AddSingleton<IDeviceDataWrapper, SpaceCompatDataWrapper>();
-                services.AddSingleton<KatActionRecognizeService>();
+                services.AddSingleton<KatMotionRecognizeService>();
 
                 services.AddSingleton<KatMotionTimeConfigService>();
                 services.AddSingleton<KatDeadZoneConfigService>();
@@ -110,7 +110,7 @@ public partial class App : Application
                 services.AddSingleton<DeadZoneConfigViewModel>();
                 services.AddSingleton<TimeAndDeadZoneVMService>();
                 services.AddSingleton<AutoDisableService>();
-                
+
                 services.AddSingleton<PopUpNotificationService>();
                 services.AddSingleton<TransparentInfoService>();
                 services.AddSingleton<GlobalStates>();
@@ -122,37 +122,35 @@ public partial class App : Application
                 services.AddSingleton<CurrentForeProgramHelper>();
                 services.AddSingleton<ActivationStatusService>();
                 services.AddSingleton<InputSimulator>();
-                services.AddSingleton<KatActionActivateService>();
-                services.AddSingleton<KatActionFileService>();
+                services.AddSingleton<KatMotionActivateService>();
+                services.AddSingleton<KatMotionFileService>();
                 services.AddSingleton<CommonConfigViewModel>();
-                services.AddTransient<KatActionConfigViewModel>();
+                services.AddTransient<KatMotionConfigViewModel>();
                 services.AddSingleton<OtherConfigsViewModel>();
                 services.AddTransient<CurrentRunningProcessSelectorViewModel>();
                 services.AddSingleton<ModeChangeService>();
-                services.AddSingleton<ConflictKatActionService>();
-                services.AddSingleton<KatActionConfigVMManageService>();
+                services.AddSingleton<ConflictKatMotionService>();
+                services.AddSingleton<KatMotionConfigVMManageService>();
                 services.AddSingleton<OfficialMapperHotKeyService>();
             })
             .UseSerilog()
             .ConfigureLogging(logging =>
             {
                 logging.ClearProviders();
-              
+
                 if (!Directory.Exists(GlobalPaths.AppLogPath))
                 {
                     Directory.CreateDirectory(GlobalPaths.AppLogPath);
                 }
+
                 var logPath = Path.Combine(GlobalPaths.AppLogPath, "Log.log");
                 Log.Logger = new LoggerConfiguration()
                     .MinimumLevel.Debug()
                     .Enrich.FromLogContext()
-                    .WriteTo.File(logPath,rollingInterval: RollingInterval.Day)
-                    // .WriteTo.Trace(
-                    //     outputTemplate:
-                    //     "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                    .WriteTo.File(logPath, rollingInterval: RollingInterval.Day)
                     .MinimumLevel.Information()
                     .CreateLogger();
-                logging.Services.AddSingleton<ILogger>(Log.Logger);
+                logging.Services.AddSingleton(Log.Logger);
             })
             .Build();
     }
@@ -160,8 +158,7 @@ public partial class App : Application
     public override void Initialize()
     {
         this.EnableHotReload();
-        var activateStatusService = GetService<ActivationStatusService>();
-        activateStatusService.WaitForActivationStatusLoaded();
+        OnStartOrCloseFunctions.LoadOnStart();
         DataContext = this;
         AvaloniaXamlLoader.Load(this);
     }
@@ -185,12 +182,9 @@ public partial class App : Application
                 }
 
                 var mainWindow = GetService<MainWindow>();
+                // var mainWindow = new TestWindow();
                 desktop.MainWindow = mainWindow;
-                mainWindow.Closed += (_, _) =>
-                {
-                    GetService<ActivationStatusService>().SaveActivationStatus();
-                    CloseApp();
-                };
+                mainWindow.Closed += (_, _) => { CloseApp(); };
                 break;
         }
 
@@ -199,6 +193,8 @@ public partial class App : Application
 
     private void CloseApp()
     {
+        GetService<ActivationStatusService>().SaveActivationStatus();
+
         switch (ApplicationLifetime)
         {
             case IClassicDesktopStyleApplicationLifetime desktop:
@@ -206,9 +202,9 @@ public partial class App : Application
                     GetRequiredService<OfficialMapperHotKeyService>();
                 ofMs.UnregisterHotKeyWrapper();
                 ofMs.UnregisterHandle();
-                OfficialWareConfigFunctions.CleanAllChange();
-
+                OfficialWareConfigFunctions.CleanAllChange().GetAwaiter().GetResult();
                 Hid.Exit();
+                GetRequiredService<CurrentForeProgramHelper>().Dispose();
                 _mutex?.WaitOne();
                 _mutex?.ReleaseMutex();
                 desktop.Shutdown();

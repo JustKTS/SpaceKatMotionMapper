@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.Messaging;
+using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.NavVMs;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.ViewModels;
@@ -29,7 +30,7 @@ public partial class MainWindow : UrsaWindow
         _manager = new WindowNotificationManager(topLevel)
         {
             MaxItems = 3,
-            Position = NotificationPosition.TopCenter
+            Position = NotificationPosition.BottomCenter
         };
 
         WeakReferenceMessenger.Default.Register<PopupNotificationData, string>(this, "PopUpNotification",
@@ -63,9 +64,14 @@ public partial class MainWindow : UrsaWindow
     protected override void OnLoaded(RoutedEventArgs e)
     {
         base.OnLoaded(e);
-        App.GetRequiredService<OfficialMapperHotKeyService>().RegisterHandle();
-        App.GetRequiredService<SettingsViewModel>().RegisterHotKeyCommand.Execute(null);
+        OnStartOrCloseFunctions.LoadOnMainWindowLoaded();
         var navVm = App.GetRequiredService<NavViewModel>();
         navVm.OnNavigation(navVm, typeof(MainView).FullName!);
+    }
+
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        OnStartOrCloseFunctions.OnMainWindowClosing();
+        base.OnClosing(e);
     }
 }

@@ -11,7 +11,7 @@ using WindowsInput;
 
 namespace SpaceKatMotionMapper.Services;
 
-public class KatActionActivateService
+public class KatMotionActivateService
 {
     public bool IsActivated { get; set; }
 
@@ -22,29 +22,29 @@ public class KatActionActivateService
     private readonly ModeChangeService _modeChangeService =
         App.GetRequiredService<ModeChangeService>();
 
-    private readonly ConflictKatActionService _conflictKatActionService =
-        App.GetRequiredService<ConflictKatActionService>();
+    private readonly ConflictKatMotionService _conflictKatMotionService =
+        App.GetRequiredService<ConflictKatMotionService>();
 
     private readonly ActivationStatusService _activationStatusService =
         App.GetRequiredService<ActivationStatusService>();
 
-    private readonly KatActionRecognizeService _katActionRecognizeService;
+    private readonly KatMotionRecognizeService _katMotionRecognizeService;
     private readonly InputSimulator _inputSimulator;
     
     private GlobalStates GlobalStates => App.GetRequiredService<GlobalStates>();
 
-    public KatActionActivateService(InputSimulator inputSimulator,
-        KatActionRecognizeService katActionRecognizeService)
+    public KatMotionActivateService(InputSimulator inputSimulator,
+        KatMotionRecognizeService katMotionRecognizeService)
     {
         _inputSimulator = inputSimulator;
-        _katActionRecognizeService = katActionRecognizeService;
-        _katActionRecognizeService.DataReceived += (o, data) =>
+        _katMotionRecognizeService = katMotionRecognizeService;
+        _katMotionRecognizeService.DataReceived += (o, data) =>
         {
             if (!IsActivated) return;
             _katDataReceived?.Invoke(o,
                 new KatDataWithInfo(_modeChangeService.ConfigIsDefault,
                     _modeChangeService.CurrentActivatedConfig, _modeChangeService.CurrentMode,
-                    data));
+                    data.ToKatMotion()));
         };
         GlobalStates.IsMapperEnableChanged += ChangeIsActivated;
     }
@@ -55,7 +55,7 @@ public class KatActionActivateService
     }
 
 
-    public void ActivateKatActions(KatActionConfigGroup configGroup)
+    public void ActivateKatMotions(KatMotionConfigGroup configGroup)
     {
         var id = Guid.Parse(configGroup.Guid);
         var handler = AssembleKatEvent(configGroup);
@@ -65,7 +65,7 @@ public class KatActionActivateService
         _activationStatusService.SetActivationStatus(id, true);
     }
 
-    public void DeactivateKatActions(KatActionConfigGroup configGroup)
+    public void DeactivateKatMotions(KatMotionConfigGroup configGroup)
     {
         var id = Guid.Parse(configGroup.Guid);
         if (!_katData.TryGetValue(id, out var handler)) return;
@@ -74,46 +74,46 @@ public class KatActionActivateService
         _katData.Remove(id);
         if (!configGroup.IsDefault)
         {
-            _conflictKatActionService.RemoveByGuid(id);
+            _conflictKatMotionService.RemoveByGuid(id);
         }
 
         _modeChangeService.RemovePathForBindProcessPathList(configGroup.ProcessPath);
         _activationStatusService.SetActivationStatus(id, false);
     }
 
-    private EventHandler<KatDataWithInfo> AssembleKatEvent(KatActionConfigGroup configGroup)
+    private EventHandler<KatDataWithInfo> AssembleKatEvent(KatMotionConfigGroup configGroup)
     {
         List<Action<KatDataWithInfo>> actions = [];
         if (!configGroup.IsDefault)
         {
-            configGroup.Actions.Iter(e =>
+            configGroup.Motions.Iter(e =>
             {
-                var info = new KatActionInfo(
+                var info = new KatMotionInfo(
                     Guid.Parse(configGroup.Guid),
-                    new KatAction(e.Action.Motion, e.Action.KatPressMode, e.Action.RepeatCount));
-                _conflictKatActionService.Register(info);
+                    new KatMotion(e.Motion.Motion, e.Motion.KatPressMode, e.Motion.RepeatCount));
+                _conflictKatMotionService.Register(info);
             });
         }
 
-        actions.AddRange(configGroup.Actions.Select(config =>
+        actions.AddRange(configGroup.Motions.Select(config =>
             (Action<KatDataWithInfo>)(dataWithInfo =>
             {
                 var id = Guid.Parse(configGroup.Guid);
                 if (dataWithInfo.ConfigIsDefault && !configGroup.IsDefault) return;
                 if (!configGroup.IsDefault && id != dataWithInfo.ActivatedConfigId) return;
-                if (dataWithInfo.KatAction.Motion != config.Action.Motion) return;
-                if (dataWithInfo.KatAction.KatPressMode != config.Action.KatPressMode) return;
-                if (dataWithInfo.KatAction.KatPressMode != KatPressModeEnum.LongReach)
+                if (dataWithInfo.KatMotion.Motion != config.Motion.Motion) return;
+                if (dataWithInfo.KatMotion.KatPressMode != config.Motion.KatPressMode) return;
+                if (dataWithInfo.KatMotion.KatPressMode != KatPressModeEnum.LongReach)
                 {
-                    if (dataWithInfo.KatAction.RepeatCount != config.Action.RepeatCount) return;
+                    if (dataWithInfo.KatMotion.RepeatCount != config.Motion.RepeatCount) return;
                 }
 
                 if (dataWithInfo.Mode != config.ModeNum) return;
 
                 if (configGroup.IsDefault && !dataWithInfo.ConfigIsDefault &&
-                    _conflictKatActionService.IsConflict(dataWithInfo.ActivatedConfigId, config.Action.Motion,
-                        config.Action.KatPressMode,
-                        config.Action.RepeatCount)) return;
+                    _conflictKatMotionService.IsConflict(dataWithInfo.ActivatedConfigId, config.Motion.Motion,
+                        config.Motion.KatPressMode,
+                        config.Motion.RepeatCount)) return;
 
                 foreach (var actionConfig in config.ActionConfigs)
                 {
@@ -126,7 +126,6 @@ public class KatActionActivateService
                     {
                         KeyBoardActionHandler(keyboardActionConfig);
                     }
-                    // TODO:验证延时的可靠性
                     if (actionConfig.TryToDelayActionConfig(out var delayActionConfig))
                     {
                         Thread.Sleep(delayActionConfig.Milliseconds);

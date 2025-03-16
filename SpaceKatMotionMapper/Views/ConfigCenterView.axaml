@@ -37,13 +37,6 @@
                        Theme="{StaticResource TitleTextBlock}" HorizontalAlignment="Center">
                 配置中心
             </TextBlock>
-            <TextBlock
-                Margin="5"
-                Classes="H7"
-                VerticalAlignment="Center"
-                Theme="{StaticResource TitleTextBlock}" HorizontalAlignment="Center">
-                （修改一项配置后需要重新关闭并打开左侧的开关才可生效）
-            </TextBlock>
         </StackPanel>
 
 

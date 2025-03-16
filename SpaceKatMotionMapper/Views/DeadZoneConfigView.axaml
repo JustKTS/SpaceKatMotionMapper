@@ -14,8 +14,15 @@
     </Design.DataContext>
 
     <Border Theme="{StaticResource CardBorder}">
-        <Grid RowDefinitions="*, Auto">
-            <Grid Grid.Row="0" Grid.ColumnDefinitions="*, 5*" RowDefinitions="*,*,*,*,*,*">
+        <Grid RowDefinitions="Auto, *, Auto">
+            <u:IconButton Grid.Row="0"
+                IsVisible="{Binding !IsDefault}"
+                HorizontalAlignment="Center"
+                Icon="{StaticResource SemiIconRefresh}"
+                Content="从全局设置处继承"
+                Command="{Binding CopyFromDefaultCommand}">
+            </u:IconButton>
+            <Grid Grid.Row="1" ColumnDefinitions="*, 5*" RowDefinitions="*,*,*,*,*,*">
                 <TextBlock Grid.Row="0" Grid.Column="0"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
@@ -103,7 +110,7 @@
                                       Value="{Binding YawData}" />
 
             </Grid>
-            <Grid Grid.Row="1" Grid.ColumnSpan="2" Grid.ColumnDefinitions="*, *, *">
+            <Grid Grid.Row="2" ColumnDefinitions="*, *, *">
                 <Button Grid.Column="0"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch"

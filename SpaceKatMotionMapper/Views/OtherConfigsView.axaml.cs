@@ -10,7 +10,7 @@ namespace SpaceKatMotionMapper.Views;
 public partial class OtherConfigsView : UrsaView
 {
     private readonly OtherConfigsViewModel _viewModel;
-    private bool _isFirstLoaded = false;
+    private bool _isFirstLoaded = true;
     public OtherConfigsView()
     {
         _viewModel =  App.GetService<OtherConfigsViewModel>();

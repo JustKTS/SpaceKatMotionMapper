@@ -16,17 +16,17 @@ public class ModeChangeService
     private readonly CurrentForeProgramHelper _currentForeProgramHelper;
     private readonly KatMotionTimeConfigService _katMotionTimeConfigService;
     private readonly KatDeadZoneConfigService _katDeadZoneConfigService;
-    private readonly KatActionConfigVMManageService _katActionConfigVmManageService;
+    private readonly KatMotionConfigVMManageService _katMotionConfigVmManageService;
     public ForeProgramInfo? CurrentForeProgramInfo { get; private set; }
     private Dictionary<string, Guid> BindProcessPathList { get; } = [];
 
     public ModeChangeService(CurrentForeProgramHelper currentForeProgramHelper,
         KatMotionTimeConfigService katMotionTimeConfigService,
         KatDeadZoneConfigService katDeadZoneConfigService,
-        KatActionConfigVMManageService katActionConfigVmManageService
+        KatMotionConfigVMManageService katMotionConfigVmManageService
     )
     {
-        _katActionConfigVmManageService = katActionConfigVmManageService;
+        _katMotionConfigVmManageService = katMotionConfigVmManageService;
         _katMotionTimeConfigService = katMotionTimeConfigService;
         _katDeadZoneConfigService = katDeadZoneConfigService;
         _currentForeProgramHelper = currentForeProgramHelper;
@@ -50,7 +50,7 @@ public class ModeChangeService
             else
             {
                 CurrentActivatedConfig = id;
-                var configRet = _katActionConfigVmManageService.GetConfig(id);
+                var configRet = _katMotionConfigVmManageService.GetConfig(id);
                 configRet.IfSucc(configVm =>
                 {
                     if (configVm.IsCustomMotionTimeConfigs) _katMotionTimeConfigService.ApplyMotionTimeConfigById(id);
@@ -62,7 +62,7 @@ public class ModeChangeService
         });
     }
 
-    public void UpdateBindProcessPathList(KatActionConfigGroup configGroup)
+    public void UpdateBindProcessPathList(KatMotionConfigGroup configGroup)
     {
         BindProcessPathList[configGroup.ProcessPath] = Guid.Parse(configGroup.Guid);
     }

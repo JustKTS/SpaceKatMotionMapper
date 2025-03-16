@@ -4,44 +4,47 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;
 using LanguageExt.Common;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Defines;
+using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.Views;
-using Ursa.Controls;
 using Dispatcher = Avalonia.Threading.Dispatcher;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
-public partial class KatActionConfigViewModel : ViewModelBase
+// TODO: 后续或需要拆分该ViewModel以匹配UI的修改
+public partial class KatMotionConfigViewModel : ViewModelBase
 {
     private readonly OtherConfigsViewModel? _parent;
 
-    [ObservableProperty] private string _configName = "自定义配置";
     [ObservableProperty] private bool _isDefault;
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(ProcessFilename))]
     private string _processPath = string.Empty;
 
     public Guid Id = Guid.NewGuid();
-    public ObservableCollection<KatActionsWithModeViewModel> KatActionsWithMode { get; set; }
-    public ObservableCollection<int> KatActionsModeNums { get; } = [];
+
+    public ObservableCollection<KatMotionsWithModeViewModel> KatMotionsWithMode { get; set; }
+    public ObservableCollection<int> KatMotionsModeNums { get; } = [];
 
 
-    private readonly KatActionActivateService _katActionActivateService =
-        App.GetRequiredService<KatActionActivateService>();
+    private readonly KatMotionActivateService _katMotionActivateService =
+        App.GetRequiredService<KatMotionActivateService>();
 
-    private readonly KatActionFileService _katActionFileService =
-        App.GetRequiredService<KatActionFileService>();
+    private readonly KatMotionFileService _katMotionFileService =
+        App.GetRequiredService<KatMotionFileService>();
 
     private readonly PopUpNotificationService _popUpNotificationService =
         App.GetRequiredService<PopUpNotificationService>();
@@ -58,25 +61,62 @@ public partial class KatActionConfigViewModel : ViewModelBase
     [ObservableProperty] private KatDeadZoneConfig _deadZoneConfig = new();
 
     [ObservableProperty] private bool _isCustomMotionTimeConfigs;
-    [ObservableProperty] private KatMotionTimeConfigs _motionTimeConfigs = new(false);
+    [ObservableProperty] private KatMotionTimeConfigs _motionTimeConfigs = new();
+
+    public bool IsAvailable => CheckIsAvailable();
 
 #if DEBUG
-    public KatActionConfigViewModel() : this(null)
+    public KatMotionConfigViewModel() : this(null)
     {
     }
 #endif
 
-    public KatActionConfigViewModel(OtherConfigsViewModel? parent = null)
+    public KatMotionConfigViewModel(OtherConfigsViewModel? parent = null)
     {
         _parent = parent;
-        KatActionsWithMode = [new KatActionsWithModeViewModel(this, 0)];
-        UpdateKatActionsModeNums();
+        KatMotionsWithMode = [];
+        KatMotionsWithMode.CollectionChanged += (sender, e) =>
+        {
+            // 处理新增项：订阅PropertyChanged
+            if (e.NewItems != null)
+            {
+                foreach (KatMotionsWithModeViewModel item in e.NewItems)
+                {
+                    item.PropertyChanged += ChildPropertyChanged;
+                }
+            }
+
+            // 处理移除项：取消订阅避免内存泄漏
+            if (e.OldItems == null) return;
+
+            foreach (KatMotionsWithModeViewModel item in e.OldItems)
+            {
+                item.PropertyChanged -= ChildPropertyChanged;
+            }
+        };
+        AddKatMotionsWithMode();
+        UpdateKatMotionsModeNums();
+        OnPropertyChanged(nameof(IsAvailable));
     }
 
-    private void UpdateKatActionsModeNums()
+    private void ChildPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        KatActionsModeNums.Clear();
-        KatActionsWithMode.Iter(e => KatActionsModeNums.Add(e.ModeNum));
+        if (e.PropertyName == nameof(KeyActionViewModel.IsAvailable))
+        {
+            OnPropertyChanged(nameof(IsAvailable));
+        }
+    }
+
+    private bool CheckIsAvailable()
+    {
+        return KatMotionsWithMode.All(e0 => e0.IsAvailable);
+    }
+
+    // TODO:该方法会导致已选择的Mode丢失，目前在删除时添加了确认，还需思考修改方法
+    private void UpdateKatMotionsModeNums()
+    {
+        KatMotionsModeNums.Clear();
+        KatMotionsWithMode.Iter(e => KatMotionsModeNums.Add(e.ModeNum));
     }
 
     [RelayCommand]
@@ -87,24 +127,26 @@ public partial class KatActionConfigViewModel : ViewModelBase
             return;
         }
 
-        var index = _parent.KatActionConfigGroups.IndexOf(this);
+        var index = _parent.KatMotionConfigGroups.IndexOf(this);
         _parent.RemoveCommand.Execute(index);
     }
 
 
     [RelayCommand]
-    private void AddKatActionsWithMode()
+    private void AddKatMotionsWithMode()
     {
-        KatActionsWithMode.Add(new KatActionsWithModeViewModel(this, KatActionsWithMode.Count));
-        UpdateKatActionsModeNums();
+        KatMotionsWithMode.Add(new KatMotionsWithModeViewModel(this, KatMotionsWithMode.Count));
+        KatMotionsModeNums.Add(KatMotionsWithMode.Count-1);
+        OnPropertyChanged(nameof(IsAvailable)); 
     }
 
     [RelayCommand]
-    private void RemoveKatActionsWithMode(int index)
+    private void RemoveKatMotionsWithMode(int index)
     {
-        if (index <= 0 || index >= KatActionsWithMode.Count) return;
-        KatActionsWithMode.RemoveAt(index);
-        UpdateKatActionsModeNums();
+        if (index <= 0 || index >= KatMotionsWithMode.Count) return;
+        KatMotionsWithMode.RemoveAt(index);
+        UpdateKatMotionsModeNums();
+        OnPropertyChanged(nameof(IsAvailable));
     }
 
     [RelayCommand]
@@ -112,10 +154,10 @@ public partial class KatActionConfigViewModel : ViewModelBase
     {
         if (!IsActivated)
         {
-            var ret = ToKatActionConfigGroups();
+            var ret = ToKatMotionConfigGroups();
             var ret2 = ret.Match(configGroup =>
             {
-                _katActionActivateService.ActivateKatActions(configGroup);
+                _katMotionActivateService.ActivateKatMotions(configGroup);
                 return true;
             }, ex =>
             {
@@ -131,10 +173,10 @@ public partial class KatActionConfigViewModel : ViewModelBase
         }
         else
         {
-            var ret = ToKatActionConfigGroups();
+            var ret = ToKatMotionConfigGroups();
             var ret2 = ret.Match(configGroup =>
             {
-                _katActionActivateService.DeactivateKatActions(configGroup);
+                _katMotionActivateService.DeactivateKatMotions(configGroup);
                 return true;
             }, ex =>
             {
@@ -150,34 +192,49 @@ public partial class KatActionConfigViewModel : ViewModelBase
         return Task.CompletedTask;
     }
 
-    private Result<bool> ValidateKatActionModeGraph()
+    private Result<bool> ValidateKatMotionModeGraph()
     {
-        // TODO: 需要实现模式节点验证
-        throw new NotImplementedException();
+        var modeChangeValidator = new ModeChangeValidator();
+        foreach (var configWithMode in KatMotionsWithMode)
+        {
+            modeChangeValidator.AddNode(configWithMode.ModeNum);
+            foreach (var katActionConfig in configWithMode.KatMotions)
+            {
+                modeChangeValidator.AddEdge(configWithMode.ModeNum, katActionConfig.ToModeNum);
+            }
+        }
+
+        var (cannotToModes, cannotReturnModes) = modeChangeValidator.Validate();
+        var stringBuilder = new StringBuilder();
+        if (cannotToModes.Count != 0)
+            stringBuilder.Append($"模式 {string.Join("、", cannotToModes)} 无法从模式0到达!");
+        if (cannotReturnModes.Count != 0)
+            stringBuilder.Append($"\n模式 {string.Join("、", cannotReturnModes)} 无法返回到模式0");
+        return cannotToModes.Count == 0 && cannotReturnModes.Count == 0
+            ? true
+            : new Result<bool>(new Exception(stringBuilder.ToString()));
     }
-    
-    private Result<bool> ValidateKatActionConfig()
+
+    private Result<bool> ValidateKatMotionConfig()
     {
         List<string> pressKeys = [];
         List<string> releaseKeys = [];
-        
-        
-        var katActions = KatActionsWithMode.SelectMany(e => e.KatActions).ToList();
 
-        foreach (var katAction in katActions)
+        var katMotions = KatMotionsWithMode.SelectMany(e => e.KatMotions).ToList();
+
+        foreach (var katMotion in katMotions)
         {
             pressKeys.AddRange(
-                katAction.KeyActionConfigGroup.ActionConfigGroups
+                katMotion.KeyActionConfigGroup.ActionConfigGroups
                     .Where(e => e.PressMode == PressModeEnum.Press)
                     .Select(e => e.Key)
                     .ToArray());
 
             releaseKeys.AddRange(
-                katAction.KeyActionConfigGroup.ActionConfigGroups
+                katMotion.KeyActionConfigGroup.ActionConfigGroups
                     .Where(e => e.PressMode == PressModeEnum.Release)
                     .Select(e => e.Key)
                     .ToArray());
-           
         }
 
         var ret1 = pressKeys.All(key => releaseKeys.Contains(key));
@@ -196,29 +253,28 @@ public partial class KatActionConfigViewModel : ViewModelBase
             exceptionStr += $"按键{string.Join(",", pressButNotReleaseKeys)}配置了释放但没有被按下";
         }
 
-        // var existButNotToModeNums = modeNums.Except(toModes).ToArray();
-        // if (existButNotToModeNums.Length != 0)
-        // {
-        //     exceptionStr += $"模式{string.Join(",", existButNotToModeNums)}没有按键动作跳转，请检查配置！";
-        // }
-        
         return new Result<bool>(new Exception(exceptionStr));
     }
 
-    public Result<KatActionConfigGroup> ToKatActionConfigGroups()
+    public Result<KatMotionConfigGroup> ToKatMotionConfigGroups()
     {
-        var ret = ValidateKatActionConfig();
-        return ret.Match(f =>
+        var ret = ValidateKatMotionConfig();
+        return ret.Match(s =>
         {
-            if (!f) return new Result<KatActionConfigGroup>(new Exception("转换失败"));
-            var katActions = KatActionsWithMode.SelectMany(e => e.KatActions).ToList();
+            if (!s) return new Result<KatMotionConfigGroup>(new Exception("转换失败"));
+            var retMode = ValidateKatMotionModeGraph();
+            return retMode.Match(s1 =>
+            {
+                if (!s1) return new Result<KatMotionConfigGroup>(new Exception("转换失败"));
+                var katActions = KatMotionsWithMode.SelectMany(e => e.KatMotions).ToList();
 
-            var configGroups = new KatActionConfigGroup(
-                Id.ToString(), IsDefault, ConfigName, ProcessPath,
-                katActions.Select(x => x.ToKatActionConfig()).ToList(),
-                IsCustomDeadZone, DeadZoneConfig, IsCustomMotionTimeConfigs, MotionTimeConfigs);
-            return configGroups;
-        }, ex => new Result<KatActionConfigGroup>(ex));
+                var configGroups = new KatMotionConfigGroup(
+                    Id.ToString(), IsDefault, ProcessPath,
+                    katActions.Select(x => x.ToKatMotionConfig()).ToList(),
+                    IsCustomDeadZone, DeadZoneConfig, IsCustomMotionTimeConfigs, MotionTimeConfigs);
+                return configGroups;
+            }, ex => new Result<KatMotionConfigGroup>(ex));
+        }, ex => new Result<KatMotionConfigGroup>(ex));
     }
 
     [RelayCommand]
@@ -226,11 +282,11 @@ public partial class KatActionConfigViewModel : ViewModelBase
     {
         try
         {
-            var configGroupRet = ToKatActionConfigGroups();
+            var configGroupRet = ToKatMotionConfigGroups();
             return configGroupRet.Match(
                 configGroup =>
                 {
-                    _katActionActivateService.ActivateKatActions(configGroup);
+                    _katMotionActivateService.ActivateKatMotions(configGroup);
                     return true;
                 },
                 ex =>
@@ -248,27 +304,52 @@ public partial class KatActionConfigViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private Task SaveToSystemConfig()
+    private void SaveToSystemConfig()
     {
+        OnPropertyChanged(nameof(IsAvailable));
+        if (!IsAvailable)
+        {
+            WeakReferenceMessenger.Default.Send(
+                new PopupNotificationData(NotificationType.Error, "存在配置错误，请检查"), Id);
+            return;
+        }
+
         var ret = SaveConfigGroupToSystemConfig();
-        return ret.IsSuccess ? Task.CompletedTask : Task.FromException(new Exception("保存到配置文件失败"));
+        _ = ret.Match(flag =>
+        {
+            if (flag)
+            {
+                WeakReferenceMessenger.Default.Send(
+                    new PopupNotificationData(NotificationType.Success, "保存成功"), Id);
+                if (!IsActivated) return true;
+                ActivateActions(); // 如果启用了，则关闭后重新启用
+                ActivateActions();
+
+                return true;
+            }
+
+            WeakReferenceMessenger.Default.Send(
+                new PopupNotificationData(NotificationType.Error, "保存失败"), Id);
+            return false;
+        }, ex =>
+        {
+            WeakReferenceMessenger.Default.Send(
+                new PopupNotificationData(NotificationType.Error, ex.Message), Id);
+            return false;
+        });
     }
 
     private Result<bool> SaveConfigGroupToSystemConfig()
     {
         try
         {
-            var configGroupRet = ToKatActionConfigGroups();
+            var configGroupRet = ToKatMotionConfigGroups();
             return configGroupRet.Match(
                 configGroup =>
                     IsDefault
-                        ? _katActionFileService.SaveDefaultConfigGroup(configGroup)
-                        : _katActionFileService.SaveConfigGroupToSysConf(configGroup),
-                ex =>
-                {
-                    _popUpNotificationService.Pop(NotificationType.Error, ex.Message);
-                    return false;
-                });
+                        ? _katMotionFileService.SaveDefaultConfigGroup(configGroup)
+                        : _katMotionFileService.SaveConfigGroupToSysConf(configGroup),
+                ex => new Result<bool>(ex));
         }
         catch (Exception e)
         {
@@ -287,7 +368,7 @@ public partial class KatActionConfigViewModel : ViewModelBase
     {
         try
         {
-            var configGroupRet = ToKatActionConfigGroups();
+            var configGroupRet = ToKatMotionConfigGroups();
             return await configGroupRet.Match<Task<Result<bool>>>(
                 async configGroup => await SaveConfigGroupToFileAsync(configGroup),
                 ex => Task.FromResult(new Result<bool>(ex)));
@@ -298,20 +379,21 @@ public partial class KatActionConfigViewModel : ViewModelBase
         }
     }
 
-    private async Task<Result<bool>> SaveConfigGroupToFileAsync(KatActionConfigGroup configGroup)
+    private async Task<Result<bool>> SaveConfigGroupToFileAsync(KatMotionConfigGroup configGroup)
     {
         var storageProvider =
             App.GetRequiredService<IStorageProviderService>().GetStorageProvider();
 
+        var suggestedName = IsDefault ? "全局配置" : Path.GetFileNameWithoutExtension(configGroup.ProcessPath);
         var file = await storageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             DefaultExtension = ".json", FileTypeChoices = [FilePickerFileTypeDefines.Json],
-            ShowOverwritePrompt = true, SuggestedFileName = configGroup.Name, Title = "另存为配置文件"
+            ShowOverwritePrompt = true, SuggestedFileName = suggestedName, Title = "另存为配置文件"
         });
 
         return file == null
             ? false
-            : _katActionFileService.SaveConfigGroup(configGroup, file.Path.LocalPath);
+            : _katMotionFileService.SaveConfigGroup(configGroup, file.Path.LocalPath);
     }
 
     [RelayCommand]
@@ -328,7 +410,7 @@ public partial class KatActionConfigViewModel : ViewModelBase
         }
 
         var file = files[0];
-        var configGroup = _katActionFileService.LoadConfigGroup(file.Path.LocalPath);
+        var configGroup = _katMotionFileService.LoadConfigGroup(file.Path.LocalPath);
         var ret = configGroup.Match(LoadFromConfigGroup, exception =>
             {
                 _popUpNotificationService.Pop(NotificationType.Error, exception.Message);
@@ -338,12 +420,11 @@ public partial class KatActionConfigViewModel : ViewModelBase
         return ret;
     }
 
-    public bool LoadFromConfigGroup(KatActionConfigGroup configGroup)
+    public bool LoadFromConfigGroup(KatMotionConfigGroup configGroup)
     {
         try
         {
             Id = Guid.Parse(configGroup.Guid);
-            ConfigName = configGroup.Name;
             IsDefault = configGroup.IsDefault;
             ProcessPath = configGroup.ProcessPath;
             IsCustomDeadZone = configGroup.IsCustomDeadZone;
@@ -351,24 +432,24 @@ public partial class KatActionConfigViewModel : ViewModelBase
             IsCustomMotionTimeConfigs = configGroup.IsCustomMotionTimeConfigs;
             MotionTimeConfigs = configGroup.MotionTimeConfigs;
 
-            KatActionsWithMode.Clear();
-            var configGroupWithMode = configGroup.Actions.GroupBy(e => e.ModeNum);
+            KatMotionsWithMode.Clear();
+            var configGroupWithMode = configGroup.Motions.GroupBy(e => e.ModeNum);
             foreach (var groupWithMode in configGroupWithMode)
             {
-                var katActionsWithModeVm = new KatActionsWithModeViewModel(this, groupWithMode.Key);
-                katActionsWithModeVm.KatActions.Clear();
+                var katActionsWithModeVm = new KatMotionsWithModeViewModel(this, groupWithMode.Key);
+                katActionsWithModeVm.KatMotions.Clear();
                 foreach (var katActionWithMode in groupWithMode)
                 {
-                    var katActionViewModel = new KatActionViewModel(katActionsWithModeVm, 0);
-                    var ret = katActionViewModel.LoadFromKatActionConfig(katActionWithMode);
+                    var katActionViewModel = new KatMotionViewModel(katActionsWithModeVm, 0);
+                    var ret = katActionViewModel.LoadFromKatMotionConfig(katActionWithMode);
                     if (!ret) return false;
-                    katActionsWithModeVm.KatActions.Add(katActionViewModel);
+                    katActionsWithModeVm.KatMotions.Add(katActionViewModel);
                 }
 
-                KatActionsWithMode.Add(katActionsWithModeVm);
+                KatMotionsWithMode.Add(katActionsWithModeVm);
             }
 
-            UpdateKatActionsModeNums();
+            UpdateKatMotionsModeNums();
             return true;
         }
         catch (Exception e)
@@ -410,38 +491,17 @@ public partial class KatActionConfigViewModel : ViewModelBase
 
         await _timeAndDeadZoneVmService.ShowDialogAsync();
     }
-    
-    
-    # region 开启独立配置框
-    
-    private readonly DialogOptions _options = new()
-    {
-        Mode = DialogMode.None,
-        StartupLocation = WindowStartupLocation.CenterScreen,
-        ShowInTaskBar = true,
-        CanDragMove = true,
-        IsCloseButtonVisible = true,
-        CanResize = true
-    };
 
-    
+
+    # region 开启独立配置窗口
+
     [RelayCommand]
     private void OpenEditDialog()
     {
-        var title = IsDefault ? ConfigName : ProcessFilename;
-        var options = new DialogOptions()
-        {
-            Title = title,
-            Button = DialogButton.None,
-            Mode = DialogMode.None,
-            StartupLocation = WindowStartupLocation.CenterScreen,
-            ShowInTaskBar = true,
-            CanDragMove = true,
-            IsCloseButtonVisible = true,
-            CanResize = true
-        };
-        Dialog.ShowCustom<KatMotionGroupConfigView, KatActionConfigViewModel>(
-            this, options: options);
+        var window = App.GetRequiredService<KatMotionGroupConfigWindow>();
+        window.DataContext = this;
+        window.Show();
     }
+
     #endregion
 }

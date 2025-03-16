@@ -76,7 +76,7 @@ public class ActionTypeKeyOrButtonConverter : IValueConverter
             }
 
             var keyCode = VirtualKeyHelper.Parse(keyStr);
-            return keyCode.ToString();
+            return keyCode.ToWarpCodeName();
         }
         catch (Exception e)
         {

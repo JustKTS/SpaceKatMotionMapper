@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using SpaceKatMotionMapper.Views;
@@ -26,6 +27,16 @@ public partial class NavViewModel : ObservableRecipient
 
     public void OnNavigation(NavViewModel vm, string s)
     {
-        Content = _viewRegister.GetView(s);
+        try
+        {
+            Content = _viewRegister.GetView(s);
+        }
+        catch (Exception e)
+        {
+            Content = null;
+            var window = new CleanOldConfigsWindow();
+            window.ShowDialog(App.GetRequiredService<MainWindow>());
+        }
+        
     }
 }

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
+using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.Services;
@@ -15,7 +16,7 @@ public class FileService : IFileService
         var json = File.ReadAllText(path);
         try
         {
-            return JsonConvert.DeserializeObject<T>(json);
+            return JsonSerializer.Deserialize<T>(json, JsonSgOption.Default);
         }
         catch (Exception e)
         {
@@ -31,7 +32,7 @@ public class FileService : IFileService
             Directory.CreateDirectory(folderPath);
         }
 
-        var fileContent = JsonConvert.SerializeObject(content);
+        var fileContent = JsonSerializer.Serialize(content, JsonSgOption.Default);
         File.WriteAllText(Path.Combine(folderPath, fileName), fileContent, Encoding.UTF8);
     }
 

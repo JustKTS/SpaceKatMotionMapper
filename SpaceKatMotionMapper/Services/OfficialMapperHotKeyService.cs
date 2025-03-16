@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using LanguageExt.Common;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services.Contract;
@@ -16,10 +17,10 @@ public class OfficialMapperHotKeyService(ITopLevelHelper topLevelHelper)
 
     private const int HotKeyEventId = 9876;
 
-    public Result<bool> RegisterHotKeyWrapper(bool useCtrl, bool useAlt, bool useShift, HotKeyCodeEnum hotKey,
+    public async Task<Result<bool>> RegisterHotKeyWrapper(bool useCtrl, bool useAlt, bool useShift, HotKeyCodeEnum hotKey,
         KatButtonEnum katButtonEnum)
     {
-        OfficialWareConfigFunctions.UnbindHotKeyToKatButton();
+        await OfficialWareConfigFunctions.UnbindHotKeyToKatButton();
         var modifierKeys = 0;
         if (useCtrl) modifierKeys |= 2;
         if (useAlt) modifierKeys |= 1;
@@ -36,9 +37,8 @@ public class OfficialMapperHotKeyService(ITopLevelHelper topLevelHelper)
             if (!ret) return new Result<bool>(new Exception("注册热键失败"));
             if (katButtonEnum != KatButtonEnum.None)
             {
-                OfficialWareConfigFunctions.BindHotKeyToKatButton(katButtonEnum, useCtrl, useAlt, useShift, hotKey);
+                 return await OfficialWareConfigFunctions.BindHotKeyToKatButton(katButtonEnum, useCtrl, useAlt, useShift, hotKey);
             }
-
             return true;
         }
 

@@ -15,7 +15,7 @@
     <u:UrsaView.Resources>
         <local:KatButtonEnumToStrConverter x:Key="KatButtonEnumToStrConverter"> </local:KatButtonEnumToStrConverter>
     </u:UrsaView.Resources>
-    
+
     <u:UrsaView.Styles>
         <Style Selector="Expander:down Border#ExpanderContent">
             <Setter Property="BorderThickness" Value="0" />
@@ -24,11 +24,13 @@
             <Setter Property="BorderBrush" Value="{DynamicResource SemiColorPrimary}"></Setter>
             <Setter Property="BorderThickness" Value="0,0,0,1" />
         </Style>
-        <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:pointerover:unchecked /template/ ContentPresenter">
+        <Style
+            Selector="Expander:down /template/ ToggleButton#ExpanderHeader:pointerover:unchecked /template/ ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}"></Setter>
             <Setter Property="CornerRadius" Value="5"></Setter>
         </Style>
-        <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:pointerover:checked /template/ ContentPresenter">
+        <Style
+            Selector="Expander:down /template/ ToggleButton#ExpanderHeader:pointerover:checked /template/ ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}"></Setter>
             <Setter Property="CornerRadius" Value="5, 5,0,0"></Setter>
         </Style>
@@ -46,18 +48,20 @@
         </Style>
 
     </u:UrsaView.Styles>
-    
+
     <Border Classes="SettingTitle Hover" Theme="{StaticResource CardBorder}"
             Padding="0" Margin="15">
-        <Expander >
+        <Expander>
             <Expander.Header>
                 <TextBlock
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center"
-                    Classes="SettingTitle">状态显示</TextBlock>
+                    Classes="SettingTitle">
+                    状态显示
+                </TextBlock>
             </Expander.Header>
             <Grid RowDefinitions="*,*" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                <Border Grid.Row="0" Theme="{StaticResource CardBorder}">
+                <Border Grid.Row="0" Classes="Shadow" Theme="{StaticResource CardBorder}">
                     <Grid RowDefinitions="Auto,*">
                         <TextBlock
                             Classes="H4"
@@ -100,7 +104,7 @@
                         </Grid>
                     </Grid>
                 </Border>
-                <Border Grid.Row="1"  Theme="{StaticResource CardBorder}">
+                <Border Grid.Row="1" Classes="Shadow" Theme="{StaticResource CardBorder}">
                     <Grid RowDefinitions="Auto,*">
                         <TextBlock
                             Classes="H4"

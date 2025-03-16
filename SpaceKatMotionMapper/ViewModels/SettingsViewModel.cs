@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SpaceKatMotionMapper.Functions;
@@ -19,7 +21,7 @@ public partial class SettingsViewModel : ObservableObject
 
     private readonly PopUpNotificationService _popUpNotificationService =
         App.GetRequiredService<PopUpNotificationService>();
-    
+
     # region 透明通知窗设置
 
     private readonly TransparentInfoViewModel _transparentInfoViewModel =
@@ -36,16 +38,26 @@ public partial class SettingsViewModel : ObservableObject
         _transparentInfoService.StartAdjustInfoWindow();
     }
 
+    [RelayCommand]
+    private void HideTransparentInfoWindow()
+    {
+        if (!_transparentInfoViewModel.IsAdjustMode)
+        {
+            return;
+        }
+
+        _transparentInfoService.StopAdjustInfoWindow();
+    }
+
     # endregion
 
     #region 禁用官方映射
 
-
     private readonly OfficialMapperHotKeyService _officialMapperHotKeyService =
         App.GetRequiredService<OfficialMapperHotKeyService>();
 
-    private readonly KatActionActivateService _katActionActivateService =
-        App.GetRequiredService<KatActionActivateService>();
+    private readonly KatMotionActivateService _katMotionActivateService =
+        App.GetRequiredService<KatMotionActivateService>();
 
     private readonly ILocalSettingsService _localSettingsService = App.GetRequiredService<ILocalSettingsService>();
 
@@ -77,30 +89,37 @@ public partial class SettingsViewModel : ObservableObject
             UseShift = hotKey.UseShift;
             HotKey = hotKey.HotKey;
             SelectedKatButton = hotKey.BindKatButtonEnum;
+
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                RegisterHotKeyCommand.Execute(null);
+            });
         });
+        
     }
 
     [RelayCommand]
-    private void RegisterHotKey()
+    private async Task RegisterHotKey()
     {
         if (UseShift || UseAlt || UseCtrl)
         {
-            var ret = _officialMapperHotKeyService.RegisterHotKeyWrapper(UseCtrl, UseAlt, UseShift, HotKey,
+            var ret = await _officialMapperHotKeyService.RegisterHotKeyWrapper(UseCtrl, UseAlt, UseShift, HotKey,
                 SelectedKatButton);
-            var ret2 = ret.Match(s =>
+            _ = ret.Match(s =>
             {
                 if (!s)
                 {
                     _popUpNotificationService.Pop(NotificationType.Warning, "注册热键失败");
                 }
 
-                return s;
+                _popUpNotificationService.Pop(NotificationType.Success, "注册热键成功");
+                SaveHotKey();
+                return true;
             }, ex =>
             {
                 _popUpNotificationService.Pop(NotificationType.Warning, "注册热键失败");
                 return false;
             });
-            if (ret2) SaveHotKey();
         }
         else
         {
@@ -131,19 +150,14 @@ public partial class SettingsViewModel : ObservableObject
     }
 
     # endregion
-    
+
     # region 启动时加载
-    
+
     public void LoadInStart()
     {
         LoadHotKey();
+        AutoDisableViewModel.LoadInfos();
     }
+
     #endregion
 }
-
-public record HotKeyRecord(
-    bool UseCtrl,
-    bool UseAlt,
-    bool UseShift,
-    HotKeyCodeEnum HotKey,
-    KatButtonEnum BindKatButtonEnum);

@@ -1,9 +1,11 @@
-﻿using Avalonia;
+﻿using System;
+using System.Globalization;
+using Avalonia;
+using Avalonia.Data.Converters;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
-using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.ViewModels;
 using Ursa.Controls;
@@ -15,7 +17,6 @@ public partial class TransparentInfoWindow : UrsaWindow
     public TransparentInfoWindow()
     {
         DataContext = App.GetRequiredService<TransparentInfoViewModel>();
-        ShowActivated = false;
         InitializeComponent();
     }
 
@@ -28,10 +29,7 @@ public partial class TransparentInfoWindow : UrsaWindow
             if (config is null)
             {
                 var screen = Screens.Primary;
-                if (screen == null)
-                {
-                    return;
-                }
+                if (screen == null) return;
 
                 Dispatcher.UIThread.InvokeAsync(() =>
                 {
@@ -42,6 +40,9 @@ public partial class TransparentInfoWindow : UrsaWindow
                     Position = new PixelPoint(area.X + area.Width - (int)Width - 10,
                         area.Y + area.Height - (int)Height - 10);
                     (DataContext as TransparentInfoViewModel)!.BackgroundColor = new Color(0x66, 0xD3, 0xD3, 0xD3);
+                    (DataContext as TransparentInfoViewModel)!.FontSize = 15;
+                    (DataContext as TransparentInfoViewModel)!.DisappearTimeMs = 1500;
+                    (DataContext as TransparentInfoViewModel)!.AnimationTimeMs = 250;
                 });
             }
             else
@@ -54,6 +55,14 @@ public partial class TransparentInfoWindow : UrsaWindow
 
                     (DataContext as TransparentInfoViewModel)!.BackgroundColor =
                         Color.FromUInt32(config.BackgroundColor);
+                    if (config.FontSize ==0 ) 
+                        (DataContext as TransparentInfoViewModel)!.FontSize = 15;
+                    else
+                    {
+                        (DataContext as TransparentInfoViewModel)!.FontSize = config.FontSize;
+                    }
+                    (DataContext as TransparentInfoViewModel)!.DisappearTimeMs = config.DisappearTimeMs;
+                    (DataContext as TransparentInfoViewModel)!.AnimationTimeMs = config.AnimationTimeMs;
                 });
             }
         });
@@ -66,12 +75,25 @@ public partial class TransparentInfoWindow : UrsaWindow
 
     private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (e.Pointer.Type == PointerType.Mouse) this.BeginMoveDrag(e);
+        if (e.Pointer.Type == PointerType.Mouse) BeginMoveDrag(e);
     }
 
     private void SaveConfigButton_OnClick(object? sender, RoutedEventArgs e)
     {
         var vm = (DataContext as TransparentInfoViewModel)!;
         vm.SaveConfig(Position.X, Position.Y, Width, Height);
+    }
+}
+
+public class TimeSpanMsConverter:IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        return TimeSpan.FromMilliseconds(value is not int timeSpanMs ? 250 : timeSpanMs);
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
     }
 }

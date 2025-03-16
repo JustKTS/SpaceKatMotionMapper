@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SpaceKatHIDWrapper.DeviceWrappers;
@@ -19,7 +21,7 @@ public partial class ConnectAndEnableViewModel : ObservableObject
     {
         GlobalStates.IsConnectionChanged += ConnectionChangeHandle;
         GlobalStates.IsMapperEnableChanged += SwitchMapperEnable;
-        
+        _deviceDataWrapper.ConnectionChanged += OnDeviceIsConnectedChange;
     }
 
 
@@ -36,8 +38,8 @@ public partial class ConnectAndEnableViewModel : ObservableObject
 
     #region 连接情况
 
-    private readonly KatActionRecognizeService _katActionRecognizeService =
-        App.GetRequiredService<KatActionRecognizeService>();
+    private readonly KatMotionRecognizeService _katMotionRecognizeService =
+        App.GetRequiredService<KatMotionRecognizeService>();
 
     private readonly IDeviceDataWrapper _deviceDataWrapper =
         App.GetRequiredService<IDeviceDataWrapper>();
@@ -57,8 +59,11 @@ public partial class ConnectAndEnableViewModel : ObservableObject
         }
     }
 
+    private bool _isUseConnectButton;
+
     private void ConnectionChangeHandle(object? obj, bool isConnected)
     {
+        if (_isUseConnectButton) return;
         if (!isConnected)
         {
             const string message = "连接断开";
@@ -74,11 +79,11 @@ public partial class ConnectAndEnableViewModel : ObservableObject
 
             _listenTask = Task.Run(async () =>
             {
-                _katActionRecognizeService.ExitEvent.Reset();
+                _katMotionRecognizeService.ExitEvent.Reset();
 
                 try
                 {
-                    await _katActionRecognizeService.StartRecognizeMotionAsync();
+                    await _katMotionRecognizeService.StartRecognizeMotionAsync();
                 }
                 catch (Exception e)
                 {
@@ -94,43 +99,45 @@ public partial class ConnectAndEnableViewModel : ObservableObject
 
         if (!isConnected)
         {
-            _popUpNotificationService.Pop(NotificationType.Warning, "未搜索到设备，是否已连接好？");
+            _isUseConnectButton = true;
+            _popUpNotificationService.Pop(NotificationType.Warning, "未搜索到设备，是否已打开设备并配对成功？");
             GlobalStates.IsConnected = true;
             GlobalStates.IsConnected = false;
+            _isUseConnectButton = false;
             return;
         }
-
-        GlobalStates.IsConnected = _deviceDataWrapper.IsConnected;
     }
 
-    private void DisconnectDevice()
+    private static void OnDeviceIsConnectedChange(object? sender, bool value) => 
+        Dispatcher.UIThread.InvokeAsync(()=> GlobalStates.IsConnected = value);
+
+private void DisconnectDevice()
     {
-        _katActionRecognizeService.ExitEvent.Set();
+        _katMotionRecognizeService.ExitEvent.Set();
         _listenTask?.Wait();
         _listenTask = null;
         KatDeviceFunction.StopDevice();
-        GlobalStates.IsConnected = false;
     }
 
     #endregion
 
     #region 映射启动情况
-
-    private readonly OfficialMapperHotKeyService _officialMapperHotKeyService =
-        App.GetRequiredService<OfficialMapperHotKeyService>();
-
-
+    
     private void SwitchMapperEnable(object? sender, bool e)
     {
         if (e)
         {
-            OfficialWareConfigFunctions.CloseOfficialMapper();
-            _transparentInfoService.DisplayOtherInfo("官方映射已禁用");
+            OfficialWareConfigFunctions.CloseOfficialMapper().ContinueWith(t =>
+            {
+                _transparentInfoService.DisplayOtherInfo("官方映射已禁用");
+            });
         }
         else
         {
-            OfficialWareConfigFunctions.OpenOfficialMapper();
-            _transparentInfoService.DisplayOtherInfo("官方映射已启用");
+            OfficialWareConfigFunctions.OpenOfficialMapper().ContinueWith(t =>
+            {
+                _transparentInfoService.DisplayOtherInfo("官方映射已启用");
+            });
         }
     }
     

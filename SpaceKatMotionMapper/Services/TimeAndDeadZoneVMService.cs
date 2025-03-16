@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using SpaceKatMotionMapper.States;
 using SpaceKatMotionMapper.ViewModels;
 using SpaceKatMotionMapper.Views;
 using Ursa.Controls;
@@ -43,11 +44,14 @@ public class TimeAndDeadZoneVMService(
 
     public async Task ShowDialogAsync()
     {
+        var globalStates = App.GetRequiredService<GlobalStates>();
         timeAndDeadZoneSettingViewModel.StartKatListening();
         deadZoneConfigViewModel.StartAxesDataDisplay();
+        globalStates.IsMapperEnable = false;
         await Dialog.ShowCustomModal<TimeAndDeadZoneSettingView, TimeAndDeadZoneSettingViewModel, object>(
             timeAndDeadZoneSettingViewModel, options: _options);
         timeAndDeadZoneSettingViewModel.StopKatListening();
         deadZoneConfigViewModel.StopAxesDataDisplay();
+        globalStates.IsMapperEnable = true;
     }
 }

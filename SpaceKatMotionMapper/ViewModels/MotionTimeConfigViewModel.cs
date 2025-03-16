@@ -10,7 +10,7 @@ using SpaceKatMotionMapper.Services;
 namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class MotionTimeConfigViewModel(
-    KatActionRecognizeService katActionRecognizeService,
+    KatMotionRecognizeService katMotionRecognizeService,
     KatMotionTimeConfigService katMotionTimeConfigService)
     : ViewModelBase
 {
@@ -18,7 +18,7 @@ public partial class MotionTimeConfigViewModel(
 
     [ObservableProperty] private Guid _id;
 
-    private KatMotionTimeConfigs _configs = new(false);
+    private KatMotionTimeConfigs _configs = new();
 
     public ObservableCollection<MotionTimeSingleConfigViewModel> ConfigViewModels { get; } = [];
 
@@ -104,7 +104,7 @@ public partial class MotionTimeConfigViewModel(
                 _configs.Configs.Add(motion, config);
             }
         }
-        katActionRecognizeService.UpdateMotionTimeConfigs(_configs);
+        katMotionRecognizeService.UpdateMotionTimeConfigs(_configs);
     }
 
     [RelayCommand]
@@ -116,5 +116,11 @@ public partial class MotionTimeConfigViewModel(
             : katMotionTimeConfigService.SaveTimeConfig(_configs, Id);
     }
 
+    [RelayCommand]
+    private void CopyFromDefault()
+    {
+        _configs.Configs.Clear();
+        ReloadConfigs();
+    }
     #endregion
 }

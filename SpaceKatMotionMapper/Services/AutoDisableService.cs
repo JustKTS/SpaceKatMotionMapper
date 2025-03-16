@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Avalonia.Threading;
 using SpaceKatHIDWrapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
@@ -18,6 +19,8 @@ public class AutoDisableService
     private const string AutoDisableKey = "IsAutoDisable";
 
     private bool _isEnable;
+
+    private bool _initialized;
 
     public bool IsEnable
     {
@@ -44,15 +47,23 @@ public class AutoDisableService
     {
         _currentForeProgramHelper = currentForeProgramHelper;
         _localSettingsService = localSettingsService;
-        _localSettingsService.ReadSettingAsync<List<string>>(AutoDisableProgramsKey).ContinueWith(t =>
+        _ = InitializeAsync();
+    }
+
+    public async Task InitializeAsync()
+    {
+        if (_initialized) return;
+        var keys = await _localSettingsService.ReadSettingAsync<List<string>>(AutoDisableProgramsKey);
+        if (keys is not null)
         {
-            if (t.Result is null) return;
-            _autoDisablePrograms.AddRange(t.Result);
-        });
-        _localSettingsService.ReadSettingAsync<bool?>(AutoDisableKey).ContinueWith(t =>
+            _autoDisablePrograms.AddRange(keys);
+        }
+        var isEnable = await _localSettingsService.ReadSettingAsync<bool?>(AutoDisableKey);
+        if (isEnable is not null)
         {
-            IsEnable = t.Result ?? false;
-        });
+            await Dispatcher.UIThread.InvokeAsync(() => { IsEnable = isEnable.Value; });
+        }
+        _initialized = true;
     }
 
     public void AddProgramPath(string programPath)

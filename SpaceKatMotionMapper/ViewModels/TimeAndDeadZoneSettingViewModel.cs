@@ -9,8 +9,8 @@ using SpaceKatMotionMapper.Services;
 namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class TimeAndDeadZoneSettingViewModel(
-    KatActionRecognizeService katActionRecognizeService,
-    KatActionConfigVMManageService katActionConfigVmManageService,
+    KatMotionRecognizeService katMotionRecognizeService,
+    KatMotionConfigVMManageService katMotionConfigVmManageService,
     PopUpNotificationService popUpNotificationService) : ViewModelBase
 {
     [ObservableProperty] private bool _isDefault;
@@ -25,10 +25,10 @@ public partial class TimeAndDeadZoneSettingViewModel(
 
     public void StartKatListening()
     {
-        katActionRecognizeService.DataReceived += ListenKatStatus;
+        katMotionRecognizeService.DataReceived += ListenKatStatus;
     }
 
-    private void ListenKatStatus(object? _, KatAction data)
+    private void ListenKatStatus(object? _, KatMotionWithTimeStamp data)
     {
         KatMotion = data.Motion.ToStringFast();
         PressMode = data.KatPressMode.ToStringFast();
@@ -37,7 +37,7 @@ public partial class TimeAndDeadZoneSettingViewModel(
 
     public void StopKatListening()
     {
-        katActionRecognizeService.DataReceived -= ListenKatStatus;
+        katMotionRecognizeService.DataReceived -= ListenKatStatus;
     }
 
     #endregion
@@ -56,7 +56,7 @@ public partial class TimeAndDeadZoneSettingViewModel(
     {
         IsDefault = false;
         Id = id;
-        var configRet = katActionConfigVmManageService.GetConfig(id);
+        var configRet = katMotionConfigVmManageService.GetConfig(id);
         _ = configRet.Match(configVm =>
             {
                 IsDeadZoneConfigEnable = configVm.IsCustomDeadZone;
@@ -76,7 +76,7 @@ public partial class TimeAndDeadZoneSettingViewModel(
     partial void OnIsDeadZoneConfigEnableChanged(bool value)
     {
         if (IsDefault || Id == Guid.Empty) return;
-        var configRet = katActionConfigVmManageService.GetConfig(Id);
+        var configRet = katMotionConfigVmManageService.GetConfig(Id);
         _ = configRet.Match(configVm =>
         {
             configVm.IsCustomDeadZone = value;
@@ -91,7 +91,7 @@ public partial class TimeAndDeadZoneSettingViewModel(
     partial void OnIsTimeConfigEnableChanged(bool value)
     {
         if (IsDefault || Id == Guid.Empty) return;
-        var configRet = katActionConfigVmManageService.GetConfig(Id);
+        var configRet = katMotionConfigVmManageService.GetConfig(Id);
         _ = configRet.Match(configVm =>
         {
             configVm.IsCustomMotionTimeConfigs = value;

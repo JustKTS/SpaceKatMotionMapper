@@ -28,10 +28,13 @@ public partial class AutoDisableViewModel(AutoDisableService autoDisableService)
 
     public void LoadInfos()
     {
-        IsEnable = autoDisableService.IsEnable;
-        AutoDisableInfos.Clear();
-        autoDisableService.GetAllProgramPaths()
-            .Iter(e => AutoDisableInfos.Add(new AutoDisableProgramViewModel(this, e)));
+        autoDisableService.InitializeAsync().ContinueWith(t =>
+        {
+            IsEnable = autoDisableService.IsEnable;
+            AutoDisableInfos.Clear();
+            autoDisableService.GetAllProgramPaths()
+                .Iter(e => AutoDisableInfos.Add(new AutoDisableProgramViewModel(this, e)));
+        });
     }
 }
 

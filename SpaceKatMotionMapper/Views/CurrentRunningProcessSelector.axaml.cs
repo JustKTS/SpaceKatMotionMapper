@@ -15,7 +15,7 @@ public partial class CurrentRunningProcessSelector : UrsaView
     protected override void OnAttachedToLogicalTree(LogicalTreeAttachmentEventArgs e)
     {
         base.OnAttachedToLogicalTree(e);
-        if (Parent?.DataContext is not KatActionConfigViewModel kbVm)
+        if (Parent?.DataContext is not KatMotionConfigViewModel kbVm)
         {
             return;
         }

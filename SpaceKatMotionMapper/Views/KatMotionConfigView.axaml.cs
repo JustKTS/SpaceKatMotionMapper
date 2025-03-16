@@ -9,9 +9,9 @@ using SpaceKatMotionMapper.Helpers;
 
 namespace SpaceKatMotionMapper.Views;
 
-public partial class KatActionConfigView : UserControl
+public partial class KatMotionConfigView : UserControl
 {
-    public KatActionConfigView()
+    public KatMotionConfigView()
     {
         InitializeComponent();
     }

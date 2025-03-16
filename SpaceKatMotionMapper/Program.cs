@@ -1,8 +1,11 @@
 ﻿using Avalonia;
 using System;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
 using Serilog;
 using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.Services;
+using SpaceKatMotionMapper.Views;
 
 namespace SpaceKatMotionMapper;
 
@@ -21,8 +24,8 @@ sealed class Program
         }
         catch (Exception e)
         {
-            App.GetRequiredService<ILogger>().Error(e, "");
-            OfficialWareConfigFunctions.CleanAllChange();
+            App.GetRequiredService<ILogger>().Fatal(e, "");
+            OfficialWareConfigFunctions.CleanAllChange().GetAwaiter().GetResult();
             throw;
         }
     }

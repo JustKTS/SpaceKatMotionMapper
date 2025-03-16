@@ -14,8 +14,27 @@ public partial class TransparentInfoViewModel : ViewModelBase
     [ObservableProperty] private bool _isAdjustMode;
     [ObservableProperty] private bool _isOtherInfo;
     [ObservableProperty] private string _otherInfo = string.Empty;
+    [ObservableProperty] private double _fontSize = 15;
+    [ObservableProperty] private int _disappearTimeMs = 1500;
+    [ObservableProperty] private int _animationTimeMs = 250;
     
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(BackgroundBrush))]
+    partial void OnAnimationTimeMsChanged(int value)
+    {
+        var service = App.GetRequiredService<TransparentInfoService>();
+        service.AnimationTimeMs = value;
+    }
+    
+    partial void OnDisappearTimeMsChanged(int value)
+    {
+        var service = App.GetRequiredService<TransparentInfoService>();
+        service.SetDisappearTime(value);
+    }
+
+    
+    [ObservableProperty]
+
+  
+    [NotifyPropertyChangedFor(nameof(BackgroundBrush))]
     private Color _backgroundColor = Colors.Gray;
 
     public IBrush BackgroundBrush => new SolidColorBrush(BackgroundColor);
@@ -23,16 +42,17 @@ public partial class TransparentInfoViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(MotionName))]
     [NotifyPropertyChangedFor(nameof(PressModeName))]
-    private KatAction _katAction = new KatAction(KatMotionEnum.Null, KatPressModeEnum.Null, 0);
+    private KatMotion _katMotion = new(KatMotionEnum.Null, KatPressModeEnum.Null, 0);
 
-    public string MotionName => KatAction.Motion.ToStringFast();
-    public string PressModeName => KatAction.KatPressMode.ToStringFast();
+    public string MotionName => KatMotion.Motion.ToStringFast();
+    public string PressModeName => KatMotion.KatPressMode.ToStringFast();
+    
     
     public void SaveConfig(int x, int y, double width, double height)
     {
         var service = App.GetRequiredService<TransparentInfoService>();
         service.SaveConfigsAsync(
-            x, y, width, height, BackgroundColor).ContinueWith(t =>
+            x, y, width, height, FontSize, BackgroundColor, DisappearTimeMs, AnimationTimeMs).ContinueWith(t =>
         {
             service.StopAdjustInfoWindow();
         });

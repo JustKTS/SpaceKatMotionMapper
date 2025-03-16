@@ -4,7 +4,7 @@ using SpaceKatHIDWrapper.Models;
 
 namespace SpaceKatHIDWrapper.Services;
 
-public partial class KatActionRecognizeService : ObservableObject
+public partial class KatMotionRecognizeService : ObservableObject
 {
     private bool IsConnected => _deviceDataWrapper.IsConnected;
     public event EventHandler<bool>? ConnectionChanged;
@@ -13,17 +13,17 @@ public partial class KatActionRecognizeService : ObservableObject
     private readonly Dictionary<KatMotionEnum, KatTriggerTimesConfig> _motionTimeConfigs =
         MotionTimeConfigInitHelper.GeneDefault();
 
-    public event EventHandler<KatAction>? DataReceived;
+    public event EventHandler<KatMotionWithTimeStamp>? DataReceived;
 
     private DateTimeOffset _pressTime = DateTimeOffset.Now;
     private bool _pressDone;
 
     [ObservableProperty] private KatDeviceData _katDeviceData = new();
 
-    [ObservableProperty] private KatAction _currentKatAction = new(KatMotionEnum.Stable, KatPressModeEnum.Short, 0);
+    [ObservableProperty] private KatMotionWithTimeStamp _currentKatMotion = new(KatMotionEnum.Stable, KatPressModeEnum.Short, 0);
 
     private readonly IDeviceDataWrapper _deviceDataWrapper;
-    public KatActionRecognizeService(IDeviceDataWrapper deviceDataWrapper)
+    public KatMotionRecognizeService(IDeviceDataWrapper deviceDataWrapper)
     {
         _deviceDataWrapper = deviceDataWrapper;
         _deviceDataWrapper.ConnectionChanged += (_, isConnected)=>
@@ -32,7 +32,7 @@ public partial class KatActionRecognizeService : ObservableObject
         };
     }
     
-    partial void OnCurrentKatActionChanged(KatAction value)
+    partial void OnCurrentKatMotionChanged(KatMotionWithTimeStamp value)
     {
         DataReceived?.Invoke(this, value);
     }
@@ -128,7 +128,7 @@ public partial class KatActionRecognizeService : ObservableObject
                         continue;
                     }
 
-                    CurrentKatAction = new KatAction(lastMotion, KatPressModeEnum.LongReach, longReachTriggerCount);
+                    CurrentKatMotion = new KatMotionWithTimeStamp(lastMotion, KatPressModeEnum.LongReach, longReachTriggerCount);
                     longReachTriggerCount += 1;
                     lastLongReachTriggerTime = DateTimeOffset.Now;
                 }
@@ -142,12 +142,12 @@ public partial class KatActionRecognizeService : ObservableObject
                         TimeSpan.FromMilliseconds(_motionTimeConfigs[lastMotion].LongReachTimeoutMs))
                     {
                         longReachTriggerCount = 1;
-                        CurrentKatAction = new KatAction(lastMotion, KatPressModeEnum.LongDown, 1);
+                        CurrentKatMotion = new KatMotionWithTimeStamp(lastMotion, KatPressModeEnum.LongDown, 1);
                     }
                     else
                     {
                         longReachTriggerCount = 1;
-                        CurrentKatAction = await RecognizeMultiShortMotionAsync(lastMotion);
+                        CurrentKatMotion = await RecognizeMultiShortMotionAsync(lastMotion);
                     }
                 }
 
@@ -157,7 +157,7 @@ public partial class KatActionRecognizeService : ObservableObject
     }
 
 
-    private async Task<KatAction> RecognizeMultiShortMotionAsync(KatMotionEnum lastMotion = KatMotionEnum.Stable)
+    private async Task<KatMotionWithTimeStamp> RecognizeMultiShortMotionAsync(KatMotionEnum lastMotion = KatMotionEnum.Stable)
     {
         var startTime = DateTimeOffset.Now;
         var waitTime = TimeSpan.Zero;
@@ -185,7 +185,7 @@ public partial class KatActionRecognizeService : ObservableObject
             waitTime = DateTimeOffset.Now - startTime;
         }
 
-        return new KatAction(recRet, KatPressModeEnum.Short, motionList.Count + 1);
+        return new KatMotionWithTimeStamp(recRet, KatPressModeEnum.Short, motionList.Count + 1);
     }
 
     private KatMotionEnum RecognizeSingleAction()

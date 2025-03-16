@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using Avalonia.Interactivity;
+using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.ViewModels;
 using Ursa.Controls;
 

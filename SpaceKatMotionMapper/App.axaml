@@ -9,7 +9,6 @@
     <Application.Styles>
         <semi:SemiTheme Locale="zh-CN" />
         <u-Semi:SemiTheme Locale="zh-CN"/>
-        <StyleInclude Source="avares://Semi.Avalonia/Index.axaml" />
         <StyleInclude Source="avares://Semi.Avalonia.DataGrid/Index.axaml" />
         <StyleInclude Source="avares://Semi.Avalonia.ColorPicker/Index.axaml" />
     </Application.Styles>

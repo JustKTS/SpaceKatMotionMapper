@@ -5,7 +5,7 @@ using Win32Helpers;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
-public partial class CurrentRunningProcessSelectorViewModel(KatActionConfigViewModel parent) : ViewModelBase
+public partial class CurrentRunningProcessSelectorViewModel(KatMotionConfigViewModel parent) : ViewModelBase
 {
 #if DEBUG
     public CurrentRunningProcessSelectorViewModel() : this(null!)

@@ -26,7 +26,7 @@ public class LocalSettingsService : ILocalSettingsService
     private Dictionary<string, object> _settings;
 
     private bool _isInitialized;
-
+    
     public LocalSettingsService(IFileService fileService, IOptions<LocalSettingsOptions> options)
     {
         _fileService = fileService;
@@ -77,7 +77,7 @@ public class LocalSettingsService : ILocalSettingsService
     public async Task SaveSettingAsync<T>(string key, T value)
     {
         await InitializeAsync();
-        _settings[key] = JsonSerializer.Serialize(value);
+        _settings[key] = JsonSerializer.Serialize(value, JsonSgOption.Default);
         _fileService.Save(_applicationDataFolder, _localSettingsFile, _settings);
     }
 }

@@ -11,9 +11,9 @@ public partial class CommonConfigView : UserControl
     {
         DataContext = App.GetService<CommonConfigViewModel>();
         InitializeComponent();
-        var view = new KatActionConfigView
+        var view = new KatMotionConfigView
         {
-            DataContext = ((CommonConfigViewModel)DataContext).DefaultKatActionConfig
+            DataContext = ((CommonConfigViewModel)DataContext).DefaultKatMotionConfig
         };
         ScrollViewer.Content = view;
     }

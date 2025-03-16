@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LanguageExt;
@@ -10,6 +11,8 @@ namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class KeyActionViewModel : ObservableObject
 {
+    #region 属性定义
+
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsAvailable))] [NotifyPropertyChangedFor(nameof(IsDelay))]
     private ActionType _actionType;
 
@@ -22,45 +25,50 @@ public partial class KeyActionViewModel : ObservableObject
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsAvailable))]
     private int _multiplier;
 
+
+    private readonly KeyActionConfigViewModel _parent;
+
     public bool IsDelay => ActionType == ActionType.Delay;
 
-    public bool IsAvailable
+    #endregion
+
+    #region 是否可用
+
+    public bool IsAvailable => CheckIsAvailable();
+
+    private bool CheckIsAvailable()
     {
-        get
+        switch (ActionType)
         {
-            switch (ActionType)
-            {
-                case ActionType.KeyBoard:
-                    return Key != "None" && PressMode != PressModeEnum.None;
-                case ActionType.Mouse:
-                    if (Key == "None") return false;
-                    try
+            case ActionType.KeyBoard:
+                return Key != "None" && PressMode != PressModeEnum.None;
+            case ActionType.Mouse:
+                if (Key == "None") return false;
+                try
+                {
+                    var key = MouseButtonEnumExtensions.Parse(Key, ignoreCase: true,
+                        allowMatchingMetadataAttribute: true);
+                    return key switch
                     {
-                        var key = MouseButtonEnumExtensions.Parse(Key, ignoreCase: true,
-                            allowMatchingMetadataAttribute: true);
-                        return key switch
-                        {
-                            MouseButtonEnum.ScrollUp or MouseButtonEnum.ScrollDown =>
-                                Multiplier != 0,
-                            _ => PressMode != PressModeEnum.None
-                        };
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                        return false;
-                    }
-                case ActionType.Delay:
-                    return Multiplier >= 15;
-                default:
+                        MouseButtonEnum.ScrollUp or MouseButtonEnum.ScrollDown =>
+                            Multiplier != 0,
+                        _ => PressMode != PressModeEnum.None
+                    };
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
                     return false;
-            }
+                }
+            case ActionType.Delay:
+                return Multiplier >= 15;
+            default:
+                return false;
         }
     }
 
+    #endregion
 
-    private readonly KeyActionConfigViewModel _parent;
-    
     public KeyActionViewModel(KeyActionConfigViewModel parent, ActionType actionType, string key,
         PressModeEnum pressMode, int multiplier)
     {
@@ -69,19 +77,24 @@ public partial class KeyActionViewModel : ObservableObject
         Key = key;
         PressMode = pressMode;
         Multiplier = multiplier;
+        OnPropertyChanged(nameof(IsAvailable));
     }
 
     public KeyActionViewModel(KeyActionConfigViewModel parent) : this(parent, ActionType.KeyBoard,
         VirtualKeyCode.None.ToString(), PressModeEnum.None, 1)
     {
+        OnPropertyChanged(nameof(IsAvailable));
     }
 
+    # region 添加删除
 
     [RelayCommand]
     private void Remove()
     {
         var index = _parent.ActionConfigGroups.IndexOf(this);
         _parent.RemoveActionConfigCommand.Execute(index);
+        OnPropertyChanged(nameof(IsAvailable));
+
     }
 
     [RelayCommand]
@@ -89,14 +102,20 @@ public partial class KeyActionViewModel : ObservableObject
     {
         var index = _parent.ActionConfigGroups.IndexOf(this);
         _parent.InsertNextActionConfig(index);
+        OnPropertyChanged(nameof(IsAvailable));
     }
-    
+
     [RelayCommand]
     private void InsertNextDelay()
     {
         var index = _parent.ActionConfigGroups.IndexOf(this);
         _parent.InsertNextDelayConfig(index);
+        OnPropertyChanged(nameof(IsAvailable));
     }
+
+    #endregion
+
+    #region 转换为配置
 
     public KeyActionConfig ToKeyActionConfig()
     {
@@ -111,4 +130,6 @@ public partial class KeyActionViewModel : ObservableObject
         Multiplier = config.Multiplier;
         return true;
     }
+
+    #endregion
 }

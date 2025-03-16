@@ -8,14 +8,14 @@ namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class CommonConfigViewModel : ViewModelBase
 {
-    [ObservableProperty] private KatActionConfigViewModel _defaultKatActionConfig =
-        App.GetRequiredService<KatActionConfigViewModel>();
+    [ObservableProperty] private KatMotionConfigViewModel _defaultKatMotionConfig =
+        App.GetRequiredService<KatMotionConfigViewModel>();
 
-    private readonly KatActionFileService _katActionFileService =
-        App.GetRequiredService<KatActionFileService>();
+    private readonly KatMotionFileService _katMotionFileService =
+        App.GetRequiredService<KatMotionFileService>();
 
-    private readonly KatActionConfigVMManageService _katActionConfigVmManageService =
-        App.GetRequiredService<KatActionConfigVMManageService>();
+    private readonly KatMotionConfigVMManageService _katMotionConfigVmManageService =
+        App.GetRequiredService<KatMotionConfigVMManageService>();
     private readonly KatMotionTimeConfigService _katMotionTimeConfigService =
         App.GetRequiredService<KatMotionTimeConfigService>();
     private readonly KatDeadZoneConfigService _katDeadZoneConfigService =
@@ -25,32 +25,30 @@ public partial class CommonConfigViewModel : ViewModelBase
 
     public CommonConfigViewModel()
     {
-        var configGroupRet = _katActionFileService.LoadDefaultConfigGroup();
+        var configGroupRet = _katMotionFileService.LoadDefaultConfigGroup();
         _ = configGroupRet.Match(cg =>
             {
-                DefaultKatActionConfig.Id = Guid.Parse(cg.Guid);
-                var ret2 = DefaultKatActionConfig.LoadFromConfigGroup(cg);
+                DefaultKatMotionConfig.Id = Guid.Parse(cg.Guid);
+                var ret2 = DefaultKatMotionConfig.LoadFromConfigGroup(cg);
                 if (!ret2) return ret2;
-                DefaultKatActionConfig.ConfigName = "全局配置";
-                DefaultKatActionConfig.IsDefault = true;
-                if (!_activationStatusService.IsConfigGroupActivated(DefaultKatActionConfig.Id)) return true;
-                DefaultKatActionConfig.ActivateActionsCommand.Execute(null);
-                _katActionConfigVmManageService.RegisterDefaultConfig(DefaultKatActionConfig);
+                DefaultKatMotionConfig.IsDefault = true;
+                if (!_activationStatusService.IsConfigGroupActivated(DefaultKatMotionConfig.Id)) return true;
+                DefaultKatMotionConfig.ActivateActionsCommand.Execute(null);
+                _katMotionConfigVmManageService.RegisterDefaultConfig(DefaultKatMotionConfig);
                 _katMotionTimeConfigService.ApplyDefaultMotionTimeConfig();
                 _katDeadZoneConfigService.ApplyDefaultDeadZoneConfig();
                 return true;
             },
             ex =>
             {
-                DefaultKatActionConfig.ConfigName = "全局配置";
-                DefaultKatActionConfig.IsDefault = true;
-                DefaultKatActionConfig.IsCustomDeadZone = true;
-                DefaultKatActionConfig.DeadZoneConfig = new KatDeadZoneConfig();
-                DefaultKatActionConfig.IsCustomMotionTimeConfigs = true;
-                DefaultKatActionConfig.MotionTimeConfigs = new KatMotionTimeConfigs(true);
-                _katActionConfigVmManageService.RegisterDefaultConfig(DefaultKatActionConfig);
-                var cgRet = DefaultKatActionConfig.ToKatActionConfigGroups();
-                return cgRet.Match(cg => _katActionFileService.SaveDefaultConfigGroup(cg),
+                DefaultKatMotionConfig.IsDefault = true;
+                DefaultKatMotionConfig.IsCustomDeadZone = true;
+                DefaultKatMotionConfig.DeadZoneConfig = new KatDeadZoneConfig();
+                DefaultKatMotionConfig.IsCustomMotionTimeConfigs = true;
+                DefaultKatMotionConfig.MotionTimeConfigs = new KatMotionTimeConfigs();
+                _katMotionConfigVmManageService.RegisterDefaultConfig(DefaultKatMotionConfig);
+                var cgRet = DefaultKatMotionConfig.ToKatMotionConfigGroups();
+                return cgRet.Match(cg => _katMotionFileService.SaveDefaultConfigGroup(cg),
                     e2 => new Result<bool>(e2));
             });
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
+using LanguageExt;
 using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.States;
@@ -10,6 +11,8 @@ public partial class GlobalStates : ObservableObject
     [ObservableProperty] private bool _isConnected;
     [ObservableProperty] private bool _isMapperEnable;
     [ObservableProperty] private bool _isTransparentInfoEnable;
+
+    public const string IsMapperEnableKey = "IsMapperEnable";
 
     public event EventHandler<bool>? IsConnectionChanged;
     public event EventHandler<bool>? IsMapperEnableChanged;
@@ -22,6 +25,7 @@ public partial class GlobalStates : ObservableObject
     
     partial void OnIsMapperEnableChanged(bool value)
     {
+        App.GetRequiredService<ILocalSettingsService>().SaveSettingAsync(IsMapperEnableKey, value);
         IsMapperEnableChanged?.Invoke(this, value);
     }
     
@@ -31,12 +35,4 @@ public partial class GlobalStates : ObservableObject
     }
     
     # endregion
-
-    private readonly ILocalSettingsService _localSettingsService;
-    
-    public GlobalStates(ILocalSettingsService localSettingsService)
-    {
-        _localSettingsService = localSettingsService;
-        // IsMapperEnable = _localSettingsService.ReadSettingAsync<bool>(IsMapperEnableKey).GetAwaiter().GetResult();
-    }
 }

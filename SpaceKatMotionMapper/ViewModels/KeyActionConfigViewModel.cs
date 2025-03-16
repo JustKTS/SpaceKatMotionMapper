@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using ABI.Windows.Perception.People;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Metsys.Bson;
+using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Models;
-using SpaceKatMotionMapper.Views;
 using Ursa.Controls;
 using WindowsInput;
 
@@ -25,18 +25,52 @@ public partial class KeyActionConfigViewModel : ViewModelBase
 
     public ObservableCollection<KeyActionViewModel> ActionConfigGroups { get; set; }
 
-    public KatActionViewModel Parent { get; }
+    public IReadOnlyList<string> KeyNames => VirtualKeyHelper.KeyNames;
+    public KatMotionViewModel Parent { get; }
 
-    public KeyActionConfigViewModel(KatActionViewModel parent)
+    public bool IsAvailable => CheckIsAvailable();
+
+    private bool CheckIsAvailable()
+    {
+        return ActionConfigGroups.All(e => e.IsAvailable);
+    }
+
+    public KeyActionConfigViewModel(KatMotionViewModel parent)
     {
         Parent = parent;
 
-        CurrentConfigModeNums = Parent.Parent.Parent.KatActionsModeNums;
+        CurrentConfigModeNums = Parent.Parent.Parent.KatMotionsModeNums;
+        ActionConfigGroups = [];
 
-        ActionConfigGroups =
-        [
-            new KeyActionViewModel(this)
-        ];
+        ActionConfigGroups.CollectionChanged += (sender, e) =>
+        {
+            // 处理新增项：订阅PropertyChanged
+            if (e.NewItems != null)
+            {
+                foreach (KeyActionViewModel item in e.NewItems)
+                {
+                    item.PropertyChanged += ChildPropertyChanged;
+                }
+            }
+        
+            // 处理移除项：取消订阅避免内存泄漏
+            if (e.OldItems == null) return;
+        
+            foreach (KeyActionViewModel item in e.OldItems)
+            {
+                item.PropertyChanged -= ChildPropertyChanged;
+            }
+        };
+
+        AddActionConfig();
+    }
+
+    private void ChildPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(KeyActionViewModel.IsAvailable))
+        {
+            OnPropertyChanged(nameof(IsAvailable));
+        }
     }
 
     # region 添加删除
@@ -45,6 +79,7 @@ public partial class KeyActionConfigViewModel : ViewModelBase
     private void AddActionConfig()
     {
         ActionConfigGroups.Add(new KeyActionViewModel(this));
+        OnPropertyChanged(nameof(IsAvailable));
     }
 
     [RelayCommand]
@@ -57,22 +92,25 @@ public partial class KeyActionConfigViewModel : ViewModelBase
             ActionConfigGroups.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.None.ToString(),
                 PressModeEnum.None, 1));
         }
+        OnPropertyChanged(nameof(IsAvailable));
     }
 
     public void InsertNextActionConfig(int index)
     {
         if (index < 0 || index >= ActionConfigGroups.Count) return;
-        ActionConfigGroups.Insert(index+1, new KeyActionViewModel(this, ActionType.KeyBoard,
+        ActionConfigGroups.Insert(index + 1, new KeyActionViewModel(this, ActionType.KeyBoard,
             VirtualKeyCode.None.ToString(),
             PressModeEnum.None, 1));
+        OnPropertyChanged(nameof(IsAvailable));
     }
-    
+
     public void InsertNextDelayConfig(int index)
     {
         if (index < 0 || index >= ActionConfigGroups.Count) return;
-        ActionConfigGroups.Insert(index+1, new KeyActionViewModel(this, ActionType.Delay,
+        ActionConfigGroups.Insert(index + 1, new KeyActionViewModel(this, ActionType.Delay,
             VirtualKeyCode.None.ToString(),
             PressModeEnum.None, 15));
+        OnPropertyChanged(nameof(IsAvailable));
     }
 
     #endregion
@@ -96,7 +134,7 @@ public partial class KeyActionConfigViewModel : ViewModelBase
                 if (!ret) return false;
                 ActionConfigGroups.Add(actionConfigGroup);
             }
-
+            OnPropertyChanged(nameof(IsAvailable));
             return true;
         }
         catch (Exception e)
@@ -111,36 +149,27 @@ public partial class KeyActionConfigViewModel : ViewModelBase
     # region HotKey转动作组
 
     public HotKeyCodeEnum[] HotKeyEnums { get; set; } = HotKeyCodeEnumExtensions.GetValues();
-
-    private readonly DialogOptions _dialogConfig = new DialogOptions()
-    {
-        Title = "选择组合键",
-        Mode = DialogMode.Question,
-        CanDragMove = true,
-        IsCloseButtonVisible = true,
-        ShowInTaskBar = false,
-        CanResize = true
-    };
-
+    
     public void AddHotKeyActions(bool useCtrl,
         bool useWin,
         bool useAlt,
         bool useShift,
-        HotKeyCodeEnum hotKey)
+        VirtualKeyCode hotKey)
     {
         List<KeyActionViewModel> list = [];
-        if (useCtrl) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, "CONTROL", PressModeEnum.Press, 1));
-        if (useWin) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, "WIN", PressModeEnum.Press, 1));
-        if (useAlt) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, "MENU", PressModeEnum.Press, 1));
-        if (useShift) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, "SHIFT", PressModeEnum.Press, 1));
-        list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, $"VK_{hotKey.ToStringFast()}", PressModeEnum.Click,
+        if (useCtrl) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.CONTROL.ToWarpCodeName(), PressModeEnum.Press, 1));
+        if (useWin) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.LWIN.ToWarpCodeName(), PressModeEnum.Press, 1));
+        if (useAlt) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.MENU.ToWarpCodeName(), PressModeEnum.Press, 1));
+        if (useShift) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.SHIFT.ToWarpCodeName(), PressModeEnum.Press, 1));
+        list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, hotKey.ToWarpCodeName(), PressModeEnum.Click,
             1));
-        if (useShift) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, "SHIFT", PressModeEnum.Release, 1));
-        if (useAlt) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, "MENU", PressModeEnum.Release, 1));
-        if (useWin) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, "WIN", PressModeEnum.Release, 1));
-        if (useCtrl) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, "CONTROL", PressModeEnum.Release, 1));
+        if (useShift) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.SHIFT.ToWarpCodeName(), PressModeEnum.Release, 1));
+        if (useAlt) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.MENU.ToWarpCodeName(), PressModeEnum.Release, 1));
+        if (useWin) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.LWIN.ToWarpCodeName(), PressModeEnum.Release, 1));
+        if (useCtrl) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.CONTROL.ToWarpCodeName(), PressModeEnum.Release, 1));
         ActionConfigGroups.Clear();
         list.Iter(ActionConfigGroups.Add);
+        OnPropertyChanged(nameof(IsAvailable));
     }
 
     #endregion

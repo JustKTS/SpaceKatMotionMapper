@@ -1,0 +1,56 @@
+﻿<u:UrsaWindow xmlns="https://github.com/avaloniaui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              xmlns:u="https://irihi.tech/ursa"
+              mc:Ignorable="d" Width="1000" Height="300"
+              x:Class="SpaceKatMotionMapper.Views.CleanOldConfigsWindow"
+              WindowStartupLocation="CenterScreen"
+              IsMinimizeButtonVisible="False"
+              IsFullScreenButtonVisible="False"
+              IsManagedResizerVisible="False"
+              IsRestoreButtonVisible="False"
+              IsCloseButtonVisible="False"
+              Padding="20"
+              Title="错误！">
+    <StackPanel Spacing="10" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+        <TextBlock Classes="H1 Danger" Theme="{StaticResource TitleTextBlock}" HorizontalAlignment="Center"
+                   VerticalAlignment="Center" TextWrapping="Wrap">
+            非常抱歉!
+        </TextBlock>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock
+                Classes="H5" Theme="{StaticResource TitleTextBlock}"
+                HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap">
+                由于软件更新，旧版配置文件已无法使用，请点击下面左侧按钮删除旧版配置文件后重新启动本软件
+              
+            </TextBlock>
+            <TextBlock
+                  Classes="H5 Danger" Theme="{StaticResource TitleTextBlock}"
+                  HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap">(会丢失所有配置)</TextBlock>
+        </StackPanel>
+        
+      
+        <TextBlock
+            Classes="H7" Theme="{StaticResource TitleTextBlock}"
+            HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap">
+            如需迁移旧版配置文件，请点击下方右侧“先不删除”按钮后，打开旧版软件（v0.1.x)，自行截图保存配置后重新配置
+        </TextBlock>
+        <StackPanel Orientation="Horizontal" Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Button
+                Classes="Danger"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Content="删除旧版配置文件"
+                Click="Button_OnClick" />
+            <Button
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Content="先不删除"
+                Click="Button2_OnClick" />
+        </StackPanel>
+       
+
+    </StackPanel>
+
+</u:UrsaWindow>

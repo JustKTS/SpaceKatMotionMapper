@@ -27,11 +27,22 @@
 
     <Border Grid.Row="1" Theme="{StaticResource CardBorder}">
         <Grid RowDefinitions="Auto, *, Auto">
-            <ToggleSwitch
-                HorizontalAlignment="Center"
-                OnContent="统一配置"
-                OffContent="统一配置"
-                IsChecked="{Binding UseUnifySetting, Mode=TwoWay}" />
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="40"
+                        HorizontalAlignment="Center">
+                <ToggleSwitch
+                    HorizontalAlignment="Center"
+                    OnContent="统一配置"
+                    OffContent="统一配置"
+                    IsChecked="{Binding UseUnifySetting, Mode=TwoWay}" />
+                <u:IconButton
+                    IsVisible="{Binding !IsDefault}"
+                    HorizontalAlignment="Center"
+                    Icon="{StaticResource SemiIconRefresh}"
+                    Content="从全局设置处继承"
+                    Command="{Binding CopyFromDefaultCommand}">
+                </u:IconButton>
+            </StackPanel>
+
 
             <DataGrid Grid.Row="1" Height="350"
                       Margin="8"

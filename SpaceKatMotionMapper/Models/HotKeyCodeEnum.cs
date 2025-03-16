@@ -1,4 +1,5 @@
-﻿using NetEscapades.EnumGenerators;
+﻿using System.Text.Json.Serialization;
+using NetEscapades.EnumGenerators;
 
 namespace SpaceKatMotionMapper.Models;
 
@@ -62,4 +63,13 @@ public enum SpaceMouseXmlKeyEnum:uint
     X = 0x1B,
     Y = 0x1C,
     Z = 0x1D
+}
+
+
+[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSerializable(typeof(HotKeyCodeEnum))]
+[JsonSerializable(typeof(SpaceMouseXmlKeyEnum))]
+[JsonSerializable(typeof(uint))]
+internal partial class HotKeyCodeJsonSgContext : JsonSerializerContext
+{
 }

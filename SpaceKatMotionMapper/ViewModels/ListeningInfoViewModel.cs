@@ -18,14 +18,14 @@ public partial class ListeningInfoViewModel : ViewModelBase
     [ObservableProperty] private int _repeatCount;
 
 
-    private readonly KatActionRecognizeService _katActionRecognizeService;
-    private readonly KatActionActivateService _katActionActivateService;
+    private readonly KatMotionRecognizeService _katMotionRecognizeService;
+    private readonly KatMotionActivateService _katMotionActivateService;
 
     private void StartKatListening()
     {
-        _katActionRecognizeService.DataReceived += (_, data) =>
+        _katMotionRecognizeService.DataReceived += (_, data) =>
         {
-            if (!_katActionActivateService.IsActivated) return;
+            if (!_katMotionActivateService.IsActivated) return;
             Dispatcher.UIThread.Invoke(() =>
             {
                 KatMotion = data.Motion.ToStringFast();
@@ -33,7 +33,7 @@ public partial class ListeningInfoViewModel : ViewModelBase
                 RepeatCount = data.RepeatCount;
                 try
                 {
-                    _transparentInfoService.DisplayKatAction(data);
+                    _transparentInfoService.DisplayKatMotion(data);
                 }
                 catch (Exception ex)
                 {
@@ -69,13 +69,13 @@ public partial class ListeningInfoViewModel : ViewModelBase
 
     public ListeningInfoViewModel(
         CurrentForeProgramHelper currentForeProgramHelper, PopUpNotificationService popUpNotificationService,
-        KatActionRecognizeService katActionRecognizeService,
-        KatActionActivateService katActionActivateService,
+        KatMotionRecognizeService katMotionRecognizeService,
+        KatMotionActivateService katMotionActivateService,
         TransparentInfoService transparentInfoService)
     {
-        _katActionRecognizeService = katActionRecognizeService;
+        _katMotionRecognizeService = katMotionRecognizeService;
         _popUpNotificationService = popUpNotificationService;
-        _katActionActivateService = katActionActivateService;
+        _katMotionActivateService = katMotionActivateService;
         _currentForeProgramHelper = currentForeProgramHelper;
         _transparentInfoService = transparentInfoService;
         _currentForeProgramHelper.ForeProgramChanged += ForeProgramChangedCallback;

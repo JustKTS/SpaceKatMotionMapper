@@ -8,18 +8,18 @@ using SpaceKatMotionMapper.ViewModels;
 namespace SpaceKatMotionMapper.Services;
 
 // ReSharper disable once InconsistentNaming
-public class KatActionConfigVMManageService
+public class KatMotionConfigVMManageService
 {
-    private readonly Dictionary<Guid, KatActionConfigViewModel> _configs = [];
+    private readonly Dictionary<Guid, KatMotionConfigViewModel> _configs = [];
 
     private Guid _commonConfigGuid = Guid.Empty;
-    public void RegisterConfig(KatActionConfigViewModel configVm)
+    public void RegisterConfig(KatMotionConfigViewModel configVm)
     {
         _configs[configVm.Id] = configVm;
     }
     
 
-    public Result<KatActionConfigViewModel> GetConfig(Guid id)
+    public Result<KatMotionConfigViewModel> GetConfig(Guid id)
     {
         try
         {
@@ -28,20 +28,20 @@ public class KatActionConfigVMManageService
         catch (Exception e)
         {
             Debug.WriteLine(e);
-            return new Result<KatActionConfigViewModel>(new Exception("获取配置组失败"));
+            return new Result<KatMotionConfigViewModel>(new Exception("获取配置组失败"));
         }
     }
     
-    public void RegisterDefaultConfig(KatActionConfigViewModel configVm)
+    public void RegisterDefaultConfig(KatMotionConfigViewModel configVm)
     {
         _commonConfigGuid = configVm.Id;
         _configs[configVm.Id] = configVm;
     }
     
-    public  Result<KatActionConfigViewModel> GetDefaultConfig()
+    public  Result<KatMotionConfigViewModel> GetDefaultConfig()
     {
         return _commonConfigGuid == Guid.Empty 
-            ? new Result<KatActionConfigViewModel>(new Exception("全局配置未设置")) 
+            ? new Result<KatMotionConfigViewModel>(new Exception("全局配置未设置")) 
             : _configs[_commonConfigGuid];
     }
 

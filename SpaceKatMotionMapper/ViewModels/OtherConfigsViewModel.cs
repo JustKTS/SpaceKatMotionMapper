@@ -16,45 +16,45 @@ namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class OtherConfigsViewModel : ViewModelBase
 {
-    public ObservableCollection<KatActionConfigViewModel> KatActionConfigGroups { get; }
-    private readonly KatActionFileService _katActionFileService;
+    public ObservableCollection<KatMotionConfigViewModel> KatMotionConfigGroups { get; } = [];
+    private readonly KatMotionFileService _katMotionFileService;
     private readonly IStorageProviderService _storageProviderService;
     private readonly PopUpNotificationService _popUpNotificationService;
     private readonly ActivationStatusService _activationStatusService;
-    private readonly KatActionConfigVMManageService _katActionConfigVmManageService;
+    private readonly KatMotionConfigVMManageService _katMotionConfigVmManageService;
 
     public OtherConfigsViewModel()
     {
-        KatActionConfigGroups = [new KatActionConfigViewModel(this)];
-        _katActionFileService = App.GetRequiredService<KatActionFileService>();
+        _katMotionFileService = App.GetRequiredService<KatMotionFileService>();
         _popUpNotificationService = App.GetRequiredService<PopUpNotificationService>();
         _storageProviderService = App.GetRequiredService<IStorageProviderService>();
         _activationStatusService = App.GetRequiredService<ActivationStatusService>();
-        _katActionConfigVmManageService = App.GetRequiredService<KatActionConfigVMManageService>();
+        _katMotionConfigVmManageService = App.GetRequiredService<KatMotionConfigVMManageService>();
+        Add();
     }
 
     [RelayCommand]
     private void Add()
     {
-        var vm = new KatActionConfigViewModel(this);
-        _katActionConfigVmManageService.RegisterConfig(vm);
-        KatActionConfigGroups.Add(vm);
+        var vm = new KatMotionConfigViewModel(this);
+        _katMotionConfigVmManageService.RegisterConfig(vm);
+        KatMotionConfigGroups.Add(vm);
     }
 
     [RelayCommand]
     private void Remove(int index)
     {
-        if (index < 0 || index >= KatActionConfigGroups.Count) return;
-        _katActionConfigVmManageService.RemoveConfig(KatActionConfigGroups[index].Id);
-        _activationStatusService.DeleteActivationStatus(KatActionConfigGroups[index].Id);
-        _katActionFileService.DeleteConfigGroupFromSysConf(KatActionConfigGroups[index].Id);
-        KatActionConfigGroups.RemoveAt(index);
+        if (index < 0 || index >= KatMotionConfigGroups.Count) return;
+        _katMotionConfigVmManageService.RemoveConfig(KatMotionConfigGroups[index].Id);
+        _activationStatusService.DeleteActivationStatus(KatMotionConfigGroups[index].Id);
+        _katMotionFileService.DeleteConfigGroupFromSysConf(KatMotionConfigGroups[index].Id);
+        KatMotionConfigGroups.RemoveAt(index);
 
-        if (KatActionConfigGroups.Count != 0) return;
+        if (KatMotionConfigGroups.Count != 0) return;
 
-        var vm = new KatActionConfigViewModel(this);
-        _katActionConfigVmManageService.RegisterConfig(vm);
-        KatActionConfigGroups.Add(vm);
+        var vm = new KatMotionConfigViewModel(this);
+        _katMotionConfigVmManageService.RegisterConfig(vm);
+        KatMotionConfigGroups.Add(vm);
     }
 
     [RelayCommand]
@@ -69,14 +69,15 @@ public partial class OtherConfigsViewModel : ViewModelBase
 
         foreach (var file in files)
         {
-            var cgRet = _katActionFileService.LoadConfigGroup(file.Path.LocalPath);
+            var cgRet = _katMotionFileService.LoadConfigGroup(file.Path.LocalPath);
             _ = cgRet.Match(cg =>
             {
                 // ReSharper disable once IdentifierTypo
-                var cgvm = new KatActionConfigViewModel(this);
+                var cgvm = new KatMotionConfigViewModel(this);
                 cgvm.LoadFromConfigGroup(cg);
                 cgvm.IsDefault = false;
-                KatActionConfigGroups.Add(cgvm);
+                _katMotionConfigVmManageService.RegisterConfig(cgvm);
+                KatMotionConfigGroups.Add(cgvm);
                 return true;
             }, ex =>
             {
@@ -86,20 +87,26 @@ public partial class OtherConfigsViewModel : ViewModelBase
         }
     }
 
+    private void ClearConfigGroups()
+    {
+        KatMotionConfigGroups.Iter(e => _katMotionConfigVmManageService.RemoveConfig(e.Id));
+        KatMotionConfigGroups.Clear();
+    }
+
     [RelayCommand]
     private void ReloadConfigGroupsFromSysConf()
     {
-        KatActionConfigGroups.Clear();
-        var rets = _katActionFileService.LoadConfigGroupsFromSysConf();
+        ClearConfigGroups();
+        var rets = _katMotionFileService.LoadConfigGroupsFromSysConf();
         _ = rets.Match(cgs =>
         {
             foreach (var cg in cgs)
             {
-                var cgVm = new KatActionConfigViewModel(this);
+                var cgVm = new KatMotionConfigViewModel(this);
                 cgVm.LoadFromConfigGroup(cg);
                 cgVm.IsDefault = false;
-                _katActionConfigVmManageService.RegisterConfig(cgVm);
-                KatActionConfigGroups.Add(cgVm);
+                _katMotionConfigVmManageService.RegisterConfig(cgVm);
+                KatMotionConfigGroups.Add(cgVm);
                 if (!_activationStatusService.IsConfigGroupActivated(cgVm.Id)) continue;
                 cgVm.ActivateActionsCommand.Execute(null);
             }
@@ -110,7 +117,7 @@ public partial class OtherConfigsViewModel : ViewModelBase
             _popUpNotificationService.Pop(NotificationType.Error, ex.Message);
             return false;
         });
-        if (KatActionConfigGroups.Count == 0)
+        if (KatMotionConfigGroups.Count == 0)
         {
             Add();
         }
@@ -119,9 +126,9 @@ public partial class OtherConfigsViewModel : ViewModelBase
     [RelayCommand]
     private Task<Result<bool>> SaveGroupsToConfigDir()
     {
-        List<KatActionConfigGroup> groups = [];
+        List<KatMotionConfigGroup> groups = [];
         // ReSharper disable once IdentifierTypo
-        return Task.FromResult(KatActionConfigGroups.Select(cgvm => cgvm.ToKatActionConfigGroups()).Select(ret =>
+        return Task.FromResult(KatMotionConfigGroups.Select(cgvm => cgvm.ToKatMotionConfigGroups()).Select(ret =>
             ret.Match(cg =>
             {
                 groups.Add(cg);
@@ -132,7 +139,7 @@ public partial class OtherConfigsViewModel : ViewModelBase
                 return false;
             })).Any(flag => !flag)
             ? new Result<bool>(false)
-            : _katActionFileService.SaveConfigGroupsToSysConf(groups));
+            : _katMotionFileService.SaveConfigGroupsToSysConf(groups));
     }
 
     [RelayCommand]
@@ -147,15 +154,15 @@ public partial class OtherConfigsViewModel : ViewModelBase
         if (folders.Count == 0) return;
 
         // ReSharper disable once IdentifierTypo
-        foreach (var cgvm in KatActionConfigGroups)
+        foreach (var cgvm in KatMotionConfigGroups)
         {
-            var cgRet = cgvm.ToKatActionConfigGroups();
+            var cgRet = cgvm.ToKatMotionConfigGroups();
             var ret = cgRet.Match(cg =>
             {
-                var filename = cg.Name + "_" + cg.Guid + ".json";
+                var filename = cg.Guid + ".json";
                 var dirPath = folders[0].Path.LocalPath;
                 var path = Path.Join(dirPath, filename);
-                return _katActionFileService.SaveConfigGroup(cg, path);
+                return _katMotionFileService.SaveConfigGroup(cg, path);
             }, ex => new Result<bool>(ex));
             ret.IfFail(ex => { _popUpNotificationService.Pop(NotificationType.Error, ex.Message); });
         }

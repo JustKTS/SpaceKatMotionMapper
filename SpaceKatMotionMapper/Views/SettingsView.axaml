@@ -67,14 +67,14 @@
                 Padding="2"
                 Classes="Hover"
                 Theme="{StaticResource CardBorder}">
-                <StackPanel Margin="10" HorizontalAlignment="Center">
+                <StackPanel Margin="20" Spacing="5" HorizontalAlignment="Center">
                     <TextBlock Classes="H6"
                                Theme="{StaticResource TitleTextBlock}">
                         作者: B站-暗光启天
                     </TextBlock>
                     <TextBlock Classes="H6"
                                Theme="{StaticResource TitleTextBlock}">
-                        版本: 0.2.1
+                        版本: 0.2.3
                     </TextBlock>
                     <TextBlock Classes="H6"
                                Theme="{StaticResource TitleTextBlock}">
@@ -107,13 +107,22 @@
                             </ToggleSwitch>
                         </Grid>
                     </Expander.Header>
-                    <Button
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
-                        HorizontalContentAlignment="Center"
-                        Command="{Binding AdjustTransparentInfoWindowCommand}">
-                        <TextBlock Classes="SettingTitle" HorizontalAlignment="Left">透明提示窗设置</TextBlock>
-                    </Button>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                        <Button
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding AdjustTransparentInfoWindowCommand}">
+                            <TextBlock Classes="SettingTitle" HorizontalAlignment="Left">透明提示窗设置</TextBlock>
+                        </Button>
+                        <Button
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding HideTransparentInfoWindowCommand}">
+                            <TextBlock Classes="SettingTitle" HorizontalAlignment="Left">关闭透明提示窗设置</TextBlock>
+                        </Button>
+                    </StackPanel>
                 </Expander>
             </Border>
 
@@ -124,7 +133,7 @@
                 Theme="{StaticResource CardBorder}">
                 <Expander>
                     <Expander.Header>
-                        <TextBlock Classes="SettingTitle" Foreground="{DynamicResource SemiColorPrimary}">快捷键设置</TextBlock>
+                        <TextBlock Classes="SettingTitle" Foreground="{DynamicResource SemiColorPrimary}">全局启用/禁用快捷键设置</TextBlock>
                     </Expander.Header>
                     <Grid
                         Margin="5"
@@ -183,7 +192,7 @@
                             VerticalAlignment="Center"
                             Classes="H6"
                             Theme="{StaticResource TitleTextBlock}">
-                            绑定快捷键到Kat按键
+                            绑定全局快捷键到Kat按键
                         </TextBlock>
 
                         <Border
@@ -207,16 +216,17 @@
                             </ListBox>
                         </Border>
 
-                        <Button
+                        <u:IconButton
                             Margin="0 5 0 5"
                             Grid.Row="2"
                             Grid.Column="0"
                             Grid.ColumnSpan="2"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Center"
+                            IsLoading="{Binding RegisterHotKeyCommand.IsRunning}"
                             Command="{Binding RegisterHotKeyCommand}">
                             应用
-                        </Button>
+                        </u:IconButton>
                     </Grid>
                 </Expander>
             </Border>
@@ -256,7 +266,7 @@
                     <Expander.Header>
                         <TextBlock Classes="SettingTitle" Foreground="{DynamicResource SemiColorPrimary}">配置文件夹相关</TextBlock>
                     </Expander.Header>
-                    <StackPanel Orientation="Horizontal" Spacing="10">
+                    <StackPanel Orientation="Horizontal" Spacing="10"  HorizontalAlignment="Center">
                         <Button Command="{Binding OpenConfigFolderCommand}">打开配置文件夹</Button>
                         <Button Command="{Binding OpenLogFolderCommand}">打开错误日志文件夹</Button>
                     </StackPanel>

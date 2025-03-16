@@ -16,18 +16,18 @@ public class CurrentForeProgramHelper : IDisposable
     public event EventHandler<ForeProgramInfo>? ForeProgramChanged;
 
     private GCHandle _gcHandle;
+    private readonly HWINEVENTHOOK _hWinEventHook;
 
     public CurrentForeProgramHelper()
     {
         var winEventProc = new WINEVENTPROC(WinEventProcFunc);
         _gcHandle = GCHandle.Alloc(winEventProc, GCHandleType.Normal);
         // 监听系统的前台窗口变化。
-        SetWinEventHook(
+        _hWinEventHook = SetWinEventHook(
             EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND,
             HMODULE.Null, winEventProc,
             0, 0,
             WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
-
         // 开启消息循环，以便 WinEventProc 能够被调用。
         if (!GetMessage(out var lpMsg, default, 0, 0)) return;
         TranslateMessage(in lpMsg);
@@ -55,6 +55,7 @@ public class CurrentForeProgramHelper : IDisposable
 
     public void Dispose()
     {
+        UnhookWinEvent(_hWinEventHook);
         if (_gcHandle.IsAllocated)
         {
             _gcHandle.Free();

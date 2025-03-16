@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Avalonia.Data.Converters;
+using SpaceKatMotionMapper.Models;
 using WindowsInput;
 
 namespace SpaceKatMotionMapper.Helpers;
@@ -12,20 +13,17 @@ public static class VirtualKeyHelper
 {
     private static FrozenDictionary<string, VirtualKeyCode> KeyDict { get; }
     public static IReadOnlyList<string> KeyNames { get; }
-
+    
     static VirtualKeyHelper()
     {
         var keyDict = new Dictionary<string, VirtualKeyCode>();
-        foreach (VirtualKeyCode key in Enum.GetValues(typeof(VirtualKeyCode)))
+        foreach (var key in KeyCodeWrapperExtensions.GetValues())
         {
-            // if (key is VirtualKeyCode.None) continue;
-            _ = keyDict.TryAdd(Enum.GetName(key)!, key);
+            _ = keyDict.TryAdd(key.ToStringFast(), (VirtualKeyCode)key);
         }
-
+        
         KeyDict = keyDict.ToFrozenDictionary();
-        KeyNames = keyDict.Keys
-            // ReSharper disable once StringLiteralTypo
-            .Where(x => x is not ("None" or "LBUTTON" or "RBUTTON" or "MBUTTON" or "XBUTTON1" or "XBUTTON2"))
+        KeyNames = KeyCodeWrapperExtensions.GetNames()
             .ToList()
             .AsReadOnly();
     }
@@ -34,17 +32,30 @@ public static class VirtualKeyHelper
     {
         return KeyDict.GetValueOrDefault(key, VirtualKeyCode.None);
     }
+
+    public static string WrapKeyCodeName(VirtualKeyCode keyCode)
+    {
+        return ((KeyCodeWrapper)keyCode).ToStringFast();
+    }
 }
 
 public class VirtualKeyCodeConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        return value is not VirtualKeyCode keyCode ? string.Empty : Enum.GetName(keyCode);
+        return value is not VirtualKeyCode keyCode ? string.Empty : ((KeyCodeWrapper)keyCode).ToStringFast();
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value is not string keyName ? VirtualKeyCode.None : VirtualKeyHelper.Parse(keyName);
+    }
+}
+
+public static class VirtualKeyCodeExtension
+{
+    public static string ToWarpCodeName(this VirtualKeyCode keyCode)
+    {
+        return VirtualKeyHelper.WrapKeyCodeName(keyCode);
     }
 }

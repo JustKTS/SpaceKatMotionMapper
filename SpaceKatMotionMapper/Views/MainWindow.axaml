@@ -11,12 +11,16 @@
     d:DesignHeight="1000"
     d:DesignWidth="600" 
     MinWidth="500"
+    MinHeight="600"
     Height="1000"
     Width="600"
-    Icon="/Assets/SpaceKatDevice.png"
     TitleBarMargin="200 0 0 0"
+    WindowStartupLocation="CenterScreen"
+    Icon="/Assets/SpaceKatDevice.png"
     mc:Ignorable="d"
     x:DataType="navVm:NavViewModel">
+   
+
     
     <u:UrsaWindow.RightContent>
         <view:TitleBarRightContent />

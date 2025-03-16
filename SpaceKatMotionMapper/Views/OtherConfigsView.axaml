@@ -77,10 +77,10 @@
             </StackPanel>
         </u:Divider>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible">
-            <ListBox Classes="Transparent" ItemsSource="{Binding KatActionConfigGroups}">
+            <ListBox Classes="Transparent" ItemsSource="{Binding KatMotionConfigGroups}">
                 <ListBox.ItemTemplate>
-                    <DataTemplate x:DataType="vm:KatActionConfigViewModel">
-                        <local:KatActionConfigView DataContext="{Binding }"></local:KatActionConfigView>
+                    <DataTemplate x:DataType="vm:KatMotionConfigViewModel">
+                        <local:KatMotionConfigView DataContext="{Binding }"></local:KatMotionConfigView>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

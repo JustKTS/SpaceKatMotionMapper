@@ -1,5 +1,5 @@
 ﻿<u:UrsaView
-    x:Class="SpaceKatMotionMapper.Views.KatActionConfigView"
+    x:Class="SpaceKatMotionMapper.Views.KatMotionConfigView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -9,10 +9,10 @@
     xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels;assembly=SpaceKatMotionMapper"
     d:DesignHeight="720"
     d:DesignWidth="1280"
-    x:DataType="vm:KatActionConfigViewModel"
+    x:DataType="vm:KatMotionConfigViewModel"
     mc:Ignorable="d">
     <Design.DataContext>
-        <vm:KatActionConfigViewModel />
+        <vm:KatMotionConfigViewModel />
     </Design.DataContext>
 
     <u:UrsaView.Styles>
@@ -55,7 +55,7 @@
                     <TextBlock Grid.Column="1" Classes="H5" VerticalAlignment="Center"
                                HorizontalAlignment="Center"
                                Theme="{StaticResource TitleTextBlock}"
-                               Text="{Binding ConfigName}" IsVisible="{Binding IsDefault}" />
+                               Text="全局配置" IsVisible="{Binding IsDefault}" />
                     <Button Grid.Column="0" Classes="Primary"
                             IsVisible="{Binding !IsDefault}">
                         <Grid ColumnDefinitions="Auto, *">
@@ -99,9 +99,7 @@
                         IsChecked="{Binding IsActivated, Mode=OneWay}"
                         Command="{Binding ActivateActionsCommand}" OnContent="" OffContent="" />
 
-
                     <u:ButtonGroup
-
                         Grid.Column="1"
                         Classes="Primary"
                         VerticalAlignment="Center"
@@ -112,7 +110,7 @@
                                 <PathIcon Data="{StaticResource SemiIconEdit}" />
                                 <TextBlock Margin="5,0,0,0">修改配置</TextBlock>
                             </StackPanel>
-                            
+
                         </Button>
                         <Button
                             Command="{Binding SetTimeAndDeadZoneCommand}">
@@ -120,11 +118,6 @@
                                 <PathIcon Data="{StaticResource SemiIconSetting}" />
                                 <TextBlock Margin="5,0,0,0">配置触发时间/死区</TextBlock>
                             </StackPanel>
-                        </Button>
-                        <Button
-                            ToolTip.Tip="保存至默认配置文件夹"
-                            Command="{Binding SaveToSystemConfigCommand}">
-                            <PathIcon Data="{StaticResource SemiIconSave}" />
                         </Button>
 
                         <Button
@@ -159,7 +152,6 @@
                         </Button>
                     </u:ButtonGroup>
                 </Grid>
-
             </Grid>
         </Border>
 

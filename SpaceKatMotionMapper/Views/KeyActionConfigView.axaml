@@ -27,6 +27,7 @@
         <helpers:ShowBaseOnMouseScrollConverter x:Key="ShowBaseOnMouseScrollConverter" />
         <helpers:HideBaseOnMouseScrollConverter x:Key="HideBaseOnMouseScrollConverter" />
         <helpers:DoubleClickCheckConverter x:Key="DoubleClickCheckConverter" />
+
     </u:UrsaView.Resources>
 
     <u:UrsaView.Styles>
@@ -40,10 +41,13 @@
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
         </Style>
+        <Style Selector="Border.WrongDefine">
+            <Setter Property="Background" Value="{DynamicResource SemiColorDanger}"></Setter>
+        </Style>
     </u:UrsaView.Styles>
 
     <Border Classes="Shadow" Theme="{StaticResource CardBorder}"
-            Background="#FFA3691F">
+           >
         <Grid ColumnDefinitions="*,auto" RowDefinitions="Auto,*">
             <StackPanel Orientation="Horizontal">
                 <TextBlock VerticalAlignment="Center" Classes="H4" Theme="{StaticResource TitleTextBlock}">按键配置</TextBlock>
@@ -63,50 +67,49 @@
                                 <CheckBox
                                     Name="UseCtrlCBox"
                                     Grid.Row="0"
-                                          Grid.Column="0"
-                                          Margin="5"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center">
+                                    Grid.Column="0"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
                                     Ctrl
                                 </CheckBox>
 
                                 <CheckBox
                                     Name="UseShiftCBox"
                                     Grid.Row="0"
-                                          Grid.Column="1"
-                                          Margin="5"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"
-                                          >
+                                    Grid.Column="1"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
                                     Shift
                                 </CheckBox>
                                 <CheckBox
                                     Name="UseWinCBox"
                                     Grid.Row="0"
-                                          Grid.Column="2"
-                                          Margin="5"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center">
+                                    Grid.Column="2"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
                                     Win
                                 </CheckBox>
                                 <CheckBox
                                     Name="UseAltCBox"
                                     Grid.Row="0"
-                                          Grid.Column="3"
-                                          Margin="5"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center">
+                                    Grid.Column="3"
+                                    Margin="5"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
                                     Alt
                                 </CheckBox>
 
-                                <ComboBox
+                                <AutoCompleteBox
                                     Name="HotKeyComboBox"
                                     Grid.Row="0"
-                                          Grid.Column="4"
-                                          Margin="5"
-                                          HorizontalAlignment="Stretch"
-                                          VerticalAlignment="Center"
-                                          ItemsSource="{Binding HotKeyEnums}"/>
+                                    Grid.Column="4"
+                                    Margin="5"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Center"
+                                    ItemsSource="{Binding KeyNames, Converter={StaticResource ActionTypeItemNamesConverter}}"/>
                                 <u:IconButton
                                     Grid.Column="0"
                                     Grid.ColumnSpan="5"
@@ -159,9 +162,12 @@
                 ItemsSource="{Binding ActionConfigGroups}">
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="vms:KeyActionViewModel">
-                        <Grid ColumnDefinitions="Auto, *, Auto"
-                               RowDefinitions="*, Auto">
-                            <StackPanel Orientation="Horizontal" Margin="5">
+                           <Grid ColumnDefinitions="Auto, *, Auto"
+                              RowDefinitions="*, Auto">
+                               <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                                       CornerRadius="5"
+                                       Classes.WrongDefine="{Binding !IsAvailable}"/>
+                               <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="5">
                                 <PathIcon HorizontalAlignment="Stretch"
                                           VerticalAlignment="Stretch"
                                           Data="{StaticResource SemiIconTickCircle}"
@@ -271,12 +277,12 @@
                                   ColumnDefinitions="*, 2*, *"
                                   IsVisible="{Binding IsDelay}">
                                 <TextBlock Grid.Column="0"
-                                    VerticalAlignment="Center"
-                                    Classes="H7"
-                                    Theme="{StaticResource TitleTextBlock}">
+                                           VerticalAlignment="Center"
+                                           Classes="H7"
+                                           Theme="{StaticResource TitleTextBlock}">
                                     延时
                                 </TextBlock>
-                                
+
                                 <u:NumericIntUpDown
                                     Grid.Column="1"
                                     Margin="10 0 10 0"
@@ -297,15 +303,16 @@
                                     毫秒
                                 </TextBlock>
                             </Grid>
-                            <Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                            <Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Center"
                                     Classes="Secendary" Theme="{DynamicResource SolidButton}"
                                     Command="{Binding RemoveCommand}">
                                 -
                             </Button>
-                            
+
                             <u:Divider
                                 Grid.Row="1"
-                                Grid.Column="0" 
+                                Grid.Column="0"
                                 Grid.ColumnSpan="3">
                                 <StackPanel Orientation="Horizontal" Spacing="5">
                                     <u:IconButton
@@ -317,12 +324,13 @@
                                         IsVisible="{Binding !IsDelay}"
                                         ToolTip.Tip="添加延时"
                                         Theme="{StaticResource BorderlessIconButton}"
-                                        Icon="{StaticResource SemiIconActivity}" 
+                                        Icon="{StaticResource SemiIconActivity}"
                                         Command="{Binding InsertNextDelayCommand}" />
                                 </StackPanel>
-                              
+
                             </u:Divider>
-                        </Grid>
+                        </Grid> 
+                        
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using System.Xml;
 using LanguageExt.Common;
+using Serilog;
 using SpaceKatMotionMapper.Models;
 
 namespace SpaceKatMotionMapper.Functions;
@@ -116,9 +118,8 @@ public static class OfficialWareConfigFunctions
         doc.Load(ConfigFilePath);
         return doc;
     }
-
-
-    public static Result<bool> OpenOfficialMapper()
+    
+    public static async Task<Result<bool>> OpenOfficialMapper()
     {
         var doc = LoadDocument();
 
@@ -127,11 +128,19 @@ public static class OfficialWareConfigFunctions
         var node2 = node1.SelectSingleNode("Devices")?.SelectSingleNode("Device")?.SelectSingleNode("AxisBank");
         if (node2 == null) return true;
         node1.SelectSingleNode("Devices")?.SelectSingleNode("Device")?.RemoveChild(node2);
-        doc.Save(ConfigFilePath);
+        try
+        {
+            doc.Save(ConfigFilePath);
+        }
+        catch (Exception e)
+        {
+            await Task.Delay(500); // 猜测是官方驱动会自动加载文件，导致文件被占用无法写入，延迟半秒后再操作。
+            doc.Save(ConfigFilePath);
+        }
         return true;
     }
 
-    public static Result<bool> UnbindHotKeyToKatButton()
+    public static async Task<Result<bool>> UnbindHotKeyToKatButton()
     {
         var doc = LoadDocument();
         var node1 = doc.SelectSingleNode("Global");
@@ -148,11 +157,19 @@ public static class OfficialWareConfigFunctions
             node1.RemoveChild(node3);
         }
 
-        doc.Save(ConfigFilePath);
+        try
+        {
+            doc.Save(ConfigFilePath);
+        }
+        catch (Exception e)
+        {
+            await Task.Delay(500); // 猜测是官方驱动会自动加载文件，导致文件被占用无法写入，延迟半秒后再操作。
+            doc.Save(ConfigFilePath);
+        }
         return true;
     }
 
-    public static Result<bool> BindHotKeyToKatButton(
+    public static async Task<Result<bool>> BindHotKeyToKatButton(
         KatButtonEnum button, bool useCtrl, bool useAlt, bool useShift, HotKeyCodeEnum hotKey)
     {
         var doc = LoadDocument();
@@ -179,11 +196,25 @@ public static class OfficialWareConfigFunctions
         var marcoNode = doc.ImportNode(macroDoc.SelectSingleNode("MacroTable")!, true);
         node1.AppendChild(marcoNode);
 
-        doc.Save(ConfigFilePath);
+        while (FileOccupiedChecker.IsOccupied(ConfigFilePath))
+        {
+            await Task.Delay(200);
+        }
+
+        try
+        {
+            doc.Save(ConfigFilePath);
+        }
+        catch (Exception e)
+        {
+            await Task.Delay(500); // 猜测是官方驱动会自动加载文件，导致文件被占用无法写入，延迟半秒后再操作。
+            doc.Save(ConfigFilePath);
+        }
+       
         return true;
     }
 
-    public static Result<bool> CloseOfficialMapper()
+    public static async Task<Result<bool>> CloseOfficialMapper()
     {
         var doc = LoadDocument();
         var node1 = doc.SelectSingleNode("Global");
@@ -203,11 +234,19 @@ public static class OfficialWareConfigFunctions
         docAxis.LoadXml(AxisBankXml);
         var importNode2 = doc.ImportNode(docAxis.SelectSingleNode("AxisBank")!, true);
         node3!.AppendChild(importNode2);
-        doc.Save(ConfigFilePath);
+        try
+        {
+            doc.Save(ConfigFilePath);
+        }
+        catch (Exception e)
+        {
+            await Task.Delay(500); // 猜测是官方驱动会自动加载文件，导致文件被占用无法写入，延迟半秒后再操作。
+            doc.Save(ConfigFilePath);
+        }
         return true;
     }
 
-    public static Result<bool> CleanAllChange()
+    public static async Task<Result<bool>> CleanAllChange()
     {
         var doc = LoadDocument();
         var node1 = doc.SelectSingleNode("Global");
@@ -224,7 +263,15 @@ public static class OfficialWareConfigFunctions
             node1.RemoveChild(node3);
         }
 
-        doc.Save(ConfigFilePath);
+        try
+        {
+            doc.Save(ConfigFilePath);
+        }
+        catch (Exception e)
+        {
+            await Task.Delay(500); // 猜测是官方驱动会自动加载文件，导致文件被占用无法写入，延迟半秒后再操作。
+            doc.Save(ConfigFilePath);
+        }
         return true;
     }
 

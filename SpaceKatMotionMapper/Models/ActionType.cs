@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using NetEscapades.EnumGenerators;
 
 namespace SpaceKatMotionMapper.Models;
 
+[JsonConverter(typeof(JsonStringEnumConverter<ActionType>))]
 [EnumExtensions]
 public enum ActionType
 {
@@ -13,4 +15,10 @@ public enum ActionType
     Mouse,
     [Display(Name="延时")]
     Delay
+}
+
+[JsonSourceGenerationOptions(WriteIndented = true ,UseStringEnumConverter = true)]
+[JsonSerializable(typeof(ActionType))]
+internal partial class ActionTypeJsonSgContext : JsonSerializerContext
+{
 }

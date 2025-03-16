@@ -12,7 +12,7 @@ namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class DeadZoneConfigViewModel : ViewModelBase
 {
-    private readonly KatActionRecognizeService _katActionRecognizeService;
+    private readonly KatMotionRecognizeService _katMotionRecognizeService;
     private readonly KatDeadZoneConfigService _katDeadZoneConfigService;
 
     [ObservableProperty] private bool _isDefault = true;
@@ -38,10 +38,10 @@ public partial class DeadZoneConfigViewModel : ViewModelBase
     }
 #endif
 
-    public DeadZoneConfigViewModel(KatActionRecognizeService katActionRecognizeService,
+    public DeadZoneConfigViewModel(KatMotionRecognizeService katMotionRecognizeService,
         KatDeadZoneConfigService katDeadZoneConfigService)
     {
-        _katActionRecognizeService = katActionRecognizeService;
+        _katMotionRecognizeService = katMotionRecognizeService;
         _katDeadZoneConfigService = katDeadZoneConfigService;
         LoadDeadZoneAsync();
     }
@@ -119,14 +119,14 @@ public partial class DeadZoneConfigViewModel : ViewModelBase
         PitchDeadZoneLower = deadZoneConfig.Lower[4];
         YawDeadZoneLower = deadZoneConfig.Lower[5];
 
-        _katActionRecognizeService.SetDeadZone(DeadZoneUpper, DeadZoneLower);
+        _katMotionRecognizeService.SetDeadZone(DeadZoneUpper, DeadZoneLower);
 
     }
 
     [RelayCommand]
     private void ApplyDeadZone()
     {
-        _katActionRecognizeService.SetDeadZone(DeadZoneUpper, DeadZoneLower);
+        _katMotionRecognizeService.SetDeadZone(DeadZoneUpper, DeadZoneLower);
     }
 
     [RelayCommand]
@@ -139,6 +139,25 @@ public partial class DeadZoneConfigViewModel : ViewModelBase
             : _katDeadZoneConfigService.SaveDeadZoneConfig(config, Id);
     }
 
+    [RelayCommand]
+    private void CopyFromDefault()
+    {
+        var deadZoneConfig = _katDeadZoneConfigService.LoadDefaultDeadZoneConfigs();
+        
+        XDeadZoneUpper = deadZoneConfig.Upper[0];
+        YDeadZoneUpper = deadZoneConfig.Upper[1];
+        ZDeadZoneUpper = deadZoneConfig.Upper[2];
+        RollDeadZoneUpper = deadZoneConfig.Upper[3];
+        PitchDeadZoneUpper = deadZoneConfig.Upper[4];
+        YawDeadZoneUpper = deadZoneConfig.Upper[5];
+        XDeadZoneLower = deadZoneConfig.Lower[0];
+        YDeadZoneLower = deadZoneConfig.Lower[1];
+        ZDeadZoneLower = deadZoneConfig.Lower[2];
+        RollDeadZoneLower = deadZoneConfig.Lower[3];
+        PitchDeadZoneLower = deadZoneConfig.Lower[4];
+        YawDeadZoneLower = deadZoneConfig.Lower[5];
+    }
+    
     #endregion
 
     #region 数据显示
@@ -159,7 +178,7 @@ public partial class DeadZoneConfigViewModel : ViewModelBase
         {
             while (!_stopEvent.IsSet)
             {
-                var data = _katActionRecognizeService.KatDeviceData;
+                var data = _katMotionRecognizeService.KatDeviceData;
                 Dispatcher.UIThread.Invoke(() =>
                 {
                     XData = data.AxesData[0];

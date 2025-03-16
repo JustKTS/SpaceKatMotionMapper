@@ -7,6 +7,7 @@ GetProcessImageFileName
 GetWindowText
 GetWindowThreadProcessId
 SetWinEventHook
+UnhookWinEvent
 TranslateMessage
 EVENT_SYSTEM_FOREGROUND
 WINEVENT_OUTOFCONTEXT
