@@ -7,13 +7,13 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <EnableEnumGeneratorInterceptor>true</EnableEnumGeneratorInterceptor>
-        <AssemblyVersion>0.2.4</AssemblyVersion>
-        <FileVersion>0.2.4</FileVersion>
+        <AssemblyVersion>0.2.5</AssemblyVersion>
+        <FileVersion>0.2.5</FileVersion>
         <ApplicationIcon>Assets\SpaceKatDevice.ico</ApplicationIcon>
         <NeutralLanguage>zh-Hans-CN</NeutralLanguage>
         <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
         <IsPackable>false</IsPackable>
-        <Version>0.2.4</Version>
+        <Version>0.2.5</Version>
         <Authors>JustKTS</Authors>
 <!--        <PublishAot>true</PublishAot>-->
 <!--        <PublishTrimmed>true</PublishTrimmed>-->

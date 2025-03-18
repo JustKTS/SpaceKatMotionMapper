@@ -16,12 +16,6 @@
     </Design.DataContext>
 
     <u:UrsaView.Styles>
-        <Style Selector="ListBox">
-            <Setter Property="CornerRadius" Value="5" />
-        </Style>
-        <Style Selector="ListBoxItem">
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        </Style>
         <Style Selector="Expander:down Border#ExpanderContent">
             <Setter Property="BorderThickness" Value="0" />
         </Style>

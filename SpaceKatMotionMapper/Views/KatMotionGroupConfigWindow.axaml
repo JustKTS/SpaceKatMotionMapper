@@ -25,13 +25,6 @@
     </Design.DataContext>
 
     <u:UrsaWindow.Styles>
-        <Style Selector="ListBox.Transparent > ListBoxItem:pointerover">
-            <Setter Property="Background" Value="Transparent" />
-        </Style>
-        <Style Selector="ListBox.Transparent > ListBoxItem:selected">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-        </Style>
         <Style Selector="Border.WrongDefine">
             <Setter Property="Background" Value="{DynamicResource SemiColorDanger}"></Setter>
         </Style>
@@ -121,7 +114,6 @@
                 <Grid>
                     <local:KeyActionConfigView DataContext="{Binding KeyActionConfigGroup}"></local:KeyActionConfigView>
                 </Grid>
-
             </Expander>
         </DataTemplate>
     </u:UrsaWindow.Resources>
@@ -235,11 +227,13 @@
                                     Command="{Binding AddKatMotionConfigCommand}">
                                 <PathIcon Data="{StaticResource SemiIconPlus}" Height="15" Width="15"></PathIcon>
                             </Button>
-                            <ListBox Grid.Row="1"
-                                     Classes="Transparent"
-                                     ItemsSource="{Binding KatMotions}"
-                                     ItemTemplate="{StaticResource KatActionSelector}">
-                            </ListBox>
+                            <ScrollViewer Grid.Row="1">
+                                <ItemsControl  Margin="10"
+                                               ItemsSource="{Binding KatMotions}"
+                                               ItemTemplate="{StaticResource KatActionSelector}">
+                                </ItemsControl>
+                            </ScrollViewer>
+                          
 
                         </Grid>
                     </Border>

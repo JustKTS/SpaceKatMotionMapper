@@ -9,16 +9,7 @@
             x:Class="SpaceKatMotionMapper.Views.OtherConfigsView"
             x:DataType="vm:OtherConfigsViewModel"
             Background="Transparent">
-
-    <u:UrsaView.Styles>
-        <Style Selector="ListBox.Transparent > ListBoxItem:pointerover">
-            <Setter Property="Background" Value="Transparent" />
-        </Style>
-        <Style Selector="ListBox.Transparent > ListBoxItem:selected">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-        </Style>
-    </u:UrsaView.Styles>
+    
     <Grid RowDefinitions="Auto,*">
         <u:Divider Grid.Row="0" Margin="20, 20 ,20,0">
             <StackPanel Orientation="Horizontal">
@@ -76,14 +67,14 @@
 
             </StackPanel>
         </u:Divider>
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible">
-            <ListBox Classes="Transparent" ItemsSource="{Binding KatMotionConfigGroups}">
-                <ListBox.ItemTemplate>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" Margin="10">
+            <ItemsControl ItemsSource="{Binding KatMotionConfigGroups}">
+                <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:KatMotionConfigViewModel">
                         <local:KatMotionConfigView DataContext="{Binding }"></local:KatMotionConfigView>
                     </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </ScrollViewer>
     </Grid>
 </u:UrsaView>

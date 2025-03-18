@@ -31,24 +31,13 @@
     </u:UrsaView.Resources>
 
     <u:UrsaView.Styles>
-        <Style Selector="ListBox.Transparent > ListBoxItem">
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        </Style>
-        <Style Selector="ListBox.Transparent > ListBoxItem:pointerover">
-            <Setter Property="Background" Value="Transparent" />
-        </Style>
-        <Style Selector="ListBox.Transparent > ListBoxItem:selected">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-        </Style>
         <Style Selector="Border.WrongDefine">
             <Setter Property="Background" Value="{DynamicResource SemiColorDanger}"></Setter>
         </Style>
     </u:UrsaView.Styles>
 
-    <Border Classes="Shadow" Theme="{StaticResource CardBorder}"
-           >
-        <Grid ColumnDefinitions="*,auto" RowDefinitions="Auto,*">
+    <Border Classes="Shadow" Theme="{StaticResource CardBorder}">
+        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,*">
             <StackPanel Orientation="Horizontal">
                 <TextBlock VerticalAlignment="Center" Classes="H4" Theme="{StaticResource TitleTextBlock}">按键配置</TextBlock>
                 <u:IconButton
@@ -109,7 +98,7 @@
                                     Margin="5"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Center"
-                                    ItemsSource="{Binding KeyNames, Converter={StaticResource ActionTypeItemNamesConverter}}"/>
+                                    ItemsSource="{Binding KeyNames, Converter={StaticResource ActionTypeItemNamesConverter}}" />
                                 <u:IconButton
                                     Grid.Column="0"
                                     Grid.ColumnSpan="5"
@@ -152,188 +141,190 @@
                 </Border>
             </StackPanel>
 
-            <ListBox
-                x:Name="ShortKeyConfigLBox"
-                Classes="Transparent"
-                Grid.Row="1"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                MaxHeight="300"
-                ItemsSource="{Binding ActionConfigGroups}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate x:DataType="vms:KeyActionViewModel">
-                           <Grid ColumnDefinitions="Auto, *, Auto"
-                              RowDefinitions="*, Auto">
-                               <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
-                                       CornerRadius="5"
-                                       Classes.WrongDefine="{Binding !IsAvailable}"/>
-                               <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="5">
-                                <PathIcon HorizontalAlignment="Stretch"
-                                          VerticalAlignment="Stretch"
-                                          Data="{StaticResource SemiIconTickCircle}"
-                                          IsVisible="{Binding IsAvailable}" />
-                                <PathIcon HorizontalAlignment="Stretch"
-                                          VerticalAlignment="Stretch"
-                                          Data="{StaticResource SemiIconClear}"
-                                          IsVisible="{Binding !IsAvailable}" />
-                            </StackPanel>
-                            <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch"
-                                  ColumnDefinitions="Auto, Auto, Auto, *, Auto, 1.5*"
-                                  IsVisible="{Binding !IsDelay}">
-                                <TextBlock
-                                    VerticalAlignment="Center"
-                                    Classes="H7"
-                                    Theme="{StaticResource TitleTextBlock}">
-                                    类型：
-                                </TextBlock>
-                                <Border
-                                    Grid.Column="1"
-                                    Margin="8,0"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch"
-                                    Theme="{StaticResource RadioButtonGroupBorder}">
-                                    <u:SelectionList
-                                        x:Name="ActionTypeSelector"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Stretch"
-                                        ItemsSource="{x:Static helpers:ActionTypeHelper.ActionTypeNames}"
-                                        SelectedItem="{Binding ActionType, Converter={StaticResource ActionTypeConverter}}">
-                                        <u:SelectionList.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" />
-                                            </ItemsPanelTemplate>
-                                        </u:SelectionList.ItemsPanel>
-                                    </u:SelectionList>
-                                </Border>
-                                <TextBlock
-                                    Grid.Column="2"
-                                    VerticalAlignment="Center"
-                                    Classes="H7"
-                                    Theme="{StaticResource TitleTextBlock}">
-                                    按键：
-                                </TextBlock>
-                                <u:AutoCompleteBox
-                                    x:Name="KeySelectionCBox"
-                                    Grid.Row="0"
-                                    Grid.Column="3"
-                                    Margin="5,0,5,0"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch"
-                                    ItemsSource="{Binding #ActionTypeSelector.SelectedItem, Converter={StaticResource ActionTypeItemNamesConverter}}"
-                                    Text="{Binding Key, Converter={StaticResource ActionTypeKeyOrButtonConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                    Watermark="请选择按键,留空则为无动作" />
-                                <TextBlock
-                                    Grid.Column="4"
-                                    VerticalAlignment="Center"
-                                    Classes="H7"
-                                    IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource HideBaseOnMouseScrollConverter}}"
-                                    Theme="{StaticResource TitleTextBlock}">
-                                    模式：
-                                </TextBlock>
-                                <Border
-                                    Grid.Column="5"
-                                    Margin="8,0"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch"
-                                    IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource HideBaseOnMouseScrollConverter}}"
-                                    Theme="{StaticResource RadioButtonGroupBorder}">
-                                    <u:SelectionList
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Stretch"
-                                        ItemsSource="{Binding ActionType, Converter={StaticResource DoubleClickCheckConverter}}"
-                                        SelectedItem="{Binding PressMode, Converter={StaticResource PressModeEnumConverter}, Mode=TwoWay}">
-                                        <u:SelectionList.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" />
-                                            </ItemsPanelTemplate>
-                                        </u:SelectionList.ItemsPanel>
-                                    </u:SelectionList>
-                                </Border>
-
-                                <TextBlock
-                                    Grid.Column="4"
-                                    VerticalAlignment="Center"
-                                    Classes="H7"
-                                    IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource ShowBaseOnMouseScrollConverter}}"
-                                    Theme="{StaticResource TitleTextBlock}">
-                                    滚动倍率：
-                                </TextBlock>
-
-                                <u:NumericIntUpDown
-                                    Grid.Column="5"
-                                    Margin="10 0 10 0"
-                                    Classes="Large"
-                                    HorizontalAlignment="Stretch"
-                                    HorizontalContentAlignment="Right"
-                                    VerticalAlignment="Stretch"
-                                    AllowDrag="True"
-                                    IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource ShowBaseOnMouseScrollConverter}}"
-                                    Maximum="100"
-                                    Minimum="-100"
-                                    Value="{Binding Multiplier}" />
-
-                            </Grid>
-                            <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center"
-                                  ColumnDefinitions="*, 2*, *"
-                                  IsVisible="{Binding IsDelay}">
-                                <TextBlock Grid.Column="0"
-                                           VerticalAlignment="Center"
-                                           Classes="H7"
-                                           Theme="{StaticResource TitleTextBlock}">
-                                    延时
-                                </TextBlock>
-
-                                <u:NumericIntUpDown
-                                    Grid.Column="1"
-                                    Margin="10 0 10 0"
-                                    Classes="Large"
-                                    HorizontalAlignment="Stretch"
-                                    HorizontalContentAlignment="Right"
-                                    VerticalAlignment="Stretch"
-                                    AllowDrag="True"
-                                    Maximum="5000"
-                                    Minimum="15"
-                                    Value="{Binding Multiplier}" />
-                                <TextBlock
-                                    Grid.Column="2"
-                                    Margin="10 0 20 0"
-                                    VerticalAlignment="Center"
-                                    Classes="H7"
-                                    Theme="{StaticResource TitleTextBlock}">
-                                    毫秒
-                                </TextBlock>
-                            </Grid>
-                            <Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Center"
-                                    Classes="Secendary" Theme="{DynamicResource SolidButton}"
-                                    Command="{Binding RemoveCommand}">
-                                -
-                            </Button>
-
-                            <u:Divider
-                                Grid.Row="1"
-                                Grid.Column="0"
-                                Grid.ColumnSpan="3">
-                                <StackPanel Orientation="Horizontal" Spacing="5">
-                                    <u:IconButton
-                                        ToolTip.Tip="添加单键"
-                                        Theme="{StaticResource BorderlessIconButton}"
-                                        Icon="{StaticResource SemiIconPlusCircle}"
-                                        Command="{Binding InsertNextActionCommand}" />
-                                    <u:IconButton
-                                        IsVisible="{Binding !IsDelay}"
-                                        ToolTip.Tip="添加延时"
-                                        Theme="{StaticResource BorderlessIconButton}"
-                                        Icon="{StaticResource SemiIconActivity}"
-                                        Command="{Binding InsertNextDelayCommand}" />
+            <ScrollViewer Grid.Row="1"
+                          Grid.Column="0"
+                          Grid.ColumnSpan="2"
+                          MaxHeight="500">
+                <ItemsControl
+                    x:Name="ShortKeyConfigLBox"
+                    ItemsSource="{Binding ActionConfigGroups}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vms:KeyActionViewModel">
+                            <Grid ColumnDefinitions="Auto, *, Auto"
+                                  RowDefinitions="*, Auto">
+                                <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                                        CornerRadius="5"
+                                        Classes.WrongDefine="{Binding !IsAvailable}" />
+                                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="5">
+                                    <PathIcon HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Stretch"
+                                              Data="{StaticResource SemiIconTickCircle}"
+                                              IsVisible="{Binding IsAvailable}" />
+                                    <PathIcon HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Stretch"
+                                              Data="{StaticResource SemiIconClear}"
+                                              IsVisible="{Binding !IsAvailable}" />
                                 </StackPanel>
+                                <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch"
+                                      ColumnDefinitions="Auto, Auto, Auto, *, Auto, 1.5*"
+                                      IsVisible="{Binding !IsDelay}">
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        Classes="H7"
+                                        Theme="{StaticResource TitleTextBlock}">
+                                        类型：
+                                    </TextBlock>
+                                    <Border
+                                        Grid.Column="1"
+                                        Margin="8,0"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        Theme="{StaticResource RadioButtonGroupBorder}">
+                                        <u:SelectionList
+                                            x:Name="ActionTypeSelector"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Stretch"
+                                            ItemsSource="{x:Static helpers:ActionTypeHelper.ActionTypeNames}"
+                                            SelectedItem="{Binding ActionType, Converter={StaticResource ActionTypeConverter}}">
+                                            <u:SelectionList.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" />
+                                                </ItemsPanelTemplate>
+                                            </u:SelectionList.ItemsPanel>
+                                        </u:SelectionList>
+                                    </Border>
+                                    <TextBlock
+                                        Grid.Column="2"
+                                        VerticalAlignment="Center"
+                                        Classes="H7"
+                                        Theme="{StaticResource TitleTextBlock}">
+                                        按键：
+                                    </TextBlock>
+                                    <u:AutoCompleteBox
+                                        x:Name="KeySelectionCBox"
+                                        Grid.Row="0"
+                                        Grid.Column="3"
+                                        Margin="5,0,5,0"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        ItemsSource="{Binding #ActionTypeSelector.SelectedItem, Converter={StaticResource ActionTypeItemNamesConverter}}"
+                                        Text="{Binding Key, Converter={StaticResource ActionTypeKeyOrButtonConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                        Watermark="请选择按键,留空则为无动作" />
+                                    <TextBlock
+                                        Grid.Column="4"
+                                        VerticalAlignment="Center"
+                                        Classes="H7"
+                                        IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource HideBaseOnMouseScrollConverter}}"
+                                        Theme="{StaticResource TitleTextBlock}">
+                                        模式：
+                                    </TextBlock>
+                                    <Border
+                                        Grid.Column="5"
+                                        Margin="8,0"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource HideBaseOnMouseScrollConverter}}"
+                                        Theme="{StaticResource RadioButtonGroupBorder}">
+                                        <u:SelectionList
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Stretch"
+                                            ItemsSource="{Binding ActionType, Converter={StaticResource DoubleClickCheckConverter}}"
+                                            SelectedItem="{Binding PressMode, Converter={StaticResource PressModeEnumConverter}, Mode=TwoWay}">
+                                            <u:SelectionList.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" />
+                                                </ItemsPanelTemplate>
+                                            </u:SelectionList.ItemsPanel>
+                                        </u:SelectionList>
+                                    </Border>
 
-                            </u:Divider>
-                        </Grid> 
-                        
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                                    <TextBlock
+                                        Grid.Column="4"
+                                        VerticalAlignment="Center"
+                                        Classes="H7"
+                                        IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource ShowBaseOnMouseScrollConverter}}"
+                                        Theme="{StaticResource TitleTextBlock}">
+                                        滚动倍率：
+                                    </TextBlock>
+
+                                    <u:NumericIntUpDown
+                                        Grid.Column="5"
+                                        Margin="10 0 10 0"
+                                        Classes="Large"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Right"
+                                        VerticalAlignment="Stretch"
+                                        AllowDrag="True"
+                                        IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource ShowBaseOnMouseScrollConverter}}"
+                                        Maximum="100"
+                                        Minimum="-100"
+                                        Value="{Binding Multiplier}" />
+
+                                </Grid>
+                                <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center"
+                                      ColumnDefinitions="*, 2*, *"
+                                      IsVisible="{Binding IsDelay}">
+                                    <TextBlock Grid.Column="0"
+                                               VerticalAlignment="Center"
+                                               Classes="H7"
+                                               Theme="{StaticResource TitleTextBlock}">
+                                        延时
+                                    </TextBlock>
+
+                                    <u:NumericIntUpDown
+                                        Grid.Column="1"
+                                        Margin="10 0 10 0"
+                                        Classes="Large"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Right"
+                                        VerticalAlignment="Stretch"
+                                        AllowDrag="True"
+                                        Maximum="5000"
+                                        Minimum="15"
+                                        Value="{Binding Multiplier}" />
+                                    <TextBlock
+                                        Grid.Column="2"
+                                        Margin="10 0 20 0"
+                                        VerticalAlignment="Center"
+                                        Classes="H7"
+                                        Theme="{StaticResource TitleTextBlock}">
+                                        毫秒
+                                    </TextBlock>
+                                </Grid>
+                                <Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch"
+                                        Margin="0 0 10 0"
+                                        VerticalAlignment="Center"
+                                        Classes="Secendary" Theme="{DynamicResource SolidButton}"
+                                        Command="{Binding RemoveCommand}">
+                                    -
+                                </Button>
+
+                                <u:Divider
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="3">
+                                    <StackPanel Orientation="Horizontal" Spacing="5">
+                                        <u:IconButton
+                                            ToolTip.Tip="添加单键"
+                                            Theme="{StaticResource BorderlessIconButton}"
+                                            Icon="{StaticResource SemiIconPlusCircle}"
+                                            Command="{Binding InsertNextActionCommand}" />
+                                        <u:IconButton
+                                            IsVisible="{Binding !IsDelay}"
+                                            ToolTip.Tip="添加延时"
+                                            Theme="{StaticResource BorderlessIconButton}"
+                                            Icon="{StaticResource SemiIconActivity}"
+                                            Command="{Binding InsertNextDelayCommand}" />
+                                    </StackPanel>
+
+                                </u:Divider>
+                            </Grid>
+
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
         </Grid>
     </Border>
 
