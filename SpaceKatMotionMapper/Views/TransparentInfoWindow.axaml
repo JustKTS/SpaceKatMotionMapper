@@ -5,6 +5,7 @@
               xmlns:u="https://irihi.tech/ursa"
               xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
               xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
+              xmlns:customControls="clr-namespace:SpaceKatMotionMapper.CustomControls"
               x:Class="SpaceKatMotionMapper.Views.TransparentInfoWindow"
               Title="信息窗口"
               mc:Ignorable="d"
@@ -48,8 +49,11 @@
             <Setter Property="BorderBrush" Value="Fuchsia" />
             <Setter Property="BorderThickness" Value="3" />
         </Style>
-        <Style Selector="TextBlock.H4">
+        <Style Selector="TextBlock.Controlled">
             <Setter Property="Foreground" Value="{Binding FontBrush}"></Setter>
+            <Setter Property="FontSize" Value="{Binding FontSize}" />
+            <Setter Property="HorizontalAlignment" Value="Center" ></Setter>
+            <Setter Property="VerticalAlignment" Value="Center" ></Setter>
         </Style>
     </u:UrsaWindow.Styles>
 
@@ -120,43 +124,56 @@
             </u:IconButton>
         </Grid>
 
-        <StackPanel HorizontalAlignment="Center"
+        <Grid RowDefinitions="*,Auto"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Center" IsVisible="{Binding !IsOtherInfo}">
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal" Spacing="20">
+                <TextBlock
                     VerticalAlignment="Center"
-                    IsVisible="{Binding !IsOtherInfo}"
-                    Orientation="Horizontal" Spacing="20"
-                    IsHitTestVisible="False">
-            <TextBlock
-                VerticalAlignment="Center"
-                Classes="H4"
+                    Classes="Controlled"
+                    FontSize="{Binding FontSize}"
+                    Text="{Binding MotionName}" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Classes="Controlled"
+                    Text="{Binding PressModeName}" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Classes="Controlled"
+                    Text="触发次数：" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Classes="Controlled"
+                    Text="{Binding KatMotion.RepeatCount}" />
+            </StackPanel>
+
+            <customControls:KeyActionsDescriptionDisplay
+                Grid.Row="1"
                 FontSize="{Binding FontSize}"
-                Theme="{StaticResource TitleTextBlock}"
-                Text="{Binding MotionName}" />
-            <TextBlock
-                VerticalAlignment="Center"
-                Classes="H4"
-                FontSize="{Binding FontSize}"
-                Theme="{StaticResource TitleTextBlock}"
-                Text="{Binding PressModeName}" />
-            <TextBlock
-                VerticalAlignment="Center"
-                Classes="H4"
-                FontSize="{Binding FontSize}"
-                Theme="{StaticResource TitleTextBlock}"
-                Text="触发次数：" />
-            <TextBlock
-                VerticalAlignment="Center"
-                Classes="H4"
-                FontSize="{Binding FontSize}"
-                Theme="{StaticResource TitleTextBlock}"
-                Text="{Binding KatMotion.RepeatCount}" />
-        </StackPanel>
+                Foreground="{Binding FontBrush}"
+                IsVisible="{Binding IsActionInfo}"
+                VerticalAlignment="Center" HorizontalAlignment="Center"
+                DisplayItems="{Binding ActionInfo}">
+            </customControls:KeyActionsDescriptionDisplay>
+
+
+            <!-- <TextBlock Grid.Row="1" TextWrapping="Wrap" -->
+            <!--            IsVisible="{Binding IsActionInfo}" -->
+            <!--            VerticalAlignment="Center" -->
+            <!--            HorizontalAlignment="Center" -->
+            <!--            Classes="H4" -->
+            <!--            FontSize="{Binding FontSize}" -->
+            <!--            Theme="{StaticResource TitleTextBlock}" -->
+            <!--            Text="{Binding ActionInfo}" /> -->
+        </Grid>
+
         <TextBlock
             TextWrapping="Wrap"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
-            Classes="H4"
-            FontSize="{Binding FontSize}"
-            Theme="{StaticResource TitleTextBlock}"
+            Classes="Controlled"
             IsVisible="{Binding IsOtherInfo}"
             Text="{Binding OtherInfo}" />
     </Panel>

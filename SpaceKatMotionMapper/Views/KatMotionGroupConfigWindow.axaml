@@ -1,24 +1,28 @@
-﻿<u:UrsaWindow xmlns="https://github.com/avaloniaui"
-              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-              xmlns:u="https://irihi.tech/ursa"
-              xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
-              xmlns:helpers="clr-namespace:SpaceKatMotionMapper.Helpers"
-              xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
-              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-              x:Class="SpaceKatMotionMapper.Views.KatMotionGroupConfigWindow"
-              x:DataType="vm:KatMotionConfigViewModel"
-              Icon="/Assets/SpaceKatDevice.png"
-              IsCloseButtonVisible="False"
-              IsRestoreButtonVisible="False"
-              IsMinimizeButtonVisible="False"
-              WindowStartupLocation="CenterScreen"
-              Width="1100"
-              MinWidth="1100"
-              MinHeight="600"
-              MaxHeight="1200"
-              Margin="50">
+﻿<u:UrsaWindow
+    Icon="/Assets/SpaceKatDevice.png"
+    IsCloseButtonVisible="False"
+    IsMinimizeButtonVisible="False"
+    IsRestoreButtonVisible="False"
+    Margin="50"
+    MaxHeight="1200"
+    MinHeight="600"
+    MinWidth="1100"
+    Width="1100"
+    WindowStartupLocation="CenterScreen"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="SpaceKatMotionMapper.Views.KatMotionGroupConfigWindow"
+    x:DataType="vm:KatMotionConfigViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:SpaceKatMotionMapper.Helpers"
+    xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:views="clr-namespace:SpaceKatMotionMapper.Views"
+    xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Design.DataContext>
         <vm:KatMotionConfigViewModel />
@@ -26,191 +30,225 @@
 
     <u:UrsaWindow.Styles>
         <Style Selector="Border.WrongDefine">
-            <Setter Property="Background" Value="{DynamicResource SemiColorDanger}"></Setter>
+            <Setter Property="Background" Value="{DynamicResource SemiColorDanger}" />
         </Style>
         <Style Selector="AccessText">
-            <Setter Property="FontSize" Value="15"></Setter>
-            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="ItemsControl ToggleButton ContentPresenter">
+            <Setter Property="CornerRadius" Value="5" />
         </Style>
 
     </u:UrsaWindow.Styles>
 
     <u:UrsaWindow.Resources>
-        <local:ModeNumToBoolConverter x:Key="ModeNumToBoolConverter"></local:ModeNumToBoolConverter>
-        <local:ShortTriggerToBoolConverter x:Key="ShortTriggerToBoolConverter"></local:ShortTriggerToBoolConverter>
-        <helpers:KatMotionConverter x:Key="KatMotionConverter"></helpers:KatMotionConverter>
-        <helpers:KatPressModeConverter x:Key="KatPressModeConverter"></helpers:KatPressModeConverter>
+        <local:ModeNumToBoolConverter x:Key="ModeNumToBoolConverter" />
+        <local:ShortTriggerToBoolConverter x:Key="ShortTriggerToBoolConverter" />
+        <helpers:KatMotionConverter x:Key="KatMotionConverter" />
+        <helpers:KatPressModeConverter x:Key="KatPressModeConverter" />
 
-        <DataTemplate x:Key="KatActionSelector" x:DataType="vm:KatMotionViewModel">
+        <DataTemplate x:DataType="vm:KatMotionViewModel" x:Key="KatActionSelector">
             <Expander>
                 <Expander.Header>
                     <Border
+                        Classes.WrongDefine="{Binding !IsAvailable}"
                         CornerRadius="5"
-                        Padding="5"
-                        Classes.WrongDefine="{Binding !IsAvailable}">
+                        Padding="5">
                         <StackPanel
                             HorizontalAlignment="Left"
                             Orientation="Horizontal"
                             Spacing="20">
-                            <Button VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                                    Command="{Binding RemoveSelfCommand}"
-                                    Classes="Primary" Theme="{DynamicResource SolidButton}"
-                                    FontSize="20" FontWeight="Heavy"
-                                    Margin="5">
-                                <PathIcon Data="{StaticResource SemiIconMinus}" Height="15" Width="15"></PathIcon>
+                            <Button
+                                Classes="Primary"
+                                Command="{Binding RemoveSelfCommand}"
+                                FontSize="20"
+                                FontWeight="Heavy"
+                                HorizontalAlignment="Stretch"
+                                Margin="5"
+                                Theme="{DynamicResource SolidButton}"
+                                VerticalAlignment="Stretch">
+                                <PathIcon
+                                    Data="{StaticResource SemiIconMinus}"
+                                    Height="15"
+                                    Width="15" />
                             </Button>
                             <TextBlock
-                                VerticalAlignment="Center"
                                 Classes="H5"
-                                Theme="{StaticResource TitleTextBlock}">
+                                Theme="{StaticResource TitleTextBlock}"
+                                VerticalAlignment="Center">
                                 运动方式
                             </TextBlock>
                             <ComboBox
-                                x:Name="KatActionComboBox"
                                 HorizontalAlignment="Center"
-                                VerticalAlignment="Stretch"
-                                MinWidth="120"
                                 ItemsSource="{x:Static helpers:KatMotionHelper.KatMotionNames}"
-                                SelectedItem="{Binding KatMotion, Converter={StaticResource KatMotionConverter}, Mode=TwoWay}" />
+                                MinWidth="120"
+                                SelectedItem="{Binding KatMotion, Converter={StaticResource KatMotionConverter}, Mode=TwoWay}"
+                                VerticalAlignment="Stretch"
+                                x:Name="KatActionComboBox" />
                             <TextBlock
-                                VerticalAlignment="Center"
                                 Classes="H5"
-                                Theme="{StaticResource TitleTextBlock}">
+                                Theme="{StaticResource TitleTextBlock}"
+                                VerticalAlignment="Center">
                                 触发状态:
                             </TextBlock>
                             <Border
-                                Margin="8,0"
                                 HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                Theme="{StaticResource RadioButtonGroupBorder}">
+                                Margin="8,0"
+                                Theme="{StaticResource RadioButtonGroupBorder}"
+                                VerticalAlignment="Stretch">
                                 <ListBox
-                                    x:Name="KatPressModeSelector"
                                     HorizontalAlignment="Center"
-                                    VerticalAlignment="Stretch"
-                                    Theme="{StaticResource ButtonRadioGroupListBox}"
                                     ItemsSource="{x:Static helpers:KatMotionHelper.KatPressModeNames}"
-                                    SelectedItem="{Binding KatPressMode, Converter={StaticResource KatPressModeConverter}}">
-                                </ListBox>
+                                    SelectedItem="{Binding KatPressMode, Converter={StaticResource KatPressModeConverter}}"
+                                    Theme="{StaticResource ButtonRadioGroupListBox}"
+                                    VerticalAlignment="Stretch"
+                                    x:Name="KatPressModeSelector" />
                             </Border>
-                            <StackPanel Orientation="Horizontal"
-                                        IsEnabled="{Binding #KatPressModeSelector.SelectedItem, Converter={StaticResource ShortTriggerToBoolConverter}}">
+                            <StackPanel IsEnabled="{Binding #KatPressModeSelector.SelectedItem, Converter={StaticResource ShortTriggerToBoolConverter}}" Orientation="Horizontal">
                                 <TextBlock
-                                    VerticalAlignment="Center"
                                     Classes="H5"
-                                    Theme="{StaticResource TitleTextBlock}">
+                                    Theme="{StaticResource TitleTextBlock}"
+                                    VerticalAlignment="Center">
                                     触发次数：
                                 </TextBlock>
 
                                 <u:NumericIntUpDown
-                                    Minimum="1" Maximum="5"
                                     EmptyInputValue="1"
-                                    Value="{Binding RepeatCount, Mode=TwoWay}">
-                                </u:NumericIntUpDown>
+                                    Maximum="5"
+                                    Minimum="1"
+                                    Value="{Binding RepeatCount, Mode=TwoWay}" />
                             </StackPanel>
                         </StackPanel>
                     </Border>
 
                 </Expander.Header>
                 <Grid>
-                    <local:KeyActionConfigView DataContext="{Binding KeyActionConfigGroup}"></local:KeyActionConfigView>
+                    <local:KeyActionConfigView DataContext="{Binding KeyActionConfigGroup}" />
                 </Grid>
             </Expander>
         </DataTemplate>
     </u:UrsaWindow.Resources>
 
     <u:UrsaWindow.RightContent>
-        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel
+            Grid.Row="0"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
             <u:IconButton
-                VerticalAlignment="Top"
-                Height="50"
-                Width="50"
                 Classes="Primary"
-                Theme="{StaticResource SolidIconButton}"
-                Icon="{StaticResource SemiIconSave}"
                 Command="{Binding SaveToSystemConfigCommand}"
-                HorizontalAlignment="Stretch">
-            </u:IconButton>
-            <u:IconButton
-                VerticalAlignment="Top"
                 Height="50"
-                Width="50"
-                Theme="{StaticResource BorderlessIconButton}"
-                Icon="{StaticResource SemiIconClose}"
+                HorizontalAlignment="Stretch"
+                Icon="{StaticResource SemiIconSave}"
+                Theme="{StaticResource SolidIconButton}"
+                VerticalAlignment="Top"
+                Width="50" />
+            <u:IconButton
                 Click="CloseButton_OnClick"
-                HorizontalAlignment="Stretch">
-            </u:IconButton>
+                Height="50"
+                HorizontalAlignment="Stretch"
+                Icon="{StaticResource SemiIconClose}"
+                Theme="{StaticResource BorderlessIconButton}"
+                VerticalAlignment="Top"
+                Width="50" />
         </StackPanel>
     </u:UrsaWindow.RightContent>
 
     <Grid RowDefinitions="Auto, *, Auto">
-        <TextBlock Grid.Row="0"
-                   Margin="20"
-                   Classes="H3"
-                   Theme="{StaticResource TitleTextBlock}"
-                   HorizontalAlignment="Center"
-                   Text="全局配置" IsVisible="{Binding IsDefault}" />
-        <TextBlock Grid.Row="0"
-                   Margin="20"
-                   Classes="H3"
-                   Theme="{StaticResource TitleTextBlock}"
-                   HorizontalAlignment="Center" Grid.Column="0" Text="{Binding ProcessFilename}"
-                   IsVisible="{Binding !IsDefault}" />
+        <TextBlock
+            Classes="H3"
+            Grid.Row="0"
+            HorizontalAlignment="Center"
+            IsVisible="{Binding IsDefault}"
+            Margin="20"
+            Text="全局配置"
+            Theme="{StaticResource TitleTextBlock}" />
+        <TextBlock
+            Classes="H3"
+            Grid.Column="0"
+            Grid.Row="0"
+            HorizontalAlignment="Center"
+            IsVisible="{Binding !IsDefault}"
+            Margin="20"
+            Text="{Binding ProcessFilename}"
+            Theme="{StaticResource TitleTextBlock}" />
 
 
-        <TabControl Grid.Row="1"
-                    Margin="50 0 50 50"
-                    Theme="{DynamicResource ScrollTabControl}"
-                    ItemsSource="{Binding KatMotionsWithMode}">
+        <TabControl
+            Grid.Row="1"
+            ItemsSource="{Binding KatMotionsWithMode}"
+            Margin="50,0,50,50"
+            Theme="{DynamicResource ScrollTabControl}">
             <TabControl.ItemTemplate>
                 <DataTemplate DataType="vm:KatMotionsWithModeViewModel">
                     <Border
+                        Classes.WrongDefine="{Binding !IsAvailable}"
                         CornerRadius="5"
-                        Padding="5"
-                        Classes.WrongDefine="{Binding !IsAvailable}">
+                        Padding="5">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Classes="H6"
-                                       Theme="{StaticResource TitleTextBlock}"
-                                       VerticalAlignment="Center">
+                            <TextBlock
+                                Classes="H6"
+                                Theme="{StaticResource TitleTextBlock}"
+                                VerticalAlignment="Center">
                                 模式
                             </TextBlock>
-                            <TextBlock Classes="H6"
-                                       Theme="{StaticResource TitleTextBlock}"
-                                       VerticalAlignment="Center" Text="{Binding ModeNum}" />
-                            <Button x:Name="ModeRemoveBtn" Margin="10 0 0 0"
-                                    Classes="Primary"
-                                    Height="30" Width="30"
-                                    Theme="{DynamicResource OutlineButton}"
-                                    IsVisible="{Binding ModeNum, Converter={StaticResource ModeNumToBoolConverter}}">
-                                <PathIcon Data="{StaticResource SemiIconMinus}" Height="15" Width="15"></PathIcon>
+                            <TextBlock
+                                Classes="H6"
+                                Text="{Binding ModeNum}"
+                                Theme="{StaticResource TitleTextBlock}"
+                                VerticalAlignment="Center" />
+                            <Button
+                                Classes="Primary"
+                                Height="30"
+                                IsVisible="{Binding ModeNum, Converter={StaticResource ModeNumToBoolConverter}}"
+                                Margin="10,0,0,0"
+                                Theme="{DynamicResource OutlineButton}"
+                                Width="30"
+                                x:Name="ModeRemoveBtn">
+                                <PathIcon
+                                    Data="{StaticResource SemiIconMinus}"
+                                    Height="15"
+                                    Width="15" />
                                 <Button.Flyout>
                                     <Flyout>
                                         <StackPanel Spacing="10">
-                                            <TextBlock Padding="5"
+                                            <TextBlock
+                                                Classes="H3 Danger"
                                                 HorizontalAlignment="Center"
-                                                Classes="H3 Danger" Theme="{StaticResource TitleTextBlock}">
+                                                Padding="5"
+                                                Theme="{StaticResource TitleTextBlock}">
                                                 确定删除吗？
                                             </TextBlock>
-                                            <TextBlock Padding="5"
-                                                       HorizontalAlignment="Center"
-                                                       Classes="H6" Theme="{StaticResource TitleTextBlock}">
+                                            <TextBlock
+                                                Classes="H6"
+                                                HorizontalAlignment="Center"
+                                                Padding="5"
+                                                Theme="{StaticResource TitleTextBlock}">
                                                 删除一个模式会导致所有模式切换的设置丢失，删除后请重新配置所有模式切换
                                             </TextBlock>
                                             <Button
                                                 Classes="Danger"
-                                                Theme="{StaticResource SolidButton}"
-                                                Command="{Binding RemoveSelfCommand}">
+                                                Command="{Binding RemoveSelfCommand}"
+                                                Theme="{StaticResource SolidButton}">
                                                 确定
                                             </Button>
                                         </StackPanel>
                                     </Flyout>
                                 </Button.Flyout>
                             </Button>
-                            <Button Margin="10 0 0 0"
-                                    Height="30" Width="30"
-                                    Classes="Primary" Theme="{DynamicResource OutlineButton}"
-                                    Command="{Binding AddOtherCommand}"
-                                    IsVisible="{Binding !#ModeRemoveBtn.IsVisible}">
-                                <PathIcon Data="{StaticResource SemiIconPlus}" Height="15" Width="15"></PathIcon>
+                            <Button
+                                Classes="Primary"
+                                Command="{Binding AddOtherCommand}"
+                                Height="30"
+                                IsVisible="{Binding !#ModeRemoveBtn.IsVisible}"
+                                Margin="10,0,0,0"
+                                Theme="{DynamicResource OutlineButton}"
+                                Width="30">
+                                <PathIcon
+                                    Data="{StaticResource SemiIconPlus}"
+                                    Height="15"
+                                    Width="15" />
                             </Button>
                         </StackPanel>
                     </Border>
@@ -220,20 +258,28 @@
                 <DataTemplate DataType="vm:KatMotionsWithModeViewModel">
                     <Border Theme="{StaticResource CardBorder}">
                         <Grid RowDefinitions="Auto, *">
-                            <Button Grid.Row="0" Margin="50 0 50 0"
-                                    VerticalAlignment="Stretch"
-                                    HorizontalAlignment="Stretch"
-                                    Classes="Primary" Theme="{DynamicResource SolidButton}"
-                                    Command="{Binding AddKatMotionConfigCommand}">
-                                <PathIcon Data="{StaticResource SemiIconPlus}" Height="15" Width="15"></PathIcon>
-                            </Button>
+
                             <ScrollViewer Grid.Row="1">
-                                <ItemsControl  Margin="10"
-                                               ItemsSource="{Binding KatMotions}"
-                                               ItemTemplate="{StaticResource KatActionSelector}">
-                                </ItemsControl>
+                                <ItemsControl
+                                    ItemTemplate="{StaticResource KatActionSelector}"
+                                    ItemsSource="{Binding KatMotions}"
+                                    Margin="10" />
                             </ScrollViewer>
-                          
+
+                            <Button
+                                Classes="Primary"
+                                Command="{Binding AddKatMotionConfigCommand}"
+                                Grid.Row="0"
+                                HorizontalAlignment="Stretch"
+                                Margin="50,0,50,0"
+                                Theme="{DynamicResource SolidButton}"
+                                VerticalAlignment="Stretch">
+                                <PathIcon
+                                    Data="{StaticResource SemiIconPlus}"
+                                    Height="15"
+                                    Width="15" />
+                            </Button>
+
 
                         </Grid>
                     </Border>
@@ -241,6 +287,11 @@
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </TabControl>
+
+        <u:OverlayDialogHost
+            Grid.Column="0"
+            Grid.Row="1"
+            HostId="{x:Static views:KatMotionGroupConfigWindow.LocalHost}" />
     </Grid>
 
 

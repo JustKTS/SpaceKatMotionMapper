@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Metsys.Bson;
-using SpaceKatMotionMapper.Helpers;
-using SpaceKatMotionMapper.Models;
+using SpaceKat.Shared.Helpers;
+using SpaceKat.Shared.Models;
+using SpaceKatMotionMapper.Views;
 using Ursa.Controls;
 using WindowsInput;
 
@@ -21,11 +22,14 @@ public partial class KeyActionConfigViewModel : ViewModelBase
     }
 #endif
 
+    [ObservableProperty] private bool _isCustomDescription;
+    [ObservableProperty] private string _keyActionsDescription = string.Empty;
+
     public ObservableCollection<int> CurrentConfigModeNums { get; }
 
     public ObservableCollection<KeyActionViewModel> ActionConfigGroups { get; set; }
 
-    public IReadOnlyList<string> KeyNames => VirtualKeyHelper.KeyNames;
+    public static IReadOnlyList<string> KeyNames => VirtualKeyHelpers.KeyNames;
     public KatMotionViewModel Parent { get; }
 
     public bool IsAvailable => CheckIsAvailable();
@@ -52,10 +56,10 @@ public partial class KeyActionConfigViewModel : ViewModelBase
                     item.PropertyChanged += ChildPropertyChanged;
                 }
             }
-        
+
             // 处理移除项：取消订阅避免内存泄漏
             if (e.OldItems == null) return;
-        
+
             foreach (KeyActionViewModel item in e.OldItems)
             {
                 item.PropertyChanged -= ChildPropertyChanged;
@@ -92,6 +96,7 @@ public partial class KeyActionConfigViewModel : ViewModelBase
             ActionConfigGroups.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.None.ToString(),
                 PressModeEnum.None, 1));
         }
+
         OnPropertyChanged(nameof(IsAvailable));
     }
 
@@ -134,6 +139,7 @@ public partial class KeyActionConfigViewModel : ViewModelBase
                 if (!ret) return false;
                 ActionConfigGroups.Add(actionConfigGroup);
             }
+
             OnPropertyChanged(nameof(IsAvailable));
             return true;
         }
@@ -148,28 +154,81 @@ public partial class KeyActionConfigViewModel : ViewModelBase
 
     # region HotKey转动作组
 
-    public HotKeyCodeEnum[] HotKeyEnums { get; set; } = HotKeyCodeEnumExtensions.GetValues();
-    
     public void AddHotKeyActions(bool useCtrl,
         bool useWin,
         bool useAlt,
         bool useShift,
-        VirtualKeyCode hotKey)
+        VirtualKeyCode hotKey,
+        string? customDescription = null)
     {
+        if (customDescription is not null)
+        {
+            KeyActionsDescription = customDescription;
+            IsCustomDescription = true;
+        }
+
         List<KeyActionViewModel> list = [];
-        if (useCtrl) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.CONTROL.ToWarpCodeName(), PressModeEnum.Press, 1));
-        if (useWin) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.LWIN.ToWarpCodeName(), PressModeEnum.Press, 1));
-        if (useAlt) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.MENU.ToWarpCodeName(), PressModeEnum.Press, 1));
-        if (useShift) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.SHIFT.ToWarpCodeName(), PressModeEnum.Press, 1));
-        list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, hotKey.ToWarpCodeName(), PressModeEnum.Click,
+        if (useCtrl)
+            list.Add(new KeyActionViewModel(this, ActionType.KeyBoard,
+                VirtualKeyCode.CONTROL.GetWrappedName(), PressModeEnum.Press, 1));
+        if (useWin)
+            list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.LWIN.GetWrappedName(),
+                PressModeEnum.Press, 1));
+        if (useAlt)
+            list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.MENU.GetWrappedName(),
+                PressModeEnum.Press, 1));
+        if (useShift)
+            list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.SHIFT.GetWrappedName(),
+                PressModeEnum.Press, 1));
+        list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, hotKey.GetWrappedName(),
+            PressModeEnum.Click,
             1));
-        if (useShift) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.SHIFT.ToWarpCodeName(), PressModeEnum.Release, 1));
-        if (useAlt) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.MENU.ToWarpCodeName(), PressModeEnum.Release, 1));
-        if (useWin) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.LWIN.ToWarpCodeName(), PressModeEnum.Release, 1));
-        if (useCtrl) list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.CONTROL.ToWarpCodeName(), PressModeEnum.Release, 1));
+        if (useShift)
+            list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.SHIFT.GetWrappedName(),
+                PressModeEnum.Release, 1));
+        if (useAlt)
+            list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.MENU.GetWrappedName(),
+                PressModeEnum.Release, 1));
+        if (useWin)
+            list.Add(new KeyActionViewModel(this, ActionType.KeyBoard, VirtualKeyCode.LWIN.GetWrappedName(),
+                PressModeEnum.Release, 1));
+        if (useCtrl)
+            list.Add(new KeyActionViewModel(this, ActionType.KeyBoard,
+                VirtualKeyCode.CONTROL.GetWrappedName(), PressModeEnum.Release, 1));
         ActionConfigGroups.Clear();
         list.Iter(ActionConfigGroups.Add);
         OnPropertyChanged(nameof(IsAvailable));
+    }
+
+    #endregion
+
+    #region 添加自定义动作组
+
+    public void AddCustomActions(string description, IEnumerable<KeyActionConfig> keyActionConfigs)
+    {
+        KeyActionsDescription = description;
+        IsCustomDescription = true;
+        FromKeyActionConfig(keyActionConfigs);
+    }
+
+    [RelayCommand]
+    private async Task OpenPresetSelector()
+    {
+        await OverlayDialog.ShowCustomModal<ProgramSpecMetaKeySelectorView, ProgramSpecMetaKeySelectorViewModel, object?>(
+            new ProgramSpecMetaKeySelectorViewModel(this), KatMotionGroupConfigWindow.LocalHost,
+            new OverlayDialogOptions
+            {
+                HorizontalAnchor = HorizontalPosition.Center,
+                VerticalAnchor = VerticalPosition.Center,
+                Buttons = DialogButton.None,
+                CanDragMove = true,
+                CanLightDismiss = true,
+                CanResize = true,
+                FullScreen = false,
+                IsCloseButtonVisible = false,
+                Mode = DialogMode.None
+            }
+        );
     }
 
     #endregion

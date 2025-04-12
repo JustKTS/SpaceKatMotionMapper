@@ -18,20 +18,19 @@ public partial class KatMotionRecognizeService : ObservableObject
     private DateTimeOffset _pressTime = DateTimeOffset.Now;
     private bool _pressDone;
 
-    [ObservableProperty] private KatDeviceData _katDeviceData = new();
+    [ObservableProperty] private KatDeviceData _katDeviceData = new(DateTimeOffset.Now, new double[6], new bool[6]);
 
-    [ObservableProperty] private KatMotionWithTimeStamp _currentKatMotion = new(KatMotionEnum.Stable, KatPressModeEnum.Short, 0);
+    [ObservableProperty]
+    private KatMotionWithTimeStamp _currentKatMotion = new(KatMotionEnum.Stable, KatPressModeEnum.Short, 0);
 
     private readonly IDeviceDataWrapper _deviceDataWrapper;
+
     public KatMotionRecognizeService(IDeviceDataWrapper deviceDataWrapper)
     {
         _deviceDataWrapper = deviceDataWrapper;
-        _deviceDataWrapper.ConnectionChanged += (_, isConnected)=>
-        {
-            ConnectionChanged?.Invoke(this, isConnected);
-        };
+        _deviceDataWrapper.ConnectionChanged += (_, isConnected) => { ConnectionChanged?.Invoke(this, isConnected); };
     }
-    
+
     partial void OnCurrentKatMotionChanged(KatMotionWithTimeStamp value)
     {
         DataReceived?.Invoke(this, value);
@@ -39,14 +38,7 @@ public partial class KatMotionRecognizeService : ObservableObject
 
     public ManualResetEventSlim ExitEvent { get; } = new(false);
 
-
-    public void SetDeadZoneByAxis(MotionAxis axis, bool isUpper, double value)
-    {
-        if (isUpper) _deadZoneConfig.Upper[(int)axis] = value;
-        else _deadZoneConfig.Lower[(int)axis] = value;
-    }
-
-    public void SetDeadZone(double[] uppers, double[] lowers)
+    public void SetDeadZone(double[] uppers, double[] lowers, bool[] axesInverse)
     {
         if (uppers.Length != 6) return;
         for (var i = 0; i < uppers.Length; i++)
@@ -58,6 +50,16 @@ public partial class KatMotionRecognizeService : ObservableObject
         for (var i = 0; i < lowers.Length; i++)
         {
             _deadZoneConfig.Lower[i] = lowers[i];
+        }
+
+        // 为保证旧版兼容性添加
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        axesInverse ??= [false, false, false, false, false, false];
+
+        if (axesInverse.Length != 6) return;
+        for (var i = 0; i < axesInverse.Length; i++)
+        {
+            _deadZoneConfig.AxesInverse[i] = axesInverse[i];
         }
     }
 
@@ -128,7 +130,8 @@ public partial class KatMotionRecognizeService : ObservableObject
                         continue;
                     }
 
-                    CurrentKatMotion = new KatMotionWithTimeStamp(lastMotion, KatPressModeEnum.LongReach, longReachTriggerCount);
+                    CurrentKatMotion =
+                        new KatMotionWithTimeStamp(lastMotion, KatPressModeEnum.LongReach, longReachTriggerCount);
                     longReachTriggerCount += 1;
                     lastLongReachTriggerTime = DateTimeOffset.Now;
                 }
@@ -157,7 +160,8 @@ public partial class KatMotionRecognizeService : ObservableObject
     }
 
 
-    private async Task<KatMotionWithTimeStamp> RecognizeMultiShortMotionAsync(KatMotionEnum lastMotion = KatMotionEnum.Stable)
+    private async Task<KatMotionWithTimeStamp> RecognizeMultiShortMotionAsync(
+        KatMotionEnum lastMotion = KatMotionEnum.Stable)
     {
         var startTime = DateTimeOffset.Now;
         var waitTime = TimeSpan.Zero;
@@ -193,7 +197,11 @@ public partial class KatMotionRecognizeService : ObservableObject
         var data = _deviceDataWrapper.Read();
         if (data is null) return KatMotionEnum.Null;
 
-        KatDeviceData = data;
+        var newData = data.AxesData.Select((v, i) =>
+            _deadZoneConfig.AxesInverse[i] ? -v : v
+        ).ToArray();
+
+        KatDeviceData = data with { AxesData = newData };
 
         var rotation = data.Rotation;
         var rotationAbs = rotation.Select(Math.Abs).ToArray();

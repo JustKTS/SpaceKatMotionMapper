@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using SpaceKatMotionMapper.Views;
@@ -29,6 +30,7 @@ public partial class NavViewModel : ObservableRecipient
     {
         try
         {
+            Content = null;
             Content = _viewRegister.GetView(s);
         }
         catch (Exception e)

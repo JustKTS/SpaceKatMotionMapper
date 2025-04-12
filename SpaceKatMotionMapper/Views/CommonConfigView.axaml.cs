@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using SpaceKatMotionMapper.ViewModels;
 
@@ -11,10 +12,5 @@ public partial class CommonConfigView : UserControl
     {
         DataContext = App.GetService<CommonConfigViewModel>();
         InitializeComponent();
-        var view = new KatMotionConfigView
-        {
-            DataContext = ((CommonConfigViewModel)DataContext).DefaultKatMotionConfig
-        };
-        ScrollViewer.Content = view;
     }
 }

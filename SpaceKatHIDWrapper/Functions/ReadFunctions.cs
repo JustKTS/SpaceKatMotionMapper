@@ -6,8 +6,10 @@ namespace SpaceKatHIDWrapper.Functions;
 
 public static class ReadFunctions
 {
-    public static bool UpdateDeviceData(ReadOnlySpan<byte> rawData,  ref KatDeviceData katDeviceData,
-        FrozenDictionary<MotionAxis, AxisSpecs> axesMappings, double axesScale, ReadOnlyCollection<ButtonSpecs> buttonsMappings)
+    public static bool UpdateDeviceData(ReadOnlySpan<byte> rawData,
+        in KatDeviceBuffer buffer,
+        FrozenDictionary<MotionAxis, AxisSpecs> axesMappings, double axesScale,
+        ReadOnlyCollection<ButtonSpecs> buttonsMappings)
     {
         try
         {
@@ -16,26 +18,25 @@ public static class ReadFunctions
                 if (rawData[0] != axisSpecs.Channel) continue;
                 if (axisSpecs.ByteIndex1 > rawData.Length || axisSpecs.ByteIndex2 > rawData.Length) continue;
 
-                katDeviceData.UpdateByAxis(axisName,
+                buffer.UpdateByAxis(axisName,
                     BitConverter.ToInt16(rawData[axisSpecs.ByteIndex1 .. (axisSpecs.ByteIndex2 + 1)]) * axisSpecs.Flip /
                     axesScale);
             }
-            
-            List<bool> buttons = [];
-            foreach (var buttonMapping in buttonsMappings)
+
+            for (var i = 0; i < buttonsMappings.Count; i++)
             {
-                if (rawData[0] != buttonMapping.Channel) continue;
-                var mask = 1U << buttonMapping.Bit;
-                buttons.Add((rawData[buttonMapping.ByteIndex] & mask) != 0);
+                if (rawData[0] != buttonsMappings[i].Channel) continue;
+                var mask = 1U << buttonsMappings[i].Bit;
+                buffer.UpdateButtonByIndex(i, (rawData[buttonsMappings[i].ByteIndex] & mask) != 0);
             }
-            katDeviceData.Buttons = buttons.ToArray();
-            
+
+
             return true;
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw;
+            return false;
         }
     }
 

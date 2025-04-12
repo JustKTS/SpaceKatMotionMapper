@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
+using SpaceKat.Shared.Models;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services.Contract;
@@ -19,7 +19,7 @@ public class TransparentInfoService
     private const string ConfigStr = "TransparentInfoWindowConfig";
     private bool IsTransparentInfoEnable { get; set; } = true;
 
-    private TransparentInfoWindow? _window = null;
+    private TransparentInfoWindow? _window;
     private bool _isWindowShow;
 
     public int AnimationTimeMs { get; set; } = 250;
@@ -72,6 +72,22 @@ public class TransparentInfoService
             vm.IsOtherInfo = false;
         });
         UpdateWindowState();
+    }
+
+    public void SetActionInfoMotion(bool isAction, KeyActionConfig[]? actionInfo = null)
+    {
+        actionInfo ??= [];
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            var vm = App.GetRequiredService<TransparentInfoViewModel>();
+            if (!isAction)
+            {
+                vm.IsActionInfo = false;
+                return;
+            }
+            vm.IsActionInfo = true;
+            vm.ActionInfo = actionInfo;
+        });
     }
 
     public void DisplayOtherInfo(string info)
@@ -182,11 +198,11 @@ public class TransparentInfoService
             var area = screen.WorkingArea;
             var windowHeight = area.Height / 20;
             var width = windowHeight * 5;
-            var position = new PixelPoint(area.X + area.Width - (int)width - 10,
-                area.Y + area.Height - (int)windowHeight - 10);
+            var position = new PixelPoint(area.X + area.Width - width - 10,
+                area.Y + area.Height - windowHeight - 10);
 
             config = new TransparentInfoWindowConfig(position.X, position.Y, width, windowHeight,
-                new Color(0x66, 0xD3, 0xD3, 0xD3).ToUInt32(), Colors.White.ToUInt32(), 15, 1500, 250);
+                new Color(0x66, 0xD3, 0xD3, 0xD3).ToUInt32(), Colors.White.ToUInt32());
         }
 
         var newConfig = config with { DisappearTimeMs = disappearTimeMs, AnimationTimeMs = animationTimeMs };

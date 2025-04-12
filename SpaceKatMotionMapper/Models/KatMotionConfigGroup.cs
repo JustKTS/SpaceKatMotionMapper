@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using SpaceKatHIDWrapper.Models;
+using SpaceKatMotionMapper.Defines;
 
 namespace SpaceKatMotionMapper.Models;
 
@@ -12,30 +13,32 @@ public record KatMotionConfigGroup(
     bool IsCustomDeadZone,
     KatDeadZoneConfig DeadZoneConfig,
     bool IsCustomMotionTimeConfigs,
-    KatMotionTimeConfigs MotionTimeConfigs)
+    KatMotionTimeConfigs MotionTimeConfigs,
+    int Version = GlobalConstConfigs.ConfigFileVersion)
 {
     public KatMotionConfigGroup(
         bool IsDefault,
         string ProcessPath,
-        List<KatMotionConfig> configs) : this(System.Guid.NewGuid().ToString(), IsDefault, ProcessPath,
+        List<KatMotionConfig> configs) : this(System.Guid.CreateVersion7().ToString(), IsDefault, ProcessPath,
         configs, false, new KatDeadZoneConfig(), false, new KatMotionTimeConfigs())
     {
     }
 
     public KatMotionConfigGroup() : this(
-        System.Guid.NewGuid().ToString(),
+        System.Guid.CreateVersion7().ToString(),
         false,
         "",
-        [], false, new KatDeadZoneConfig(), false, new KatMotionTimeConfigs())
+        [], false, new KatDeadZoneConfig(), false, new KatMotionTimeConfigs()
+    )
     {
     }
 }
-
 
 [JsonSourceGenerationOptions(WriteIndented = true)]
 [JsonSerializable(typeof(KatMotionConfigGroup))]
 [JsonSerializable(typeof(string))]
 [JsonSerializable(typeof(bool))]
+[JsonSerializable(typeof(int))]
 [JsonSerializable(typeof(List<KatMotionConfig>))]
 [JsonSerializable(typeof(KatDeadZoneConfig))]
 [JsonSerializable(typeof(KatMotionTimeConfigs))]

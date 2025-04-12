@@ -6,6 +6,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceKatHIDWrapper", "Space
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Win32Helpers", "Win32Helpers\Win32Helpers.csproj", "{F79CA2E8-97ED-4CD7-BA25-4E98DC6075B7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgramSpecificConfigCreator", "ProgramSpecificConfigCreator\ProgramSpecificConfigCreator.csproj", "{1482F207-F037-4DC0-B32B-38E704AA3CF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceKat.Shared", "SpaceKat.Shared\SpaceKat.Shared.csproj", "{A28A5E00-7E89-46B5-88BD-20909C5B10F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,13 @@ Global
 		{F79CA2E8-97ED-4CD7-BA25-4E98DC6075B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F79CA2E8-97ED-4CD7-BA25-4E98DC6075B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F79CA2E8-97ED-4CD7-BA25-4E98DC6075B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1482F207-F037-4DC0-B32B-38E704AA3CF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1482F207-F037-4DC0-B32B-38E704AA3CF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1482F207-F037-4DC0-B32B-38E704AA3CF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1482F207-F037-4DC0-B32B-38E704AA3CF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A28A5E00-7E89-46B5-88BD-20909C5B10F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A28A5E00-7E89-46B5-88BD-20909C5B10F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A28A5E00-7E89-46B5-88BD-20909C5B10F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A28A5E00-7E89-46B5-88BD-20909C5B10F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

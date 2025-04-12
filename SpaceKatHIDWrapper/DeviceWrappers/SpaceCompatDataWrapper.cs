@@ -45,12 +45,12 @@ public class SpaceCompatDataWrapper : IDeviceDataWrapper
     private const double AxisScale = 350.0;
 
     private Device? _device;
-
-    private KatDeviceData _katDeviceData = new();
-
+    
     private int _readFailedCount;
 
     public bool IsConnected => _device != null;
+    
+    private readonly KatDeviceBuffer _buffer = new();
 
     private void RetryConnect(object? obj, bool isConnected)
     {
@@ -99,10 +99,9 @@ public class SpaceCompatDataWrapper : IDeviceDataWrapper
         try
         {
             var rawData = _device.ReadTimeout(_readLength, 300);
-
-            ReadFunctions.UpdateDeviceData(rawData, ref _katDeviceData, _axesMappings, AxisScale, _buttonMappings);
-
-            return _katDeviceData;
+            
+            var ret = ReadFunctions.UpdateDeviceData(rawData, in _buffer, _axesMappings, AxisScale, _buttonMappings);
+            return ret? _buffer.ToKatDeviceData() : null;
         }
         catch (Exception e)
         {

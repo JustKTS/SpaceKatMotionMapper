@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using SpaceKatHIDWrapper.Services;
@@ -20,7 +21,7 @@ public class AutoDisableService
 
     private bool _isEnable;
 
-    private bool _initialized;
+    public bool IsInitialized { get; private set; }
 
     public bool IsEnable
     {
@@ -52,7 +53,7 @@ public class AutoDisableService
 
     public async Task InitializeAsync()
     {
-        if (_initialized) return;
+        if (IsInitialized) return;
         var keys = await _localSettingsService.ReadSettingAsync<List<string>>(AutoDisableProgramsKey);
         if (keys is not null)
         {
@@ -63,7 +64,20 @@ public class AutoDisableService
         {
             await Dispatcher.UIThread.InvokeAsync(() => { IsEnable = isEnable.Value; });
         }
-        _initialized = true;
+
+        IsInitialized = true;
+    }
+
+    public async Task<bool> WaitForInitializedAsync()
+    {
+        var count = 0;
+        while (!IsInitialized || count == 20) 
+        {
+            await Task.Delay(100);
+            count++;
+        }
+
+        return IsInitialized;
     }
 
     public void AddProgramPath(string programPath)

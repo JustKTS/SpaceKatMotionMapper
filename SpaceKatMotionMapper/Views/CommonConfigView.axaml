@@ -1,21 +1,28 @@
-﻿<u:UrsaView xmlns="https://github.com/avaloniaui"
-            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-            xmlns:vms="clr-namespace:SpaceKatMotionMapper.ViewModels;assembly=SpaceKatMotionMapper"
-            xmlns:u="https://irihi.tech/ursa"
-            mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-            x:Class="SpaceKatMotionMapper.Views.CommonConfigView"
-            x:DataType="vms:CommonConfigViewModel">
+﻿<u:UrsaView
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="SpaceKatMotionMapper.Views.CommonConfigView"
+    x:DataType="vms:CommonConfigViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:views="clr-namespace:SpaceKatMotionMapper.Views"
+    xmlns:vms="clr-namespace:SpaceKatMotionMapper.ViewModels;assembly=SpaceKatMotionMapper"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Design.DataContext>
-        <vms:CommonConfigViewModel></vms:CommonConfigViewModel>
+        <vms:CommonConfigViewModel />
     </Design.DataContext>
     <u:UrsaView.Styles>
         <Style Selector="Expander:down Border#ExpanderContent">
             <Setter Property="BorderThickness" Value="0" />
         </Style>
     </u:UrsaView.Styles>
-    <ScrollViewer Name="ScrollViewer" Margin="10" VerticalScrollBarVisibility="Auto">
-       
+    <ScrollViewer
+        Margin="10"
+        Name="ScrollViewer"
+        VerticalScrollBarVisibility="Auto">
+        <views:KatMotionConfigView DataContext="{Binding DefaultKatMotionConfig}" />
     </ScrollViewer>
 </u:UrsaView>

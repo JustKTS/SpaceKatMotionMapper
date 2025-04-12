@@ -4,6 +4,7 @@ using Avalonia.Controls.Notifications;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Messaging;
+using SpaceKat.Shared.Models;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.ViewModels;
 using Ursa.Controls;
@@ -14,6 +15,7 @@ namespace SpaceKatMotionMapper.Views;
 
 public partial class KatMotionGroupConfigWindow : UrsaWindow
 {
+    public const string LocalHost = "KatMotionGroupConfigWindow";
     private readonly WindowNotificationManager _manager;
 
     public KatMotionGroupConfigWindow()

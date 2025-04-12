@@ -1,18 +1,18 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
-using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SpaceKatMotionMapper.Functions;
+using ProgramSpecificConfigCreator.Views;
+using SpaceKat.Shared.Helpers;
+using SpaceKat.Shared.States;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.States;
-using SpaceKatMotionMapper.Views;
+using WindowsInput;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
@@ -45,7 +45,6 @@ public partial class SettingsViewModel : ObservableObject
         _transparentInfoViewModel.DisappearTimeMs = DisappearTimeMs;
         _transparentInfoViewModel.AnimationTimeMs = AnimationTimeMs;
         await infoService.UpdateTimeConfigs(DisappearTimeMs, AnimationTimeMs);
-       
     }
     
     [RelayCommand]
@@ -86,13 +85,13 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _useCtrl = true;
     [ObservableProperty] private bool _useAlt = true;
     [ObservableProperty] private bool _useShift;
-    [ObservableProperty] private HotKeyCodeEnum _hotKey = HotKeyCodeEnum.D;
+    [ObservableProperty] private VirtualKeyCode _hotKey = VirtualKeyCode.VK_D;
 
     [ObservableProperty] private KatButtonEnum _selectedKatButton = KatButtonEnum.None;
 
     public static KatButtonEnum[] KatButtonList => KatButtonEnumExtensions.GetValues();
 
-    public static HotKeyCodeEnum[] HotKeyCodes => HotKeyCodeEnumExtensions.GetValues();
+    public static IReadOnlyList<string> HotKeyCodes => VirtualKeyHelpers.KeyNames;
 
     private void SaveHotKey()
     {
@@ -152,7 +151,7 @@ public partial class SettingsViewModel : ObservableObject
 
     # region 自动禁用官方映射
 
-    public AutoDisableViewModel AutoDisableViewModel => App.GetRequiredService<AutoDisableViewModel>();
+    public static AutoDisableViewModel AutoDisableViewModel => App.GetRequiredService<AutoDisableViewModel>();
 
     # endregion
 
@@ -171,7 +170,7 @@ public partial class SettingsViewModel : ObservableObject
     }
 
     # endregion
-
+    
     # region 启动时加载
 
     public void LoadInStart()
@@ -179,6 +178,18 @@ public partial class SettingsViewModel : ObservableObject
         LoadHotKey();
         AutoDisableViewModel.LoadInfos();
     }
+
+    #endregion
+
+    #region 各应用预设快捷键配置工具
+    
+    [RelayCommand]
+    private static void OpenProgramSpecificConfigCreator()
+    {
+        var mainWindow = App.GetRequiredService<ProgramSpecificConfigMainWindow>();
+        mainWindow.Show();
+    }   
+    
 
     #endregion
 }

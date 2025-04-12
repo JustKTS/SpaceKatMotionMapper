@@ -24,7 +24,7 @@ public partial class DeadZoneConfigViewModel : ViewModelBase
         IsDefault = false;
         Id = id;
     }
-    
+
     public void UpdateByDefault()
     {
         IsDefault = true;
@@ -68,6 +68,12 @@ public partial class DeadZoneConfigViewModel : ViewModelBase
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(DeadZoneUpper))]
     private double _yawDeadZoneUpper;
 
+    public double[] DeadZoneUpper =>
+    [
+        XDeadZoneUpper, YDeadZoneUpper, ZDeadZoneUpper, RollDeadZoneUpper, PitchDeadZoneUpper, YawDeadZoneUpper
+    ];
+
+
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(DeadZoneLower))]
     private double _xDeadZoneLower;
 
@@ -86,25 +92,44 @@ public partial class DeadZoneConfigViewModel : ViewModelBase
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(DeadZoneLower))]
     private double _yawDeadZoneLower;
 
-    public double[] DeadZoneUpper =>
-    [
-        XDeadZoneUpper, YDeadZoneUpper, ZDeadZoneUpper, RollDeadZoneUpper, PitchDeadZoneUpper, YawDeadZoneUpper
-    ];
 
     public double[] DeadZoneLower =>
     [
         XDeadZoneLower, YDeadZoneLower, ZDeadZoneLower, RollDeadZoneLower, PitchDeadZoneLower, YawDeadZoneLower
     ];
 
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(AxesInverse))]
+    private bool _xIsAxisInverse;
+
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(AxesInverse))]
+    private bool _yIsAxisInverse;
+
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(AxesInverse))]
+    private bool _zIsAxisInverse;
+
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(AxesInverse))]
+    private bool _pitchIsAxisInverse;
+
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(AxesInverse))]
+    private bool _rollIsAxisInverse;
+
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(AxesInverse))]
+    private bool _yawIsAxisInverse;
+
+    public bool[] AxesInverse =>
+    [
+        XIsAxisInverse, YIsAxisInverse, ZIsAxisInverse, RollIsAxisInverse, PitchIsAxisInverse, YawIsAxisInverse
+    ];
+
+
     [RelayCommand]
     private void LoadDeadZoneAsync()
     {
         var deadZoneConfig = IsDefault
-            ? _katDeadZoneConfigService.LoadDefaultDeadZoneConfigs() 
+            ? _katDeadZoneConfigService.LoadDefaultDeadZoneConfigs()
             : _katDeadZoneConfigService.LoadDeadZoneConfigs(Id);
 
         deadZoneConfig ??= _katDeadZoneConfigService.LoadDefaultDeadZoneConfigs();
-        
         
         XDeadZoneUpper = deadZoneConfig.Upper[0];
         YDeadZoneUpper = deadZoneConfig.Upper[1];
@@ -118,21 +143,26 @@ public partial class DeadZoneConfigViewModel : ViewModelBase
         RollDeadZoneLower = deadZoneConfig.Lower[3];
         PitchDeadZoneLower = deadZoneConfig.Lower[4];
         YawDeadZoneLower = deadZoneConfig.Lower[5];
+        XIsAxisInverse = deadZoneConfig.AxesInverse[0];
+        YIsAxisInverse = deadZoneConfig.AxesInverse[1];
+        ZIsAxisInverse = deadZoneConfig.AxesInverse[2];
+        RollIsAxisInverse = deadZoneConfig.AxesInverse[3];
+        PitchIsAxisInverse = deadZoneConfig.AxesInverse[4];
+        YawIsAxisInverse = deadZoneConfig.AxesInverse[5];
 
-        _katMotionRecognizeService.SetDeadZone(DeadZoneUpper, DeadZoneLower);
-
+        _katMotionRecognizeService.SetDeadZone(DeadZoneUpper, DeadZoneLower, AxesInverse);
     }
 
     [RelayCommand]
     private void ApplyDeadZone()
     {
-        _katMotionRecognizeService.SetDeadZone(DeadZoneUpper, DeadZoneLower);
+        _katMotionRecognizeService.SetDeadZone(DeadZoneUpper, DeadZoneLower, AxesInverse);
     }
 
     [RelayCommand]
     private void SaveDeadZone()
     {
-        var config = new KatDeadZoneConfig(DeadZoneUpper, DeadZoneLower);
+        var config = new KatDeadZoneConfig(DeadZoneUpper, DeadZoneLower, AxesInverse);
         ApplyDeadZone();
         _ = IsDefault
             ? _katDeadZoneConfigService.SaveDefaultDeadZoneConfig(config)
@@ -143,7 +173,7 @@ public partial class DeadZoneConfigViewModel : ViewModelBase
     private void CopyFromDefault()
     {
         var deadZoneConfig = _katDeadZoneConfigService.LoadDefaultDeadZoneConfigs();
-        
+
         XDeadZoneUpper = deadZoneConfig.Upper[0];
         YDeadZoneUpper = deadZoneConfig.Upper[1];
         ZDeadZoneUpper = deadZoneConfig.Upper[2];
@@ -156,8 +186,14 @@ public partial class DeadZoneConfigViewModel : ViewModelBase
         RollDeadZoneLower = deadZoneConfig.Lower[3];
         PitchDeadZoneLower = deadZoneConfig.Lower[4];
         YawDeadZoneLower = deadZoneConfig.Lower[5];
+        XIsAxisInverse = deadZoneConfig.AxesInverse[0];
+        YIsAxisInverse = deadZoneConfig.AxesInverse[1];
+        ZIsAxisInverse = deadZoneConfig.AxesInverse[2];
+        RollIsAxisInverse = deadZoneConfig.AxesInverse[3];
+        PitchIsAxisInverse = deadZoneConfig.AxesInverse[4];
+        YawIsAxisInverse = deadZoneConfig.AxesInverse[5];
     }
-    
+
     #endregion
 
     #region 数据显示

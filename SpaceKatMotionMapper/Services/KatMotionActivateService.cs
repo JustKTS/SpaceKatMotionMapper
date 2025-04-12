@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
+using SpaceKat.Shared.Models;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatHIDWrapper.Services;
+using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.States;
 using WindowsInput;
@@ -15,7 +16,7 @@ public class KatMotionActivateService
 {
     public bool IsActivated { get; set; }
 
-    private EventHandler<KatDataWithInfo>? _katDataReceived;
+    private event EventHandler<KatDataWithInfo>? KatDataReceived;
 
     private readonly Dictionary<Guid, EventHandler<KatDataWithInfo>> _katData = [];
 
@@ -27,11 +28,17 @@ public class KatMotionActivateService
 
     private readonly ActivationStatusService _activationStatusService =
         App.GetRequiredService<ActivationStatusService>();
-
+    
+    private readonly TransparentInfoActionDisplayService _transparentInfoActionDisplayService
+        = App.GetRequiredService<TransparentInfoActionDisplayService>();
+    
     private readonly KatMotionRecognizeService _katMotionRecognizeService;
     private readonly InputSimulator _inputSimulator;
-    
+
     private GlobalStates GlobalStates => App.GetRequiredService<GlobalStates>();
+
+    private KatMotionWithTimeStamp _lastKatMotionWithTimeStamp =
+        new KatMotionWithTimeStamp(KatMotionEnum.Null, KatPressModeEnum.Null, 0);
 
     public KatMotionActivateService(InputSimulator inputSimulator,
         KatMotionRecognizeService katMotionRecognizeService)
@@ -41,10 +48,19 @@ public class KatMotionActivateService
         _katMotionRecognizeService.DataReceived += (o, data) =>
         {
             if (!IsActivated) return;
-            _katDataReceived?.Invoke(o,
+
+            if (!(data.Motion == _lastKatMotionWithTimeStamp.Motion &&
+                  data.KatPressMode == _lastKatMotionWithTimeStamp.KatPressMode))
+            {
+                App.GetRequiredService<TransparentInfoService>().SetActionInfoMotion(false);
+            }
+
+            KatDataReceived?.Invoke(o,
                 new KatDataWithInfo(_modeChangeService.ConfigIsDefault,
                     _modeChangeService.CurrentActivatedConfig, _modeChangeService.CurrentMode,
                     data.ToKatMotion()));
+            
+            _lastKatMotionWithTimeStamp = data;
         };
         GlobalStates.IsMapperEnableChanged += ChangeIsActivated;
     }
@@ -60,7 +76,7 @@ public class KatMotionActivateService
         var id = Guid.Parse(configGroup.Guid);
         var handler = AssembleKatEvent(configGroup);
         _katData.Add(id, handler);
-        _katDataReceived += handler;
+        KatDataReceived += handler;
         _modeChangeService.UpdateBindProcessPathList(configGroup);
         _activationStatusService.SetActivationStatus(id, true);
     }
@@ -70,7 +86,7 @@ public class KatMotionActivateService
         var id = Guid.Parse(configGroup.Guid);
         if (!_katData.TryGetValue(id, out var handler)) return;
 
-        _katDataReceived -= handler;
+        KatDataReceived -= handler;
         _katData.Remove(id);
         if (!configGroup.IsDefault)
         {
@@ -94,13 +110,23 @@ public class KatMotionActivateService
                 _conflictKatMotionService.Register(info);
             });
         }
+        var motionId = Guid.Parse(configGroup.Guid);
 
-        actions.AddRange(configGroup.Motions.Select(config =>
+        _transparentInfoActionDisplayService.ClearMotionGroup(motionId);
+        Dictionary<Guid, KatMotionConfig> motionWithGUIDs = [];
+        configGroup.Motions.Iter(config =>
+        {
+            var displayId = Guid.CreateVersion7();
+            motionWithGUIDs[displayId] = config;
+            _transparentInfoActionDisplayService.Register(motionId, displayId, config.GetKeyActionsDescriptions());
+        } );
+
+        actions.AddRange(motionWithGUIDs.Select(keyValue =>
             (Action<KatDataWithInfo>)(dataWithInfo =>
             {
-                var id = Guid.Parse(configGroup.Guid);
+                var (displayId, config) = keyValue;
                 if (dataWithInfo.ConfigIsDefault && !configGroup.IsDefault) return;
-                if (!configGroup.IsDefault && id != dataWithInfo.ActivatedConfigId) return;
+                if (!configGroup.IsDefault && motionId != dataWithInfo.ActivatedConfigId) return;
                 if (dataWithInfo.KatMotion.Motion != config.Motion.Motion) return;
                 if (dataWithInfo.KatMotion.KatPressMode != config.Motion.KatPressMode) return;
                 if (dataWithInfo.KatMotion.KatPressMode != KatPressModeEnum.LongReach)
@@ -115,6 +141,9 @@ public class KatMotionActivateService
                         config.Motion.KatPressMode,
                         config.Motion.RepeatCount)) return;
 
+                App.GetRequiredService<TransparentInfoService>()
+                    .SetActionInfoMotion(true, _transparentInfoActionDisplayService.GetDisplay(motionId, displayId));
+
                 foreach (var actionConfig in config.ActionConfigs)
                 {
                     if (actionConfig.TryToMouseActionConfig(out var mouseActionConfig))
@@ -126,6 +155,7 @@ public class KatMotionActivateService
                     {
                         KeyBoardActionHandler(keyboardActionConfig);
                     }
+
                     if (actionConfig.TryToDelayActionConfig(out var delayActionConfig))
                     {
                         Thread.Sleep(delayActionConfig.Milliseconds);
@@ -137,13 +167,7 @@ public class KatMotionActivateService
                     _modeChangeService.CurrentMode = config.ToModeNum;
                 }
             })));
-        return (_, data) =>
-        {
-            foreach (var action in actions)
-            {
-                action.Invoke(data);
-            }
-        };
+        return (_, data) => { actions.Iter(action => action.Invoke(data)); };
     }
 
     private void MouseActionHandler(MouseActionConfig mouseActionConfig)
@@ -220,6 +244,12 @@ public class KatMotionActivateService
                 break;
             case MouseButtonEnum.ScrollDown:
                 _inputSimulator.Mouse.VerticalScroll(-1 * mouseActionConfig.Multiplier);
+                break;
+            case MouseButtonEnum.ScrollLeft:
+                _inputSimulator.Mouse.HorizontalScroll(-1 * mouseActionConfig.Multiplier);
+                break;
+            case MouseButtonEnum.ScrollRight:
+                _inputSimulator.Mouse.HorizontalScroll(mouseActionConfig.Multiplier);
                 break;
             default:
                 throw new Exception("No mouse action configured");

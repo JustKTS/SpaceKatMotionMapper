@@ -1,0 +1,69 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:SpaceKatMotionMapper.CustomControls"
+             xmlns:models="clr-namespace:SpaceKatMotionMapper.Models"
+             xmlns:modelsShared="clr-namespace:SpaceKat.Shared.Models;assembly=SpaceKat.Shared"
+             xmlns:u="https://irihi.tech/ursa"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SpaceKatMotionMapper.CustomControls.KeyActionsDescriptionDisplay">
+    <UserControl.Resources>
+        <local:ActionTypeToIconConverter x:Key="ActionTypeToIconConverter"></local:ActionTypeToIconConverter>
+        <local:ActionTypeNoneToFalseConverter x:Key="ActionTypeNoneToFalseConverter"></local:ActionTypeNoneToFalseConverter>
+        <local:ActionTypeNoneToTrueConverter x:Key="ActionTypeNoneToTrueConverter"></local:ActionTypeNoneToTrueConverter>
+        <local:DisplayMultiplierConverter x:Key="DisplayMultiplierConverter"></local:DisplayMultiplierConverter>
+        <local:KeyConverter x:Key="KeyConverter"></local:KeyConverter>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="ItemsControl > ContentPresenter:nth-last-child(1) TextBlock#PART_Separator">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+    </UserControl.Styles>
+
+    <ItemsControl Name="DisplayItemsControl">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <u:ElasticWrapPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"></u:ElasticWrapPanel>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+       
+        <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="modelsShared:KeyActionConfig">
+                <Grid ColumnDefinitions="*, Auto" Name="PART_Container">
+                    <TextBlock Grid.Column="0" Text="{Binding Key}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               IsVisible="{Binding ActionType, Converter={StaticResource ActionTypeNoneToTrueConverter}}">
+                    </TextBlock>
+                    <Grid Grid.Column="0" ColumnDefinitions="Auto, *, Auto"
+                          Margin="5 0 5 0"
+                          IsVisible="{Binding ActionType, Converter={StaticResource ActionTypeNoneToFalseConverter}}">
+                        <PathIcon Grid.Column="0" Margin="0 0 5 0"
+                                  BorderThickness="3"
+                                  Width="{Binding FontSize, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                  Data="{Binding ActionType, Converter={StaticResource ActionTypeToIconConverter}}">
+                        </PathIcon>
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding Key, Converter={StaticResource KeyConverter}}">
+                        </TextBlock>
+                        <Grid Grid.Column="2" ColumnDefinitions="Auto,Auto" Margin="5 0 5 0"
+                              IsVisible="{Binding Converter={StaticResource DisplayMultiplierConverter}}">
+                            <PathIcon Grid.Column="0"
+                                      BorderThickness="3"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      Data="{StaticResource SemiIconClose}">
+                            </PathIcon>
+                            <TextBlock Grid.Column="1" Margin="2 0 0 0"
+                                       Text="{Binding Multiplier}">
+                            </TextBlock>
+                        </Grid>
+                    </Grid>
+                    <TextBlock Grid.Column="1"
+                        Margin="0 0 5 0"  Name="PART_Separator" Text="+" />
+                </Grid>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>

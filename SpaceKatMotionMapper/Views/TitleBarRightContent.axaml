@@ -12,7 +12,6 @@
         <Style Selector="ToggleButton.Second:unchecked /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource ButtonBorderlessBackground}"></Setter>
         </Style>
-        <!-- -->
         <Style Selector="ToggleButton.Second:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}"></Setter>
         </Style>

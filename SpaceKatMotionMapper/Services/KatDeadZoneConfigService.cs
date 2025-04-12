@@ -15,7 +15,15 @@ public class KatDeadZoneConfigService(
     {
         var configRet = katMotionConfigVmManageService.GetDefaultConfig();
         var config = configRet.Match<KatDeadZoneConfig?>(config => config.DeadZoneConfig with { }, ex => null);
-        return config ?? new KatDeadZoneConfig();
+        if (config is null) return new KatDeadZoneConfig();
+        
+        // 为保证兼容性添加
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (config.AxesInverse is null)
+        {
+            config = config with { AxesInverse = [false, false, false, false, false, false]};
+        }
+        return config;
     }
 
     public KatDeadZoneConfig? LoadDeadZoneConfigs(Guid configGroupId)
@@ -67,7 +75,7 @@ public class KatDeadZoneConfigService(
     {
         var vmRet = katMotionConfigVmManageService.GetConfig(id);
         if (!vmRet.IsSuccess) return false;
-        vmRet.IfSucc(vm => katMotionRecognizeService.SetDeadZone(vm.DeadZoneConfig.Upper, vm.DeadZoneConfig.Lower));
+        vmRet.IfSucc(vm => katMotionRecognizeService.SetDeadZone(vm.DeadZoneConfig.Upper, vm.DeadZoneConfig.Lower, vm.DeadZoneConfig.AxesInverse));
         return true;
     }
 
@@ -75,7 +83,7 @@ public class KatDeadZoneConfigService(
     {
         var vmRet = katMotionConfigVmManageService.GetDefaultConfig();
         if (!vmRet.IsSuccess) return false;
-        vmRet.IfSucc(vm => katMotionRecognizeService.SetDeadZone(vm.DeadZoneConfig.Upper, vm.DeadZoneConfig.Lower));
+        vmRet.IfSucc(vm => katMotionRecognizeService.SetDeadZone(vm.DeadZoneConfig.Upper, vm.DeadZoneConfig.Lower, vm.DeadZoneConfig.AxesInverse));
         return true;
     }
 }

@@ -7,6 +7,7 @@ using Avalonia.Controls.Notifications;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
 using LanguageExt.Common;
+using SpaceKat.Shared.Defines;
 using SpaceKatMotionMapper.Defines;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;

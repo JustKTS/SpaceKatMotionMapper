@@ -1,42 +1,46 @@
 <u:UrsaWindow
+    Height="1000"
+    Icon="/Assets/SpaceKatDevice.png"
+    MinHeight="600"
+    MinWidth="500"
+    Title="SpaceKat动作映射工具"
+    TitleBarMargin="200 0 0 0"
+    Width="600"
+    WindowStartupLocation="CenterScreen"
+    d:DesignHeight="1000"
+    d:DesignWidth="600"
+    mc:Ignorable="d"
     x:Class="SpaceKatMotionMapper.Views.MainWindow"
+    x:DataType="navVm:NavViewModel"
     xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:navVm="clr-namespace:SpaceKatMotionMapper.NavVMs"
     xmlns:u="https://irihi.tech/ursa"
     xmlns:view="clr-namespace:SpaceKatMotionMapper.Views"
-    xmlns:navVm="clr-namespace:SpaceKatMotionMapper.NavVMs"
-    Title="SpaceKat动作映射工具"
-    d:DesignHeight="1000"
-    d:DesignWidth="600" 
-    MinWidth="500"
-    MinHeight="600"
-    Height="1000"
-    Width="600"
-    TitleBarMargin="200 0 0 0"
-    WindowStartupLocation="CenterScreen"
-    Icon="/Assets/SpaceKatDevice.png"
-    mc:Ignorable="d"
-    x:DataType="navVm:NavViewModel">
-   
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    
+
+
     <u:UrsaWindow.RightContent>
         <view:TitleBarRightContent />
     </u:UrsaWindow.RightContent>
- 
+
     <Grid RowDefinitions="Auto, *">
-        <view:ConnectAndEnableView Grid.Row="0" MaxWidth="200" HorizontalAlignment="Left" />
-        
+        <view:ConnectAndEnableView
+            Grid.Row="0"
+            HorizontalAlignment="Left"
+            MaxWidth="200" />
+
         <TransitioningContentControl
-            Grid.Row="1" Margin="5"
-            Content="{Binding Content}" >
+            Content="{Binding Content}"
+            Grid.Row="1"
+            Margin="5">
             <TransitioningContentControl.PageTransition>
                 <CrossFade Duration="0:00:00.100" />
             </TransitioningContentControl.PageTransition>
         </TransitioningContentControl>
-        <u:OverlayDialogHost Grid.Row="1" HostId="{x:Static view:MainWindow.LocalHost}" /> 
+        <u:OverlayDialogHost Grid.Row="1" HostId="{x:Static view:MainWindow.LocalHost}" />
 
     </Grid>
 </u:UrsaWindow>

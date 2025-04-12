@@ -1,7 +1,7 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using HotAvalonia;
+﻿using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Threading;
+using SpaceKat.Shared.Helpers;
 using SpaceKatMotionMapper.ViewModels;
 
 namespace SpaceKatMotionMapper.Views;
@@ -12,5 +12,15 @@ public partial class SettingsView : UserControl
     {
         DataContext = App.GetRequiredService<SettingsViewModel>();
         InitializeComponent();
+    }
+    
+    private void HotKeyTextBox_OnKeyUp(object? sender, KeyEventArgs e)
+    {
+        if (sender is not TextBox textBox) return;
+        
+        Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            textBox.Text = e.Key.ToVirtualKeyCode().GetWrappedName();
+        });
     }
 }

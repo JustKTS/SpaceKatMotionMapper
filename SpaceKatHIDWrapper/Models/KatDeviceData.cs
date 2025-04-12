@@ -1,64 +1,10 @@
 ﻿namespace SpaceKatHIDWrapper.Models;
 
-public class KatDeviceData
+public record KatDeviceData(DateTimeOffset Timestamp, double[] AxesData, bool[] Buttons)
 {
-    public DateTimeOffset Timestamp { get; set; }
+    public double[] Translation => AxesData[..3];
 
-    public double[] AxesData { get; } = new double[6];
-
-    public double[] Translation
-    {
-        get => AxesData[..3];
-        private set
-        {
-            if (value.Length != 3) return;
-            AxesData[0] = value[0];
-            AxesData[1] = value[1];
-            AxesData[2] = value[2];
-        }
-    }
-
-    public double[] Rotation
-    {
-        get => AxesData[3..];
-        private set
-        {
-            if (value.Length != 3) return;
-            AxesData[3] = value[0];
-            AxesData[4] = value[1];
-            AxesData[5] = value[2];
-        }
-    }
-
-    public bool[] Buttons { get; set; }
-
-    public KatDeviceData(DateTimeOffset timestamp, double[] axes,
-        bool[] buttons)
-    {
-        Timestamp = timestamp;
-        Translation = axes[..3];
-        Rotation = axes[3..];
-        Buttons = buttons;
-    }
-
-    public KatDeviceData() : this(DateTimeOffset.Now, new double[6], [])
-    {
-    }
-
-    public bool UpdateByAxis(MotionAxis axis, double value)
-    {
-        try
-        {
-            AxesData[(int)axis] = value;
-            return true;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return false;
-        }
-    }
-
+    public double[] Rotation => AxesData[3..];
 
     public override string ToString()
     {

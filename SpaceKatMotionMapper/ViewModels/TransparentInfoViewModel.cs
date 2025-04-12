@@ -1,8 +1,6 @@
-﻿using Avalonia;
-using Avalonia.Media;
+﻿using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using LanguageExt.Pipes;
+using SpaceKat.Shared.Models;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Services;
 using IBrush = Avalonia.Media.IBrush;
@@ -14,6 +12,8 @@ public partial class TransparentInfoViewModel : ViewModelBase
     [ObservableProperty] private bool _isAdjustMode;
     [ObservableProperty] private bool _isOtherInfo;
     [ObservableProperty] private string _otherInfo = string.Empty;
+    [ObservableProperty] private bool _isActionInfo;
+    [ObservableProperty] private KeyActionConfig[] _actionInfo = [];
     [ObservableProperty] private double _fontSize = 15;
     [ObservableProperty] private int _disappearTimeMs = 1500;
     [ObservableProperty] private int _animationTimeMs = 250;

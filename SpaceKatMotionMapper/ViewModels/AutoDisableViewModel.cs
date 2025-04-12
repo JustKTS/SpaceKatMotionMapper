@@ -28,8 +28,9 @@ public partial class AutoDisableViewModel(AutoDisableService autoDisableService)
 
     public void LoadInfos()
     {
-        autoDisableService.InitializeAsync().ContinueWith(t =>
+        autoDisableService.WaitForInitializedAsync().ContinueWith(t =>
         {
+            if (!t.Result) return;
             IsEnable = autoDisableService.IsEnable;
             AutoDisableInfos.Clear();
             autoDisableService.GetAllProgramPaths()

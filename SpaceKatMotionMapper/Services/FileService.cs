@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using Serilog;
 using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Services.Contract;
 
@@ -9,6 +10,9 @@ namespace SpaceKatMotionMapper.Services;
 
 public class FileService : IFileService
 {
+    
+    private readonly ILogger _logger = App.GetRequiredService<ILogger>();
+    
     public T? Read<T>(string folderPath, string fileName)
     {
         var path = Path.Combine(folderPath, fileName);
@@ -20,7 +24,7 @@ public class FileService : IFileService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.Error(e, "");
             return default;
         }
     }

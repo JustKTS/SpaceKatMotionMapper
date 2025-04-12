@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 using System.Xml;
 using LanguageExt.Common;
 using Serilog;
+using SpaceKat.Shared.Helpers;
+using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Models;
+using WindowsInput;
 
 namespace SpaceKatMotionMapper.Functions;
 
@@ -170,7 +173,7 @@ public static class OfficialWareConfigFunctions
     }
 
     public static async Task<Result<bool>> BindHotKeyToKatButton(
-        KatButtonEnum button, bool useCtrl, bool useAlt, bool useShift, HotKeyCodeEnum hotKey)
+        KatButtonEnum button, bool useCtrl, bool useAlt, bool useShift, VirtualKeyCode hotKey)
     {
         var doc = LoadDocument();
         var node1 = doc.SelectSingleNode("Global");
@@ -313,7 +316,7 @@ public static class OfficialWareConfigFunctions
         return d1;
     }
 
-    private static XmlDocument CreateHotKeyMacroXml(bool useCtrl, bool useAlt, bool useShift, HotKeyCodeEnum hotKey)
+    private static XmlDocument CreateHotKeyMacroXml(bool useCtrl, bool useAlt, bool useShift, VirtualKeyCode hotKey)
     {
         List<string> modifierKeyStrList = [];
         if (useCtrl)
@@ -347,7 +350,7 @@ public static class OfficialWareConfigFunctions
 
         var eKey = d1.CreateElement("Key");
         eKey.InnerText = ((int)SpaceMouseXmlKeyEnumExtensions.Parse(
-            hotKey.ToStringFast(), true, true)).ToString("X");
+            hotKey.GetWrappedName(), true, true)).ToString("X");
 
         eMacroTable.AppendChild(eMacroEntry);
         eMacroEntry.AppendChild(eId);

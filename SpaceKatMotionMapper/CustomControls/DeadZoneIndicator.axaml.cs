@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Ursa.Controls;
 
@@ -98,7 +99,9 @@ public partial class DeadZoneIndicator : UserControl
     {
         var width = Bounds.Width;
         var left = (args.NewValue.Value - Minimum) / (Maximum - Minimum) * width - IndicatorBorder.Width / 2;
-        IndicatorBorder.Margin = new Thickness(left, 8, 0, 8);
+        if (IndicatorBorder.RenderTransform is not TranslateTransform transform) return;
+        transform.X = left;
+        // IndicatorBorder.Margin = new Thickness(left, 8, 0, 8);
     }
 
     public DeadZoneIndicator()
@@ -119,7 +122,9 @@ public partial class DeadZoneIndicator : UserControl
     {
         base.OnLoaded(e);
         var left = 0.5 * Bounds.Width - IndicatorBorder.Width / 2;
-        IndicatorBorder.Margin = new Thickness(left, 8, 0, 8);
+        if (IndicatorBorder.RenderTransform is not TranslateTransform transform) return;
+        transform.X = left;
+        // IndicatorBorder.Margin = new Thickness(left, 8, 0, 8);
     }
 
     private void DeadZoneRangeSlider_OnValueChanged(object? sender, RangeValueChangedEventArgs e)

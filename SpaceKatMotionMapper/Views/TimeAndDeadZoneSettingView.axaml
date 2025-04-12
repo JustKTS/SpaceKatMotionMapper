@@ -9,6 +9,8 @@
             x:Class="SpaceKatMotionMapper.Views.TimeAndDeadZoneSettingView"
             x:DataType="vm:TimeAndDeadZoneSettingViewModel"
             Width="1400"
+            MinWidth="1000"
+            MinHeight="600"
             Background="Transparent"
             Margin="50">
     <Grid RowDefinitions="*,Auto">

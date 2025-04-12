@@ -11,7 +11,9 @@ using HidApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ProgramSpecificConfigCreator.Helpers;
 using Serilog;
+using SpaceKat.Shared.Services;
 using SpaceKatHIDWrapper.DeviceWrappers;
 using SpaceKatHIDWrapper.Services;
 using SpaceKatMotionMapper.Functions;
@@ -23,7 +25,7 @@ using Win32Helpers;
 using WindowsInput;
 using ILogger = Serilog.ILogger;
 using Path = System.IO.Path;
-using HotAvalonia;
+using SpaceKat.Shared.States;
 using SpaceKatMotionMapper.NavVMs;
 using SpaceKatMotionMapper.States;
 
@@ -100,6 +102,7 @@ public class App : Application
 
                 services.AddSingleton<IDeviceDataWrapper, SpaceCompatDataWrapper>();
                 services.AddSingleton<KatMotionRecognizeService>();
+                services.AddSingleton<TransparentInfoActionDisplayService>();
 
                 services.AddSingleton<KatMotionTimeConfigService>();
                 services.AddSingleton<KatDeadZoneConfigService>();
@@ -132,6 +135,11 @@ public class App : Application
                 services.AddSingleton<ConflictKatMotionService>();
                 services.AddSingleton<KatMotionConfigVMManageService>();
                 services.AddSingleton<OfficialMapperHotKeyService>();
+                services.AddSingleton<ProgramSpecMetaKeyService>();
+                services.AddSingleton<ProgramSpecMetaKeyFileService>();
+                
+                // 分应用快捷键预设配置工具
+                DIHelper.RegisterServices(services);
             })
             .UseSerilog()
             .ConfigureLogging(logging =>
@@ -153,11 +161,12 @@ public class App : Application
                 logging.Services.AddSingleton(Log.Logger);
             })
             .Build();
+        DIHelper.SetServiceProvider(Host.Services);
     }
 
+    // [AvaloniaHotReload]
     public override void Initialize()
     {
-        this.EnableHotReload();
         OnStartOrCloseFunctions.LoadOnStart();
         DataContext = this;
         AvaloniaXamlLoader.Load(this);

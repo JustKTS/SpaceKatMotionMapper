@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.Messaging;
+using SpaceKat.Shared.Models;
 using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.NavVMs;
 using SpaceKatMotionMapper.Services;

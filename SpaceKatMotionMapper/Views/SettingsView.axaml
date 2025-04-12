@@ -1,24 +1,20 @@
 ﻿<u:UrsaView
+    Margin="10"
+    d:DesignHeight="800"
+    d:DesignWidth="600"
+    mc:Ignorable="d"
     x:Class="SpaceKatMotionMapper.Views.SettingsView"
+    x:DataType="vm:SettingsViewModel"
     xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:converters="clr-namespace:ValueConverters;assembly=ValueConverters.Avalonia"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:icon="https://github.com/projektanker/icons.avalonia"
+    xmlns:defines="clr-namespace:SpaceKatMotionMapper.Defines"
+    xmlns:helpers="clr-namespace:SpaceKat.Shared.Helpers;assembly=SpaceKat.Shared"
     xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:SpaceKatMotionMapper.Models"
     xmlns:u="https://irihi.tech/ursa"
     xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
-
-    xmlns:colorPicker="clr-namespace:Semi.Avalonia.ColorPicker;assembly=Semi.Avalonia.ColorPicker"
-    xmlns:controls="using:Avalonia.Controls"
-
-    Margin="10"
-    d:DesignHeight="800"
-    d:DesignWidth="600"
-    x:DataType="vm:SettingsViewModel"
-    mc:Ignorable="d">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Design.DataContext>
         <vm:SettingsViewModel />
     </Design.DataContext>
@@ -28,18 +24,16 @@
             <Setter Property="BorderThickness" Value="0" />
         </Style>
         <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:checked /template/ ContentPresenter">
-            <Setter Property="BorderBrush" Value="{DynamicResource SemiColorPrimary}"></Setter>
+            <Setter Property="BorderBrush" Value="{DynamicResource SemiColorPrimary}" />
             <Setter Property="BorderThickness" Value="0,0,0,1" />
         </Style>
-        <Style
-            Selector="Expander:down /template/ ToggleButton#ExpanderHeader:pointerover:unchecked /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}"></Setter>
-            <Setter Property="CornerRadius" Value="5"></Setter>
+        <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:pointerover:unchecked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}" />
+            <Setter Property="CornerRadius" Value="5" />
         </Style>
-        <Style
-            Selector="Expander:down /template/ ToggleButton#ExpanderHeader:pointerover:checked /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}"></Setter>
-            <Setter Property="CornerRadius" Value="5, 5,0,0"></Setter>
+        <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:pointerover:checked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}" />
+            <Setter Property="CornerRadius" Value="5, 5,0,0" />
         </Style>
         <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:unchecked:pointerover">
             <Setter Property="Background" Value="Transparent" />
@@ -58,198 +52,230 @@
 
     <u:UrsaView.Resources>
         <local:KatButtonEnumToStrConverter x:Key="KatButtonEnumToStrConverter" />
+        <helpers:VirtualKeyCodeConverter x:Key="VirtualKeyCodeConverter" />
     </u:UrsaView.Resources>
 
-    <ScrollViewer>
+    <ScrollViewer VerticalAlignment="Stretch">
         <StackPanel Spacing="10">
             <Border
+                Classes="Hover"
                 Margin="0"
                 Padding="2"
-                Classes="Hover"
                 Theme="{StaticResource CardBorder}">
-                <StackPanel Margin="20" Spacing="5" HorizontalAlignment="Center">
-                    <TextBlock Classes="H6"
-                               Theme="{StaticResource TitleTextBlock}">
+                <StackPanel
+                    HorizontalAlignment="Center"
+                    Margin="20"
+                    Spacing="5">
+                    <TextBlock Classes="H6" Theme="{StaticResource TitleTextBlock}">
                         作者: B站-暗光启天
                     </TextBlock>
-                    <TextBlock Classes="H6"
-                               Theme="{StaticResource TitleTextBlock}">
-                        版本: 0.2.5
-                    </TextBlock>
-                    <TextBlock Classes="H6"
-                               Theme="{StaticResource TitleTextBlock}">
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <TextBlock Classes="H6" Theme="{StaticResource TitleTextBlock}">
+                            版本:
+                        </TextBlock>
+                        <TextBlock
+                            Classes="H6"
+                            Text="{x:Static defines:GlobalConstConfigs.SoftVersion}"
+                            Theme="{StaticResource TitleTextBlock}" />
+                    </StackPanel>
+
+                    <TextBlock Classes="H6" Theme="{StaticResource TitleTextBlock}">
                         Powered by AvaloniaUI/Semi.Avalonia/Ursa.Avalonia
                     </TextBlock>
                 </StackPanel>
             </Border>
-            <!--  内容： 透明提示窗设置、快捷键、自动禁用、配置文件夹  -->
 
             <Border
+                Classes="Hover"
                 Margin="0"
                 Padding="2"
-                Classes="Hover"
                 Theme="{StaticResource CardBorder}">
                 <Expander>
                     <Expander.Header>
                         <Grid ColumnDefinitions="Auto, *">
-                            <TextBlock Grid.Column="0" Classes="SettingTitle"
-                                       HorizontalAlignment="Left"
-                                       VerticalAlignment="Center"
-                                       Foreground="{DynamicResource SemiColorPrimary}">
+                            <TextBlock
+                                Classes="SettingTitle"
+                                Foreground="{DynamicResource SemiColorPrimary}"
+                                Grid.Column="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
                                 透明提示窗设置
                             </TextBlock>
-                            <ToggleSwitch Grid.Column="1"
-                                          Classes="Large"
-                                          HorizontalAlignment="Right"
-                                          Theme="{StaticResource SimpleToggleSwitch}"
-                                          OnContent="开" OffContent="关"
-                                          IsChecked="{Binding GlobalStates.IsTransparentInfoEnable, Mode=TwoWay}">
-                            </ToggleSwitch>
+                            <ToggleSwitch
+                                Classes="Large"
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                IsChecked="{Binding GlobalStates.IsTransparentInfoEnable, Mode=TwoWay}"
+                                OffContent="关"
+                                OnContent="开"
+                                Theme="{StaticResource SimpleToggleSwitch}" />
                         </Grid>
                     </Expander.Header>
                     <StackPanel HorizontalAlignment="Center" Spacing="5">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal"
+                            Spacing="10">
                             <Button
+                                Command="{Binding AdjustTransparentInfoWindowCommand}"
                                 HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
                                 HorizontalContentAlignment="Center"
-                                Command="{Binding AdjustTransparentInfoWindowCommand}">
+                                VerticalAlignment="Stretch">
                                 <TextBlock Classes="SettingTitle" HorizontalAlignment="Left">透明提示窗设置</TextBlock>
                             </Button>
                             <Button
+                                Command="{Binding HideTransparentInfoWindowCommand}"
                                 HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
                                 HorizontalContentAlignment="Center"
-                                Command="{Binding HideTransparentInfoWindowCommand}">
+                                VerticalAlignment="Stretch">
                                 <TextBlock Classes="SettingTitle" HorizontalAlignment="Left">关闭透明提示窗设置</TextBlock>
                             </Button>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
-                            <TextBlock Margin="10 0 10 0"
-                                       VerticalAlignment="Center"
-                                       Classes="H6"
-                                       Theme="{StaticResource TitleTextBlock}"
-                                       Text="消失延时(毫秒):" />
-                            <u:NumericIntUpDown Minimum="300" Maximum="3000" VerticalAlignment="Center"
-                                                EmptyInputValue="1000"
-                                                Value="{Binding DisappearTimeMs , Mode=TwoWay}">
-                            </u:NumericIntUpDown>
-            
-                            <TextBlock Margin="10 0 10 0"
-                                       VerticalAlignment="Center"
-                                       Classes="H6"
-                                       Theme="{StaticResource TitleTextBlock}"
-                                       Text="淡入淡出时间(毫秒):" />
-                            <u:NumericIntUpDown Minimum="0" Maximum="1000" VerticalAlignment="Center"
-                                                EmptyInputValue="250"
-                                                Value="{Binding AnimationTimeMs, Mode=TwoWay}">
-                            </u:NumericIntUpDown>
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            Orientation="Horizontal"
+                            Spacing="10">
+                            <TextBlock
+                                Classes="H6"
+                                Margin="10,0,10,0"
+                                Text="消失延时(毫秒):"
+                                Theme="{StaticResource TitleTextBlock}"
+                                VerticalAlignment="Center" />
+                            <u:NumericIntUpDown
+                                EmptyInputValue="1000"
+                                Maximum="3000"
+                                Minimum="300"
+                                Value="{Binding DisappearTimeMs, Mode=TwoWay}"
+                                VerticalAlignment="Center" />
+
+                            <TextBlock
+                                Classes="H6"
+                                Margin="10,0,10,0"
+                                Text="淡入淡出时间(毫秒):"
+                                Theme="{StaticResource TitleTextBlock}"
+                                VerticalAlignment="Center" />
+                            <u:NumericIntUpDown
+                                EmptyInputValue="250"
+                                Maximum="1000"
+                                Minimum="0"
+                                Value="{Binding AnimationTimeMs, Mode=TwoWay}"
+                                VerticalAlignment="Center" />
                             <Button Command="{Binding SetTransparentInfoWindowTimesCommand}">应用</Button>
                         </StackPanel>
                     </StackPanel>
-                   
+
                 </Expander>
             </Border>
 
             <Border
+                Classes="Hover"
                 Margin="0"
                 Padding="2"
-                Classes="Hover"
                 Theme="{StaticResource CardBorder}">
                 <Expander>
                     <Expander.Header>
                         <TextBlock Classes="SettingTitle" Foreground="{DynamicResource SemiColorPrimary}">全局启用/禁用快捷键设置</TextBlock>
                     </Expander.Header>
                     <Grid
-                        Margin="5"
                         ColumnDefinitions="Auto, *"
                         HorizontalAlignment="Stretch"
+                        Margin="5"
                         RowDefinitions="Auto, Auto, Auto">
-                        <TextBlock Grid.Row="0"
-                                   Grid.Column="0"
-                                   HorizontalAlignment="Left"
-                                   VerticalAlignment="Center"
-                                   Classes="H6"
-                                   Theme="{StaticResource TitleTextBlock}">
+                        <TextBlock
+                            Classes="H6"
+                            Grid.Column="0"
+                            Grid.Row="0"
+                            HorizontalAlignment="Left"
+                            Theme="{StaticResource TitleTextBlock}"
+                            VerticalAlignment="Center">
                             自定义快捷键
                         </TextBlock>
-                        <Grid Row="0" Grid.Column="1"
-                              Margin="10 0 0 0"
-                              ColumnDefinitions="*,*,*,*">
+                        <Grid
+                            ColumnDefinitions="*,*,*,*"
+                            Grid.Column="1"
+                            Margin="10,0,0,0"
+                            Row="0">
 
                             <CheckBox
                                 Grid.Column="0"
-                                Margin="5"
                                 HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                IsChecked="{Binding UseCtrl}">
+                                IsChecked="{Binding UseCtrl}"
+                                Margin="5"
+                                VerticalAlignment="Center">
                                 Ctrl
                             </CheckBox>
                             <CheckBox
                                 Grid.Column="1"
-                                Margin="5"
                                 HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                IsChecked="{Binding UseAlt}">
+                                IsChecked="{Binding UseAlt}"
+                                Margin="5"
+                                VerticalAlignment="Center">
                                 Alt
                             </CheckBox>
                             <CheckBox
                                 Grid.Column="2"
-                                Margin="5"
                                 HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                IsChecked="{Binding UseShift}">
+                                IsChecked="{Binding UseShift}"
+                                Margin="5"
+                                VerticalAlignment="Center">
                                 Shift
                             </CheckBox>
                             <ComboBox
                                 Grid.Column="3"
-                                Margin="5"
                                 HorizontalAlignment="Stretch"
-                                VerticalAlignment="Center"
                                 ItemsSource="{Binding HotKeyCodes}"
-                                SelectedItem="{Binding HotKey}" />
+                                Margin="5"
+                                SelectedItem="{Binding HotKey}"
+                                VerticalAlignment="Center" />
+                            <TextBox
+                                Grid.Column="3"
+                                KeyUp="HotKeyTextBox_OnKeyUp"
+                                Margin="5"
+                                Name="HotKeyTextBox"
+                                Text="{Binding HotKey, Mode=TwoWay, Converter={StaticResource VirtualKeyCodeConverter}}"
+                                ToolTip.Tip="请按下所需的按键"
+                                Watermark="请按下所需的按键" />
                         </Grid>
 
                         <TextBlock
-                            Grid.Row="1"
-                            Grid.Column="0"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
                             Classes="H6"
-                            Theme="{StaticResource TitleTextBlock}">
+                            Grid.Column="0"
+                            Grid.Row="1"
+                            HorizontalAlignment="Left"
+                            Theme="{StaticResource TitleTextBlock}"
+                            VerticalAlignment="Center">
                             绑定全局快捷键到Kat按键
                         </TextBlock>
 
                         <Border
-                            Margin="10 0 0 0"
-                            Grid.Row="1"
                             Grid.Column="1"
+                            Grid.Row="1"
                             HorizontalAlignment="Stretch"
+                            Margin="10,0,0,0"
                             Theme="{StaticResource RadioButtonGroupBorder}">
                             <ListBox
                                 HorizontalAlignment="Center"
-                                Margin="5"
                                 ItemsSource="{Binding KatButtonList}"
+                                Margin="5"
                                 SelectedItem="{Binding SelectedKatButton, Mode=TwoWay}"
                                 Theme="{DynamicResource PureCardRadioGroupListBox}">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate x:DataType="models:KatButtonEnum">
-                                        <TextBlock
-                                            Text="{Binding Converter={StaticResource KatButtonEnumToStrConverter}}" />
+                                        <TextBlock Text="{Binding Converter={StaticResource KatButtonEnumToStrConverter}}" />
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
                         </Border>
 
                         <u:IconButton
-                            Margin="0 5 0 5"
-                            Grid.Row="2"
+                            Command="{Binding RegisterHotKeyCommand}"
                             Grid.Column="0"
                             Grid.ColumnSpan="2"
+                            Grid.Row="2"
                             HorizontalAlignment="Stretch"
-                            VerticalAlignment="Center"
                             IsLoading="{Binding RegisterHotKeyCommand.IsRunning}"
-                            Command="{Binding RegisterHotKeyCommand}">
+                            Margin="0,5,0,5"
+                            VerticalAlignment="Center">
                             应用
                         </u:IconButton>
                     </Grid>
@@ -257,41 +283,66 @@
             </Border>
 
             <Border
+                Classes="Hover"
                 Margin="0"
                 Padding="2"
-                Classes="Hover"
                 Theme="{StaticResource CardBorder}">
                 <Expander>
                     <Expander.Header>
                         <Grid ColumnDefinitions="Auto, *">
-                            <TextBlock Grid.Column="0" Classes="SettingTitle"
-                                       HorizontalAlignment="Left"
-                                       VerticalAlignment="Center"
-                                       Foreground="{DynamicResource SemiColorPrimary}">
+                            <TextBlock
+                                Classes="SettingTitle"
+                                Foreground="{DynamicResource SemiColorPrimary}"
+                                Grid.Column="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
                                 自动禁用设置
                             </TextBlock>
-                            <ToggleSwitch Grid.Column="1"
-                                          Classes="Large"
-                                          HorizontalAlignment="Right"
-                                          Theme="{StaticResource SimpleToggleSwitch}"
-                                          OnContent="开" OffContent="关"
-                                          IsChecked="{Binding AutoDisableViewModel.IsEnable, Mode=TwoWay}">
-                            </ToggleSwitch>
+                            <ToggleSwitch
+                                Classes="Large"
+                                Grid.Column="1"
+                                HorizontalAlignment="Right"
+                                IsChecked="{Binding AutoDisableViewModel.IsEnable, Mode=TwoWay}"
+                                OffContent="关"
+                                OnContent="开"
+                                Theme="{StaticResource SimpleToggleSwitch}" />
                         </Grid>
                     </Expander.Header>
-                    <local:AutoDisableConfigView></local:AutoDisableConfigView>
+                    <local:AutoDisableConfigView />
                 </Expander>
             </Border>
+
             <Border
+                Classes="Hover"
                 Margin="0"
                 Padding="2"
+                Theme="{StaticResource CardBorder}">
+                <Expander>
+                    <Expander.Header>
+                        <TextBlock Classes="SettingTitle" Foreground="{DynamicResource SemiColorPrimary}">应用快捷键预设配置工具</TextBlock>
+                    </Expander.Header>
+                    <StackPanel
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="10">
+                        <Button Command="{Binding OpenProgramSpecificConfigCreatorCommand}">打开应用快捷键预设配置工具</Button>
+                    </StackPanel>
+                </Expander>
+            </Border>
+
+            <Border
                 Classes="Hover"
+                Margin="0"
+                Padding="2"
                 Theme="{StaticResource CardBorder}">
                 <Expander>
                     <Expander.Header>
                         <TextBlock Classes="SettingTitle" Foreground="{DynamicResource SemiColorPrimary}">配置文件夹相关</TextBlock>
                     </Expander.Header>
-                    <StackPanel Orientation="Horizontal" Spacing="10"  HorizontalAlignment="Center">
+                    <StackPanel
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="10">
                         <Button Command="{Binding OpenConfigFolderCommand}">打开配置文件夹</Button>
                         <Button Command="{Binding OpenLogFolderCommand}">打开错误日志文件夹</Button>
                     </StackPanel>

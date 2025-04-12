@@ -6,6 +6,7 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using SpaceKat.Shared.Defines;
 using SpaceKatMotionMapper.Defines;
 using SpaceKatMotionMapper.Services.Contract;
 using Win32Helpers;

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SpaceKatHIDWrapper.Models;
+using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Models;
 
 namespace SpaceKatMotionMapper.ViewModels;
@@ -41,7 +42,7 @@ public partial class KatMotionViewModel : ObservableObject
             {
                 sameCount++;
             }
-            
+
             if (sameCount > 1) return false;
         }
 
@@ -71,7 +72,8 @@ public partial class KatMotionViewModel : ObservableObject
     public KatMotionConfig ToKatMotionConfig()
     {
         return new KatMotionConfig(new KatMotion(KatMotion, KatPressMode, RepeatCount),
-            KeyActionConfigGroup.ToKeyActionConfigList(), ModeNum, ToModeNum);
+            KeyActionConfigGroup.ToKeyActionConfigList(),KeyActionConfigGroup.IsCustomDescription, KeyActionConfigGroup.KeyActionsDescription, ModeNum,
+            ToModeNum);
     }
 
     public bool LoadFromKatMotionConfig(KatMotionConfig motionConfig)

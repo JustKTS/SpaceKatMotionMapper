@@ -1,10 +1,7 @@
 ﻿using System;
-using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using LanguageExt;
-using LanguageExt.ClassInstances.Const;
-using SpaceKatMotionMapper.Models;
+using SpaceKat.Shared.Models;
 using WindowsInput;
 
 namespace SpaceKatMotionMapper.ViewModels;

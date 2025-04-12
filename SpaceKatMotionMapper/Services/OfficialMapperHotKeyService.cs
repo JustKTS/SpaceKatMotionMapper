@@ -8,6 +8,7 @@ using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.States;
 using SpaceKatMotionMapper.ViewModels;
 using Win32Helpers;
+using WindowsInput;
 
 namespace SpaceKatMotionMapper.Services;
 
@@ -17,7 +18,7 @@ public class OfficialMapperHotKeyService(ITopLevelHelper topLevelHelper)
 
     private const int HotKeyEventId = 9876;
 
-    public async Task<Result<bool>> RegisterHotKeyWrapper(bool useCtrl, bool useAlt, bool useShift, HotKeyCodeEnum hotKey,
+    public async Task<Result<bool>> RegisterHotKeyWrapper(bool useCtrl, bool useAlt, bool useShift, VirtualKeyCode hotKey,
         KatButtonEnum katButtonEnum)
     {
         await OfficialWareConfigFunctions.UnbindHotKeyToKatButton();

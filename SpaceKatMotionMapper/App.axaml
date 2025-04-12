@@ -4,27 +4,35 @@
              xmlns:semi="https://irihi.tech/semi"
              xmlns:u-Semi="https://irihi.tech/ursa/themes/semi"
              RequestedThemeVariant="Dark">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
-  
+    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
     <Application.Styles>
         <semi:SemiTheme Locale="zh-CN" />
-        <u-Semi:SemiTheme Locale="zh-CN"/>
+        <u-Semi:SemiTheme Locale="zh-CN" />
         <StyleInclude Source="avares://Semi.Avalonia.DataGrid/Index.axaml" />
         <StyleInclude Source="avares://Semi.Avalonia.ColorPicker/Index.axaml" />
     </Application.Styles>
-     <TrayIcon.Icons>
-         <TrayIcons>
-             <TrayIcon Icon="/Assets/SpaceKatDevice.png"
-                       ToolTipText="3D旋钮辅助工具"
-                       Clicked="ShowWindowMenuItem_OnClick">
-                 <TrayIcon.Menu>
-                     <NativeMenu>
-                         <NativeMenuItem Header="显示窗口" Click="ShowWindowMenuItem_OnClick" />
-                         <NativeMenuItemSeparator />
-                         <NativeMenuItem Header="退出" Click="ExitMenuItem_OnClick" />
-                     </NativeMenu>
-                 </TrayIcon.Menu>
-             </TrayIcon>
-         </TrayIcons>
-     </TrayIcon.Icons>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <MergeResourceInclude Source="/Styles/CustomIcons.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+    <TrayIcon.Icons>
+        <TrayIcons>
+            <TrayIcon Icon="/Assets/SpaceKatDevice.png"
+                      ToolTipText="3D旋钮辅助工具"
+                      Clicked="ShowWindowMenuItem_OnClick">
+                <TrayIcon.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="显示窗口" Click="ShowWindowMenuItem_OnClick" />
+                        <NativeMenuItemSeparator />
+                        <NativeMenuItem Header="退出" Click="ExitMenuItem_OnClick" />
+                    </NativeMenu>
+                </TrayIcon.Menu>
+            </TrayIcon>
+        </TrayIcons>
+    </TrayIcon.Icons>
 </Application>

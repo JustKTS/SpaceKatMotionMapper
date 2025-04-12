@@ -1,27 +1,33 @@
-﻿<u:UrsaView xmlns="https://github.com/avaloniaui"
-            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-            mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-            xmlns:u="https://irihi.tech/ursa"
-            xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels;assembly=SpaceKatMotionMapper"
-            xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
-            x:Class="SpaceKatMotionMapper.Views.OtherConfigsView"
-            x:DataType="vm:OtherConfigsViewModel"
-            Background="Transparent">
-    
+﻿<u:UrsaView
+    Background="Transparent"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="SpaceKatMotionMapper.Views.OtherConfigsView"
+    x:DataType="vm:OtherConfigsViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels;assembly=SpaceKatMotionMapper"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
     <Grid RowDefinitions="Auto,*">
-        <u:Divider Grid.Row="0" Margin="20, 20 ,20,0">
+        <u:Divider Grid.Row="0" Margin="20,20,20,0">
             <StackPanel Orientation="Horizontal">
-                <TextBlock VerticalAlignment="Center" Classes="H4" Theme="{StaticResource TitleTextBlock}">分应用配置</TextBlock>
-                <u:ButtonGroup Classes="Primary Solid" Margin="10 0 0 0">
-                    <Button Command="{Binding AddCommand}"
-                            ToolTip.Tip="新增配置">
-                        <PathIcon Data="{StaticResource SemiIconPlus}"></PathIcon>
+                <TextBlock
+                    Classes="H4"
+                    Theme="{StaticResource TitleTextBlock}"
+                    VerticalAlignment="Center">
+                    分应用配置
+                </TextBlock>
+                <u:ButtonGroup Classes="Primary Solid" Margin="10,0,0,0">
+                    <Button Command="{Binding AddCommand}" ToolTip.Tip="新增配置">
+                        <PathIcon Data="{StaticResource SemiIconPlus}" />
                     </Button>
-                    <Button Command="{Binding SaveGroupsToConfigDirCommand}"
-                            ToolTip.Tip="保存下列所有配置至默认配置文件夹">
-                        <PathIcon Data="{StaticResource SemiIconLayers}"></PathIcon>
+                    <Button Command="{Binding SaveGroupsToConfigDirCommand}" ToolTip.Tip="保存下列所有配置至默认配置文件夹">
+                        <PathIcon Data="{StaticResource SemiIconLayers}" />
                     </Button>
                     <Button>
                         <PathIcon Data="{StaticResource SemiIconMore}" />
@@ -31,8 +37,10 @@
                                     <MenuItem.Header>
                                         <Grid ColumnDefinitions="Auto,*">
                                             <PathIcon Data="{StaticResource SemiIconRefresh}" />
-                                            <TextBlock Grid.Column="1" HorizontalAlignment="Left"
-                                                       Margin="20,0,0,0">
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                HorizontalAlignment="Left"
+                                                Margin="20,0,0,0">
                                                 从默认配置文件夹中重新导入所有自定义配置
                                             </TextBlock>
                                         </Grid>
@@ -42,8 +50,10 @@
                                     <MenuItem.Header>
                                         <Grid ColumnDefinitions="Auto,*">
                                             <PathIcon Data="{StaticResource SemiIconExport}" />
-                                            <TextBlock Grid.Column="1" HorizontalAlignment="Left"
-                                                       Margin="20,0,0,0">
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                HorizontalAlignment="Left"
+                                                Margin="20,0,0,0">
                                                 从文件中导入配置（可多选）
                                             </TextBlock>
                                         </Grid>
@@ -53,8 +63,10 @@
                                     <MenuItem.Header>
                                         <Grid ColumnDefinitions="Auto,*">
                                             <PathIcon Data="{StaticResource SemiIconImport}" />
-                                            <TextBlock Grid.Column="1" HorizontalAlignment="Left"
-                                                       Margin="20,0,0,0">
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                HorizontalAlignment="Left"
+                                                Margin="20,0,0,0">
                                                 保存组到文件夹
                                             </TextBlock>
                                         </Grid>
@@ -67,11 +79,14 @@
 
             </StackPanel>
         </u:Divider>
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" Margin="10">
+        <ScrollViewer
+            Grid.Row="1"
+            Margin="10"
+            VerticalScrollBarVisibility="Visible">
             <ItemsControl ItemsSource="{Binding KatMotionConfigGroups}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:KatMotionConfigViewModel">
-                        <local:KatMotionConfigView DataContext="{Binding }"></local:KatMotionConfigView>
+                        <local:KatMotionConfigView />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

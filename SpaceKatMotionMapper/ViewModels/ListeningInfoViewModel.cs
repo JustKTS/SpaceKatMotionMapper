@@ -31,6 +31,7 @@ public partial class ListeningInfoViewModel : ViewModelBase
                 KatMotion = data.Motion.ToStringFast();
                 PressMode = data.KatPressMode.ToStringFast();
                 RepeatCount = data.RepeatCount;
+                
                 try
                 {
                     _transparentInfoService.DisplayKatMotion(data);

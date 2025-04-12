@@ -21,7 +21,7 @@ public partial class ConnectAndEnableViewModel : ObservableObject
     {
         GlobalStates.IsConnectionChanged += ConnectionChangeHandle;
         GlobalStates.IsMapperEnableChanged += SwitchMapperEnable;
-        _deviceDataWrapper.ConnectionChanged += OnDeviceIsConnectedChange;
+        _katMotionRecognizeService.ConnectionChanged += OnDeviceIsConnectedChange;
     }
 
 
@@ -61,6 +61,7 @@ public partial class ConnectAndEnableViewModel : ObservableObject
 
     private bool _isUseConnectButton;
 
+
     private void ConnectionChangeHandle(object? obj, bool isConnected)
     {
         if (_isUseConnectButton) return;
@@ -77,19 +78,19 @@ public partial class ConnectAndEnableViewModel : ObservableObject
             _transparentInfoService.DisplayOtherInfo(message);
             _popUpNotificationService.Pop(NotificationType.Success, message);
 
-            _listenTask = Task.Run(async () =>
+            _listenTask = new Task(async void () =>
             {
-                _katMotionRecognizeService.ExitEvent.Reset();
-
                 try
                 {
+                    _katMotionRecognizeService.ExitEvent.Reset();
                     await _katMotionRecognizeService.StartRecognizeMotionAsync();
                 }
                 catch (Exception e)
                 {
                     Debug.WriteLine(e);
                 }
-            });
+            }, TaskCreationOptions.LongRunning);
+            _listenTask.Start();
         }
     }
 
@@ -97,21 +98,19 @@ public partial class ConnectAndEnableViewModel : ObservableObject
     {
         var isConnected = await _deviceDataWrapper.Connect();
 
-        if (!isConnected)
-        {
-            _isUseConnectButton = true;
-            _popUpNotificationService.Pop(NotificationType.Warning, "未搜索到设备，是否已打开设备并配对成功？");
-            GlobalStates.IsConnected = true;
-            GlobalStates.IsConnected = false;
-            _isUseConnectButton = false;
-            return;
-        }
+        if (isConnected) return;
+
+        _isUseConnectButton = true;
+        _popUpNotificationService.Pop(NotificationType.Warning, "未搜索到设备，是否已打开设备并配对成功？");
+        GlobalStates.IsConnected = true;
+        GlobalStates.IsConnected = false;
+        _isUseConnectButton = false;
     }
 
-    private static void OnDeviceIsConnectedChange(object? sender, bool value) => 
-        Dispatcher.UIThread.InvokeAsync(()=> GlobalStates.IsConnected = value);
+    private static void OnDeviceIsConnectedChange(object? sender, bool value) =>
+        Dispatcher.UIThread.InvokeAsync(() => GlobalStates.IsConnected = value);
 
-private void DisconnectDevice()
+    private void DisconnectDevice()
     {
         _katMotionRecognizeService.ExitEvent.Set();
         _listenTask?.Wait();
@@ -122,7 +121,7 @@ private void DisconnectDevice()
     #endregion
 
     #region 映射启动情况
-    
+
     private void SwitchMapperEnable(object? sender, bool e)
     {
         if (e)
@@ -140,7 +139,6 @@ private void DisconnectDevice()
             });
         }
     }
-    
-    
+
     #endregion
 }
