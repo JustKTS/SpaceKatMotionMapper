@@ -1,63 +1,69 @@
-﻿<u:UrsaView
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:u="https://irihi.tech/ursa"
-    xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
-    xmlns:view="clr-namespace:SpaceKatMotionMapper.Views"
-    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+﻿<UserControl
+    Background="Transparent"
+    d:DesignHeight="600"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
     x:Class="SpaceKatMotionMapper.Views.AutoDisableConfigView"
     x:DataType="vm:AutoDisableViewModel"
-    Background="Transparent">
-    
-    <u:UrsaView.Styles>
-        <Style Selector="ListBox#ProgramListBox > ListBoxItem">
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:view="clr-namespace:SpaceKatMotionMapper.Views"
+    xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Styles>
+        <Style Selector="ListBox#ProgramListBox &gt; ListBoxItem">
             <!-- <Setter Property="CornerRadius" Value="5"></Setter> -->
-            <Setter Property="BorderBrush" Value="{DynamicResource SemiColorPrimaryLightActive}"></Setter>
-            <Setter Property="BorderThickness" Value="0,0,0,1"></Setter>
+            <Setter Property="BorderBrush" Value="{DynamicResource SemiColorPrimaryLightActive}" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
         </Style>
-    </u:UrsaView.Styles>
-    
-    <Grid RowDefinitions="Auto, *"
-          HorizontalAlignment="Stretch"
-          VerticalAlignment="Stretch"
-          MinHeight="200"
-          MaxHeight="315">
-        <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Center">
+    </UserControl.Styles>
+
+    <Grid
+        HorizontalAlignment="Stretch"
+        MaxHeight="315"
+        MinHeight="200"
+        RowDefinitions="Auto, *"
+        VerticalAlignment="Stretch">
+        <StackPanel
+            Grid.Row="0"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
             <TextBlock
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
                 Classes="H4"
-                Theme="{StaticResource TitleTextBlock}">
+                HorizontalAlignment="Center"
+                Theme="{StaticResource TitleTextBlock}"
+                VerticalAlignment="Center">
                 程序列表
             </TextBlock>
-            <Button Margin="5" Content="+">
-                <Button.Flyout>
-                    <Flyout>
-                        <view:RunningProgramSelector></view:RunningProgramSelector>
-                    </Flyout>
-                </Button.Flyout>
+            <Button Content="+" Margin="5" Command="{Binding OpenRunningProgramSelectorCommand}">
             </Button>
         </StackPanel>
-        <Border Grid.Row="1" Classes="Shadow" Theme="{StaticResource CardBorder}">
-            <ListBox Name="ProgramListBox"
-                ItemsSource="{Binding AutoDisableInfos}">
+        <Border
+            Classes="Shadow"
+            Grid.Row="1"
+            Theme="{StaticResource CardBorder}">
+            <ListBox ItemsSource="{Binding AutoDisableInfos}" Name="ProgramListBox">
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="vm:AutoDisableProgramViewModel">
                         <Grid ColumnDefinitions="*, 3*, Auto">
                             <TextBlock
                                 Grid.Column="0"
-                                VerticalAlignment="Center"
-                                Text="{Binding Name}"></TextBlock>
+                                Text="{Binding Name}"
+                                VerticalAlignment="Center" />
                             <TextBlock
                                 Grid.Column="1"
-                                VerticalAlignment="Center"
+                                Text="{Binding ProgramPath}"
                                 TextWrapping="NoWrap"
                                 ToolTip.Tip="{Binding ProgramPath}"
-                                Text="{Binding ProgramPath}">
-                            </TextBlock>
-                            <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding RemoveSelfCommand}">-</Button>
+                                VerticalAlignment="Center" />
+                            <Button
+                                Command="{Binding RemoveSelfCommand}"
+                                Grid.Column="2"
+                                VerticalAlignment="Center">
+                                -
+                            </Button>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -65,4 +71,4 @@
         </Border>
     </Grid>
 
-</u:UrsaView>
+</UserControl>

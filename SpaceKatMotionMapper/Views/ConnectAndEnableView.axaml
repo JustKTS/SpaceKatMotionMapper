@@ -1,47 +1,49 @@
-﻿<u:UrsaView xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:u="https://irihi.tech/ursa"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:converters="clr-namespace:ValueConverters;assembly=ValueConverters.Avalonia"
-             xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
-             xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="SpaceKatMotionMapper.Views.ConnectAndEnableView"
-             x:DataType="vm:ConnectAndEnableViewModel"
-             Background="Transparent"
-             >
-    <u:UrsaView.Resources>
+﻿<UserControl
+    Background="Transparent"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="SpaceKatMotionMapper.Views.ConnectAndEnableView"
+    x:DataType="vm:ConnectAndEnableViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:converters="clr-namespace:ValueConverters;assembly=ValueConverters.Avalonia"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
         <converters:BoolToStringConverter
-            x:Key="BoolToStringConverter"
             FalseValue="连接设备"
-            TrueValue="已连接" />
-    </u:UrsaView.Resources>
+            TrueValue="已连接"
+            x:Key="BoolToStringConverter" />
+    </UserControl.Resources>
     <Grid ColumnDefinitions="*,*" MinWidth="200">
-            <ToggleButton Name="ConnectBtn"
-                          Margin="5"
-                          IsChecked="{Binding GlobalStates.IsConnected, Mode=OneWay}"
-                          HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch"
-                          Command="{Binding ConnectBtnCommand}">
-                <Panel>
-                    <u:Loading
-                        Background="Transparent"
-                        IsLoading="{Binding ConnectBtnCommand.IsRunning}"
-                        IsVisible="{Binding ConnectBtnCommand.IsRunning}" />
-                    <TextBlock IsVisible="{Binding !ConnectBtnCommand.IsRunning}"
-                               Text="{Binding GlobalStates.IsConnected, Converter={StaticResource BoolToStringConverter}}" />
-                </Panel>
-            </ToggleButton>
-            <Grid Grid.Column="1" ColumnDefinitions="*, Auto,Auto">
-                <ToggleSwitch Grid.Column="0"
-                              Margin="5"
-                              HorizontalAlignment="Stretch"
-                              VerticalAlignment="Stretch"
-                              IsChecked="{Binding GlobalStates.IsMapperEnable}"
-                              OnContent="启用"
-                              OffContent="禁用"/>
-            </Grid>
-
+        <ToggleButton
+            Command="{Binding ConnectBtnCommand}"
+            HorizontalAlignment="Stretch"
+            IsChecked="{Binding GlobalStates.IsConnected, Mode=OneWay}"
+            Margin="5"
+            Name="ConnectBtn"
+            VerticalAlignment="Stretch">
+            <Panel>
+                <u:Loading
+                    Background="Transparent"
+                    IsLoading="{Binding ConnectBtnCommand.IsRunning}"
+                    IsVisible="{Binding ConnectBtnCommand.IsRunning}" />
+                <TextBlock IsVisible="{Binding !ConnectBtnCommand.IsRunning}" Text="{Binding GlobalStates.IsConnected, Converter={StaticResource BoolToStringConverter}}" />
+            </Panel>
+        </ToggleButton>
+        <Grid ColumnDefinitions="*, Auto,Auto" Grid.Column="1">
+            <ToggleSwitch
+                Grid.Column="0"
+                HorizontalAlignment="Stretch"
+                IsChecked="{Binding GlobalStates.IsMapperEnable}"
+                Margin="5"
+                OffContent="禁用"
+                OnContent="启用"
+                VerticalAlignment="Stretch" />
         </Grid>
-</u:UrsaView>
+
+    </Grid>
+</UserControl>

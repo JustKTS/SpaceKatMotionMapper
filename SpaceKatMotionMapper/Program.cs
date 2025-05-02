@@ -3,6 +3,7 @@ using System;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using Serilog;
+using SpaceKat.Shared.Functions;
 using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Views;

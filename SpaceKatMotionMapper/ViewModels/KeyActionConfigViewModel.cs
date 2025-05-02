@@ -4,10 +4,13 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SpaceKat.Shared.Helpers;
 using SpaceKat.Shared.Models;
+using SpaceKatMotionMapper.Models;
+using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Views;
 using Ursa.Controls;
 using WindowsInput;
@@ -214,21 +217,58 @@ public partial class KeyActionConfigViewModel : ViewModelBase
     [RelayCommand]
     private async Task OpenPresetSelector()
     {
-        await OverlayDialog.ShowCustomModal<ProgramSpecMetaKeySelectorView, ProgramSpecMetaKeySelectorViewModel, object?>(
-            new ProgramSpecMetaKeySelectorViewModel(this), KatMotionGroupConfigWindow.LocalHost,
-            new OverlayDialogOptions
-            {
-                HorizontalAnchor = HorizontalPosition.Center,
-                VerticalAnchor = VerticalPosition.Center,
-                Buttons = DialogButton.None,
-                CanDragMove = true,
-                CanLightDismiss = true,
-                CanResize = true,
-                FullScreen = false,
-                IsCloseButtonVisible = false,
-                Mode = DialogMode.None
-            }
-        );
+        await OverlayDialog
+            .ShowCustomModal<MetaKeyPresetSelectorView, MetaKeyPresetSelectorViewModel, object?>(
+                new MetaKeyPresetSelectorViewModel(this, new RelayCommand<KeyActionsForPresetRecord>(
+                        param =>
+                        {
+                            if (param is null) return;
+                            AddCustomActions(param.Description, param.Actions);
+                        }),
+                    new RelayCommand<KeyValuePair<string, CombinationKeysRecord>>(param =>
+                    {
+                        AddHotKeyActions(param.Value.UseCtrl, param.Value.UseWin, param.Value.UseAlt,
+                            param.Value.UseShift, param.Value.Key, param.Key);
+                    })), KatMotionGroupConfigWindow.LocalHost,
+                new OverlayDialogOptions
+                {
+                    HorizontalAnchor = HorizontalPosition.Center,
+                    VerticalAnchor = VerticalPosition.Center,
+                    Buttons = DialogButton.None,
+                    CanDragMove = true,
+                    CanLightDismiss = true,
+                    CanResize = true,
+                    FullScreen = false,
+                    IsCloseButtonVisible = false,
+                    Mode = DialogMode.None
+                }
+            );
+    }
+
+    #endregion
+
+    #region 添加动作组到收藏
+
+    private readonly MetaKeyPresetService _metaKeyPresetService =
+        App.GetRequiredService<MetaKeyPresetService>();
+
+    [RelayCommand]
+    private void AddToFavPreset()
+    {
+        var ret = _metaKeyPresetService.AddToFavPreset(KeyActionsDescription, ToKeyActionConfigList());
+        _ = ret.Match(s =>
+        {
+            if (!s) return s;
+            App.GetRequiredService<PopUpNotificationService>()
+                .PopInKatMotionConfigWindow(Parent.Parent.Parent.Id, NotificationType.Success,
+                    $"收藏\"{KeyActionsDescription}\"成功");
+            return s;
+        }, ex =>
+        {
+            App.GetRequiredService<PopUpNotificationService>()
+                .PopInKatMotionConfigWindow(Parent.Parent.Parent.Id, NotificationType.Error, ex.Message);
+            return false;
+        });
     }
 
     #endregion

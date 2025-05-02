@@ -1,0 +1,326 @@
+﻿<UserControl
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="MetaKeyPresetsEditor.Views.PresetEditView"
+    x:DataType="vm:ProgramSpecificConfigViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MetaKeyPresetsEditor.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sharedViews="clr-namespace:SpaceKat.Shared.Views;assembly=SpaceKat.Shared"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:viewModels="clr-namespace:SpaceKat.Shared.ViewModels;assembly=SpaceKat.Shared"
+    xmlns:vm="using:MetaKeyPresetsEditor.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Design.DataContext>
+        <!--
+            This only sets the DataContext for the previewer in an IDE,
+            to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs)
+        -->
+        <vm:ProgramSpecificConfigViewModel />
+    </Design.DataContext>
+
+    <UserControl.Styles>
+        <Style Selector="Expander:down Border#ExpanderContent">
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:checked /template/ ContentPresenter">
+            <Setter Property="BorderBrush" Value="{DynamicResource SemiColorPrimary}" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+        </Style>
+        <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:pointerover:unchecked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}" />
+            <Setter Property="CornerRadius" Value="5" />
+        </Style>
+        <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:pointerover:checked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}" />
+            <Setter Property="CornerRadius" Value="5, 5,0,0" />
+        </Style>
+        <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:unchecked:pointerover">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="Expander:down:expanded /template/ ToggleButton#ExpanderHeader:checked:pointerover">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="TextBlock.SettingTitle">
+            <Setter Property="FontSize" Value="17" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style Selector="Border.Hover">
+            <Setter Property="MinHeight" Value="50" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto, Auto, *, *, Auto">
+        <Grid
+            ColumnDefinitions="Auto, *"
+            Grid.Row="0"
+            Margin="20">
+
+            <ToggleButton
+                Content="启用通用配置"
+                IsChecked="{Binding IsGeneral}"
+                IsVisible="{Binding !IsDefault}"
+                Margin="0,0,5,0" />
+
+            <Grid
+                ColumnDefinitions="Auto, *"
+                Grid.Column="1"
+                IsVisible="{Binding !IsGeneral}">
+                <u:IconButton
+                    Classes="Primary"
+                    Grid.Column="0"
+                    Icon="{StaticResource SemiIconLink}">
+                    关联程序
+                    <Button.Flyout>
+                        <Flyout>
+                            <local:CurrentRunningProcessSelector Margin="10" />
+                        </Flyout>
+                    </Button.Flyout>
+                </u:IconButton>
+                <TextBlock
+                    Classes="H4"
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    Text="{Binding ConfigName}"
+                    Theme="{StaticResource TitleTextBlock}"
+                    VerticalAlignment="Center" />
+            </Grid>
+
+            <Grid
+                ColumnDefinitions="*, Auto"
+                Grid.Column="1"
+                IsVisible="{Binding IsGeneral}">
+                <TextBlock
+                    Classes="H4"
+                    Grid.Column="0"
+                    HorizontalAlignment="Center"
+                    IsVisible="{Binding !IsConfigNameEditing}"
+                    Text="{Binding ConfigName}"
+                    Theme="{StaticResource TitleTextBlock}"
+                    VerticalAlignment="Center" />
+                <TextBox
+                    Grid.Column="0"
+                    IsVisible="{Binding IsConfigNameEditing}"
+                    Text="{Binding ConfigName}"
+                    VerticalAlignment="Stretch" />
+                <ToggleButton
+                    Grid.Column="1"
+                    IsChecked="{Binding IsConfigNameEditing}"
+                    IsVisible="{Binding !IsDefault}"
+                    Margin="5,0,0,0">
+                    <PathIcon Data="{StaticResource SemiIconEdit}" />
+                </ToggleButton>
+            </Grid>
+        </Grid>
+
+        <Grid
+            ColumnDefinitions="Auto, *"
+            Grid.Row="1"
+            Margin="20,0">
+            <TextBlock
+                Classes="H5"
+                Theme="{StaticResource TitleTextBlock}"
+                VerticalAlignment="Center">
+                贡献者:
+            </TextBlock>
+            <u:TagInput
+                AllowDuplicates="False"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                LostFocusBehavior="Clear"
+                Margin="20,0"
+                Separator="-"
+                Tags="{Binding Contributors}" />
+        </Grid>
+
+        <Border
+            Classes="Hover"
+            Grid.Row="2"
+            Margin="10"
+            Padding="2"
+            Theme="{StaticResource CardBorder}"
+            VerticalAlignment="Stretch">
+            <Grid RowDefinitions="Auto, *">
+                <Grid ColumnDefinitions="Auto, *, Auto">
+                    <TextBlock
+                        Classes="SettingTitle"
+                        Foreground="{DynamicResource SemiColorPrimary}"
+                        Grid.Column="0"
+                        HorizontalAlignment="Left"
+                        Margin="10,0,0,0"
+                        MinWidth="200"
+                        VerticalAlignment="Center">
+                        组合式快捷键设置
+                    </TextBlock>
+                    <Grid
+                        ColumnDefinitions="Auto, *"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center">
+                        <ToggleButton
+                            Content="筛选"
+                            IsChecked="{Binding IsCombinationKeyFilter}"
+                            Margin="10,0" />
+                        <TextBox
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            IsEnabled="{Binding IsCombinationKeyFilter}"
+                            Margin="10,0"
+                            MaxWidth="300"
+                            MinWidth="200"
+                            Text="{Binding CombinationKeysFilterStr}"
+                            Watermark="输入需要筛选的名称" />
+                    </Grid>
+
+                    <u:IconButton
+                        Command="{Binding AddCombinationKeysConfigCommand}"
+                        Content="添加新设置"
+                        Grid.Column="2"
+                        HorizontalAlignment="Right"
+                        Icon="{StaticResource SemiIconPlus}"
+                        Margin="10" />
+                </Grid>
+
+                <ScrollViewer
+                    Grid.Row="1"
+                    IsVisible="{Binding !IsCombinationKeyFilter}"
+                    VerticalAlignment="Stretch">
+                    <ItemsControl
+                        HorizontalAlignment="Stretch"
+                        ItemsSource="{Binding CombinationKeysConfigs}"
+                        VerticalAlignment="Stretch">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="viewModels:CombinationKeysConfigViewModel">
+                                <sharedViews:CombinationKeysConfigView DataContext="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <ScrollViewer
+                    Grid.Row="1"
+                    IsVisible="{Binding IsCombinationKeyFilter}"
+                    VerticalAlignment="Stretch">
+                    <ItemsControl
+                        HorizontalAlignment="Stretch"
+                        ItemsSource="{Binding CombinationKeysConfigsFiltered}"
+                        VerticalAlignment="Stretch">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="viewModels:CombinationKeysConfigViewModel">
+                                <sharedViews:CombinationKeysConfigView DataContext="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <Border
+            Classes="Hover"
+            Grid.Row="3"
+            Margin="10"
+            Padding="2"
+            Theme="{StaticResource CardBorder}"
+            VerticalAlignment="Stretch">
+            <Grid RowDefinitions="Auto, *">
+                <Grid ColumnDefinitions="Auto, *, Auto">
+                    <TextBlock
+                        Classes="SettingTitle"
+                        Foreground="{DynamicResource SemiColorPrimary}"
+                        Grid.Column="0"
+                        HorizontalAlignment="Left"
+                        Margin="10,0,0,0"
+                        MinWidth="200"
+                        VerticalAlignment="Center">
+                        自定义组合按键设置
+                    </TextBlock>
+                    <Grid
+                        ColumnDefinitions="Auto, *"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center">
+                        <ToggleButton
+                            Content="筛选"
+                            IsChecked="{Binding IsKeyActionFilter}"
+                            Margin="10,0" />
+                        <TextBox
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            IsEnabled="{Binding IsKeyActionFilter}"
+                            Margin="10,0"
+                            MaxWidth="300"
+                            MinWidth="200"
+                            Text="{Binding KeyActionFilterStr}"
+                            Watermark="输入需要筛选的名称" />
+                    </Grid>
+                    <u:IconButton
+                        Command="{Binding AddKeyActionConfigCommand}"
+                        Content="添加新设置"
+                        Grid.Column="2"
+                        HorizontalAlignment="Right"
+                        Icon="{StaticResource SemiIconPlus}"
+                        Margin="10" />
+                </Grid>
+                <ScrollViewer
+                    Grid.Row="1"
+                    IsVisible="{Binding !IsKeyActionFilter}"
+                    VerticalAlignment="Stretch">
+                    <ItemsControl
+                        HorizontalAlignment="Stretch"
+                        ItemsSource="{Binding KeyActionConfigs}"
+                        VerticalAlignment="Stretch">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="viewModels:KeyActionConfigForPresetsViewModel">
+                                <sharedViews:KeyActionConfigView DataContext="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <ScrollViewer
+                    Grid.Row="1"
+                    IsVisible="{Binding IsKeyActionFilter}"
+                    VerticalAlignment="Stretch">
+                    <ItemsControl
+                        HorizontalAlignment="Stretch"
+                        ItemsSource="{Binding KeyActionConfigsFiltered}"
+                        VerticalAlignment="Stretch">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="viewModels:KeyActionConfigForPresetsViewModel">
+                                <sharedViews:KeyActionConfigView DataContext="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+            </Grid>
+        </Border>
+
+        <Grid
+            ColumnDefinitions="2*, *"
+            Grid.Row="4"
+            VerticalAlignment="Bottom">
+            <u:IconButton
+                Classes="Primary"
+                Command="{Binding SaveToConfigDirCommand}"
+                Grid.Column="0"
+                HorizontalAlignment="Stretch"
+                Icon="{StaticResource SemiIconSave}"
+                Margin="10"
+                Theme="{DynamicResource SolidIconButton}"
+                VerticalAlignment="Stretch">
+                保存当前设置到配置文件夹
+            </u:IconButton>
+            <u:IconButton
+                Command="{Binding SaveToFileCommand}"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                Icon="{StaticResource SemiIconExport}"
+                Margin="10"
+                VerticalAlignment="Stretch">
+                保存当前设置到文件
+            </u:IconButton>
+        </Grid>
+    </Grid>
+</UserControl>

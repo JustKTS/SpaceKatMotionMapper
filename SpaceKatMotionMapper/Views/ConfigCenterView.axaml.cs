@@ -1,8 +1,8 @@
-using Ursa.Controls;
+using Avalonia.Controls;
 
 namespace SpaceKatMotionMapper.Views;
 
-public partial class ConfigCenterView : UrsaView
+public partial class ConfigCenterView : UserControl
 {
     public ConfigCenterView()
     {

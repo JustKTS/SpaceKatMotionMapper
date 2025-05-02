@@ -1,12 +1,9 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
+﻿using Avalonia.Controls;
 using SpaceKatMotionMapper.ViewModels;
-using Ursa.Controls;
 
 namespace SpaceKatMotionMapper.Views;
 
-public partial class ConnectAndEnableView : UrsaView
+public partial class ConnectAndEnableView : UserControl
 {
     public ConnectAndEnableView()
     {

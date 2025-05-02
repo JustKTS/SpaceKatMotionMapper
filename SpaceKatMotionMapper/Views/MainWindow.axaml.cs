@@ -45,7 +45,7 @@ public partial class MainWindow : UrsaWindow
         Dispatcher.UIThread.Invoke(() =>
         {
             _manager.Show(
-                new Notification()
+                new Notification
                 {
                     Content = e.Message,
                     ShowIcon = true,

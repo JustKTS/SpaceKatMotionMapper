@@ -1,4 +1,5 @@
 ﻿using HidApi;
+using LanguageExt;
 using SpaceKatHIDWrapper.Models;
 
 namespace SpaceKatHIDWrapper.DeviceWrappers;
@@ -10,6 +11,6 @@ public interface IDeviceDataWrapper
     public void Disconnect();
     public KatDeviceData? Read();
 
-    public event EventHandler<bool>? ConnectionChanged;
+    public event EventHandler<Either<Exception, bool>>? ConnectionChanged;
 
 }

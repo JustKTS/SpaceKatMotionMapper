@@ -1,9 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading.Tasks;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using SpaceKatMotionMapper.Services;
+using SpaceKat.Shared.Services;
+using SpaceKat.Shared.ViewModels;
+using SpaceKat.Shared.Views;
+using SpaceKatMotionMapper.States;
+using SpaceKatMotionMapper.Views;
+using Ursa.Controls;
 using Win32Helpers;
 
 namespace SpaceKatMotionMapper.ViewModels;
@@ -14,12 +20,36 @@ public partial class AutoDisableViewModel(AutoDisableService autoDisableService)
 
     partial void OnIsEnableChanged(bool value)
     {
+        if (value)
+        {
+            autoDisableService.IsCurrentFpInList += CurrentFpInListHandler;
+        }
+        else
+        {
+            autoDisableService.IsCurrentFpInList -= CurrentFpInListHandler;
+        }
+
         autoDisableService.IsEnable = value;
+    }
+
+    private void CurrentFpInListHandler(object? sender, bool e)
+    {
+        Dispatcher.UIThread.Invoke(() => { App.GetRequiredService<GlobalStates>().IsMapperEnable = e; });
     }
 
     public ObservableCollection<AutoDisableProgramViewModel> AutoDisableInfos { get; } = [];
 
-    public void Add(ForeProgramInfo info)
+
+    [RelayCommand]
+    private async Task OpenRunningProgramSelector()
+    {
+        var ret = await Dialog.ShowCustomModal<RunningProgramSelector, RunningProgramSelectorViewModel, object?>(
+            App.GetRequiredService<RunningProgramSelectorViewModel>(), null, RunningProgramSelectorViewModel.DialogOptions);
+        if (ret is not ForeProgramInfo info) return;
+        Add(info);
+    }
+
+    private void Add(ForeProgramInfo info)
     {
         if (autoDisableService.IsPathContained(info.ProcessFileAddress)) return;
         AutoDisableInfos.Add(new AutoDisableProgramViewModel(this, info.ProcessFileAddress));

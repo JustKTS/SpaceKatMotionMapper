@@ -1,4 +1,4 @@
-﻿<u:UrsaView
+﻿<UserControl
     Background="Transparent"
     Margin="5"
     d:DesignHeight="720"
@@ -11,7 +11,6 @@
     xmlns:helpers="clr-namespace:SpaceKat.Shared.Helpers;assembly=SpaceKat.Shared"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:u="https://irihi.tech/ursa"
-    xmlns:views="clr-namespace:SpaceKatMotionMapper.Views;assembly=SpaceKatMotionMapper"
     xmlns:vms="clr-namespace:SpaceKatMotionMapper.ViewModels;assembly=SpaceKatMotionMapper"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
@@ -19,7 +18,7 @@
         <vms:KeyActionConfigViewModel />
     </Design.DataContext>
 
-    <u:UrsaView.Resources>
+    <UserControl.Resources>
         <helpers:PressModeEnumConverter x:Key="PressModeEnumConverter" />
         <helpers:ActionTypeConverter x:Key="ActionTypeConverter" />
         <helpers:ActionTypeItemNamesConverter x:Key="ActionTypeItemNamesConverter" />
@@ -29,9 +28,9 @@
         <helpers:HideBaseOnMouseScrollConverter x:Key="HideBaseOnMouseScrollConverter" />
         <helpers:DoubleClickCheckConverter x:Key="DoubleClickCheckConverter" />
 
-    </u:UrsaView.Resources>
+    </UserControl.Resources>
 
-    <u:UrsaView.Styles>
+    <UserControl.Styles>
         <Style Selector="Border.WrongDefine">
             <Setter Property="Background" Value="{DynamicResource SemiColorDanger}" />
         </Style>
@@ -41,19 +40,20 @@
         <Style Selector="ToggleButton.Borderless:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}" />
         </Style>
-    </u:UrsaView.Styles>
+    </UserControl.Styles>
 
     <Border Classes="Shadow" Theme="{StaticResource CardBorder}">
         <Grid ColumnDefinitions="Auto, Auto, *,*" RowDefinitions="Auto,*">
-            <Grid ColumnDefinitions="Auto, Auto, Auto">
+            <Grid ColumnDefinitions="Auto, Auto, Auto" Margin="0,5">
                 <TextBlock
                     Classes="H4"
                     Theme="{StaticResource TitleTextBlock}"
                     VerticalAlignment="Center">
                     按键配置
                 </TextBlock>
+
                 <u:IconButton
-                    Content="设置组合键"
+                    Content="组合键"
                     Grid.Column="1"
                     HorizontalAlignment="Stretch"
                     Icon="{StaticResource SemiIconComponent}"
@@ -126,7 +126,7 @@
                 </u:IconButton>
                 <u:IconButton
                     Command="{Binding OpenPresetSelectorCommand}"
-                    Content="从预设中选择"
+                    Content="预设"
                     Grid.Column="2"
                     Icon="{StaticResource SemiIconList}"
                     Margin="5"
@@ -134,7 +134,7 @@
             </Grid>
 
             <Grid
-                ColumnDefinitions="*,Auto"
+                ColumnDefinitions="*,Auto,Auto"
                 Grid.Column="2"
                 Grid.Row="0"
                 HorizontalAlignment="Center"
@@ -153,6 +153,13 @@
                     Text="{Binding KeyActionsDescription, Mode=TwoWay}"
                     VerticalAlignment="Center"
                     Watermark="自定义动作描述" />
+                <u:IconButton
+                    Command="{Binding AddToFavPresetCommand}"
+                    Grid.Column="2"
+                    Icon="{StaticResource SemiIconFavoriteList}"
+                    IsEnabled="{Binding IsCustomDescription}"
+                    Margin="5,0"
+                    ToolTip.Tip="添加当前动作组到我的收藏" />
             </Grid>
 
             <Grid
@@ -417,4 +424,4 @@
         </Grid>
     </Border>
 
-</u:UrsaView>
+</UserControl>

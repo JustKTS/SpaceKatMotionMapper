@@ -1,13 +1,10 @@
-﻿using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 using SpaceKatMotionMapper.ViewModels;
-using Ursa.Controls;
 
 namespace SpaceKatMotionMapper.Views;
 
-public partial class AutoDisableConfigView : UrsaView
+public partial class AutoDisableConfigView : UserControl
 {
     public AutoDisableConfigView()
     {

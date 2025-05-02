@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using SpaceKat.Shared.Models;
 using SpaceKatMotionMapper.Models;
 
@@ -10,17 +11,9 @@ public static class KatMotionConfigDisplayHelper
 {
     public static KeyActionConfig[] GetKeyActionsDescriptions(this KatMotionConfig config)
     {
-        if (config.IsCustomDescription)
-            return [new KeyActionConfig(ActionType.None, config.KeyActionsDescription, PressModeEnum.None, 0)];
-        //TODO: 优化显示内容，增加特殊快捷键
-        if (config.ActionConfigs.Count == 1)
-        {
-            return [config.ActionConfigs.First()];
-        }
-
-        return ValidateIsCombinationKeys(config)
-            ? GenerateCombinationKeysStr(config)
-            : config.ActionConfigs.ToArray();
+        return config.IsCustomDescription
+            ? [new KeyActionConfig(ActionType.None, config.KeyActionsDescription, PressModeEnum.None, 0)]
+            : GenerateDisplayList(config.ActionConfigs);
     }
 
     private static readonly string[] ModifierKeys = ["CONTROL", "ALT", "SHIFT", "WIN"];
@@ -34,9 +27,22 @@ public static class KatMotionConfigDisplayHelper
         _ => key
     };
 
-    private static bool ValidateIsCombinationKeys(KatMotionConfig config)
+    public static KeyActionConfig[] GenerateDisplayList(List<KeyActionConfig> actionConfigs)
     {
-        return config.ActionConfigs
+        //TODO: 优化显示内容，增加特殊快捷键
+        if (actionConfigs.Count == 1)
+        {
+            return [actionConfigs.First()];
+        }
+
+        return ValidateIsCombinationKeys(actionConfigs)
+            ? GenerateCombinationKeys(actionConfigs)
+            : actionConfigs.ToArray();
+    }
+
+    private static bool ValidateIsCombinationKeys(List<KeyActionConfig> actionConfigs)
+    {
+        return actionConfigs
             .Select(c => RemoveLorR(c.Key)) // 取出所有的Key并去除LR
             .Where(key => ModifierKeys.Contains(key)) // 过滤出组合键
             .GroupBy(key => key) // 分组
@@ -44,9 +50,9 @@ public static class KatMotionConfigDisplayHelper
     }
 
 
-    private static KeyActionConfig[] GenerateCombinationKeysStr(KatMotionConfig config)
+    private static KeyActionConfig[] GenerateCombinationKeys(List<KeyActionConfig> actionConfigs)
     {
-        var allKeys = config.ActionConfigs
+        var allKeys = actionConfigs
             .Select(c => c with { Key = RemoveLorR(c.Key) }) // 取出所有的Key并去除LR
             .GroupBy(c => c.Key).Select(group => group.First()).ToArray();
         var modifierKeys = allKeys

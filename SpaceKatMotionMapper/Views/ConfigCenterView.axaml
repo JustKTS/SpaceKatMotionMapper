@@ -1,25 +1,25 @@
-<u:UrsaView
-    x:Class="SpaceKatMotionMapper.Views.ConfigCenterView"
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:u="https://irihi.tech/ursa"
-    xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
+<UserControl
+    Background="Transparent"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d"
-    Background="Transparent">
+    x:Class="SpaceKatMotionMapper.Views.ConfigCenterView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <u:UrsaView.Styles>
+    <UserControl.Styles>
         <Style Selector="Expander:down Border#ExpanderContent">
             <Setter Property="BorderThickness" Value="0" />
         </Style>
         <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:unchecked:pointerover">
-            <Setter Property="Background" Value="Transparent"></Setter>
+            <Setter Property="Background" Value="Transparent" />
         </Style>
         <Style Selector="Expander:down:expanded /template/ ToggleButton#ExpanderHeader:checked:pointerover">
-            <Setter Property="Background" Value="Transparent"></Setter>
+            <Setter Property="Background" Value="Transparent" />
         </Style>
         <Style Selector="ListBox">
             <Setter Property="CornerRadius" Value="5" />
@@ -27,20 +27,22 @@
         <Style Selector="ListBoxItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
-    </u:UrsaView.Styles>
+    </UserControl.Styles>
 
     <Grid RowDefinitions="Auto,Auto,*">
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-            <TextBlock Margin="5"
-                       Classes="H4"
-                       VerticalAlignment="Center"
-                       Theme="{StaticResource TitleTextBlock}" HorizontalAlignment="Center">
+        <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
+            <TextBlock
+                Classes="H4"
+                HorizontalAlignment="Center"
+                Margin="5"
+                Theme="{StaticResource TitleTextBlock}"
+                VerticalAlignment="Center">
                 配置中心
             </TextBlock>
         </StackPanel>
 
 
-        <local:CommonConfigView Grid.Row="1"></local:CommonConfigView>
-        <local:OtherConfigsView Grid.Row="2"></local:OtherConfigsView>
+        <local:CommonConfigView Grid.Row="1" />
+        <local:OtherConfigsView Grid.Row="2" />
     </Grid>
-</u:UrsaView>
+</UserControl>

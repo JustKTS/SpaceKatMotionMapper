@@ -23,7 +23,7 @@ public static class JsonSgOption
             KatTriggerTimesConfigJsonSgContext.Default,
             ActionTypeJsonSgContext.Default,
             DelayActionConfigJsonSgContext.Default,
-            HotKeyCodeJsonSgContext.Default,
+            SpaceMouseXmlKeyEnumJsonSgContext.Default,
             HotKeyRecordJsonSgContext.Default,
             KatMotionConfigGroupJsonSgContext.Default,
             KatMotionInfoJsonSgContext.Default,

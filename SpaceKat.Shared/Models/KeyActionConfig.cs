@@ -39,6 +39,8 @@ public record KeyActionConfig(ActionType ActionType, string Key, PressModeEnum P
 
 [JsonSourceGenerationOptions(WriteIndented = true)]
 [JsonSerializable(typeof(KeyActionConfig))]
+[JsonSerializable(typeof(List<KeyActionConfig>))]
+[JsonSerializable(typeof(KeyActionConfig[]))]
 [JsonSerializable(typeof(ActionType))]
 [JsonSerializable(typeof(string))]
 [JsonSerializable(typeof(PressModeEnum))]

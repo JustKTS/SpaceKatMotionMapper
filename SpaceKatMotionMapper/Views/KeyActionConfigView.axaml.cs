@@ -10,7 +10,7 @@ using WindowsInput;
 
 namespace SpaceKatMotionMapper.Views;
 
-public partial class KeyActionConfigView : UrsaView
+public partial class KeyActionConfigView : UserControl
 {
     public KeyActionConfigView()
     {

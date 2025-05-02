@@ -1,4 +1,4 @@
-﻿<u:UrsaView
+﻿<UserControl
     Background="Transparent"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -92,4 +92,4 @@
             </ItemsControl>
         </ScrollViewer>
     </Grid>
-</u:UrsaView>
+</UserControl>

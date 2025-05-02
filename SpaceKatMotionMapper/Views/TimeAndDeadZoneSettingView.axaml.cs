@@ -1,11 +1,10 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using SpaceKatMotionMapper.ViewModels;
-using Ursa.Controls;
 
 namespace SpaceKatMotionMapper.Views;
 
-public partial class TimeAndDeadZoneSettingView : UrsaView
+public partial class TimeAndDeadZoneSettingView : UserControl
 {
     public TimeAndDeadZoneSettingView()
     {

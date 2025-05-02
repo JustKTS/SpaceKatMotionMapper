@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Globalization;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
-using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
+using SpaceKat.Shared.Models;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.ViewModels;
-using Ursa.Controls;
 
 namespace SpaceKatMotionMapper.Views;
 
-public partial class ListeningInfoView : UrsaView
+public partial class ListeningInfoView : UserControl
 {
     public ListeningInfoView()
     {

@@ -1,4 +1,6 @@
 ﻿using Avalonia.Threading;
+using SpaceKat.Shared.Services;
+using SpaceKat.Shared.Services.Contract;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.States;
@@ -16,7 +18,7 @@ public static class OnStartOrCloseFunctions
 
     public static void LoadOnMainWindowLoaded()
     {
-        var officialMapperHotKeyService = App.GetRequiredService<OfficialMapperHotKeyService>();
+        var officialMapperHotKeyService = App.GetRequiredService<IOfficialMapperHotKeyService>();
         officialMapperHotKeyService.RegisterHandle();
 
         var settingsVm = App.GetRequiredService<SettingsViewModel>();
@@ -38,7 +40,7 @@ public static class OnStartOrCloseFunctions
 
     public static void OnMainWindowClosing()
     {
-        var officialMapperHotKeyService = App.GetRequiredService<OfficialMapperHotKeyService>();
+        var officialMapperHotKeyService = App.GetRequiredService<IOfficialMapperHotKeyService>();
         officialMapperHotKeyService.UnregisterHotKeyWrapper();
     }
 }

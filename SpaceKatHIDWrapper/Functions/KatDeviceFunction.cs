@@ -25,7 +25,6 @@ public static class KatDeviceFunction
         {
             return null;
         }
-       
     }
 
     public static void StopDevice()

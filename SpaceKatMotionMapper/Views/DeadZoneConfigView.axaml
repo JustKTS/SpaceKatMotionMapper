@@ -1,206 +1,293 @@
-﻿<u:UrsaView xmlns="https://github.com/avaloniaui"
-            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-            xmlns:u="https://irihi.tech/ursa"
-            xmlns:vms="clr-namespace:SpaceKatMotionMapper.ViewModels"
-            xmlns:cc="clr-namespace:SpaceKatMotionMapper.CustomControls"
-            mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-            x:Class="SpaceKatMotionMapper.Views.DeadZoneConfigView"
-            x:DataType="vms:DeadZoneConfigViewModel"
-            Background="Transparent">
+﻿<UserControl
+    Background="Transparent"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="SpaceKatMotionMapper.Views.DeadZoneConfigView"
+    x:DataType="vms:DeadZoneConfigViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:cc="clr-namespace:SpaceKatMotionMapper.CustomControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:vms="clr-namespace:SpaceKatMotionMapper.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Design.DataContext>
-        <vms:DeadZoneConfigViewModel></vms:DeadZoneConfigViewModel>
+        <vms:DeadZoneConfigViewModel />
     </Design.DataContext>
 
     <Border Theme="{StaticResource CardBorder}">
         <Grid RowDefinitions="Auto, *, Auto">
-            <u:IconButton Grid.Row="0"
-                          IsVisible="{Binding !IsDefault}"
-                          HorizontalAlignment="Center"
-                          Icon="{StaticResource SemiIconRefresh}"
-                          Content="从全局设置处继承"
-                          Command="{Binding CopyFromDefaultCommand}">
-            </u:IconButton>
-            <Grid Grid.Row="1" ColumnDefinitions="*, 5*, Auto" RowDefinitions="*,*,*,*,*,*">
-                <TextBlock Grid.Row="0" Grid.Column="0"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Text="X平移"
-                           Classes="H6"
-                           Theme="{StaticResource TitleTextBlock}" />
-                <TextBlock Grid.Row="1" Grid.Column="0"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Text="Y平移"
-                           Classes="H6"
-                           Theme="{StaticResource TitleTextBlock}" />
-                <TextBlock Grid.Row="2" Grid.Column="0"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Text="Z平移"
-                           Classes="H6"
-                           Theme="{StaticResource TitleTextBlock}" />
-                <TextBlock Grid.Row="3" Grid.Column="0"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Text="俯仰"
-                           Classes="H6"
-                           Theme="{StaticResource TitleTextBlock}" />
-                <TextBlock Grid.Row="4" Grid.Column="0"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Text="滚转"
-                           Classes="H6"
-                           Theme="{StaticResource TitleTextBlock}" />
-                <TextBlock Grid.Row="5" Grid.Column="0"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Text="偏航"
-                           Classes="H6"
-                           Theme="{StaticResource TitleTextBlock}" />
+            <u:IconButton
+                Command="{Binding CopyFromDefaultCommand}"
+                Content="从全局设置处继承"
+                Grid.Row="0"
+                HorizontalAlignment="Center"
+                Icon="{StaticResource SemiIconRefresh}"
+                IsVisible="{Binding !IsDefault}" />
+            <Grid
+                ColumnDefinitions="*, 5*, Auto"
+                Grid.Row="1"
+                RowDefinitions="*,*,*,*,*,*">
+                <TextBlock
+                    Classes="H6"
+                    Grid.Column="0"
+                    Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    Text="X平移"
+                    Theme="{StaticResource TitleTextBlock}"
+                    VerticalAlignment="Center" />
+                <TextBlock
+                    Classes="H6"
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    Text="Y平移"
+                    Theme="{StaticResource TitleTextBlock}"
+                    VerticalAlignment="Center" />
+                <TextBlock
+                    Classes="H6"
+                    Grid.Column="0"
+                    Grid.Row="2"
+                    HorizontalAlignment="Center"
+                    Text="Z平移"
+                    Theme="{StaticResource TitleTextBlock}"
+                    VerticalAlignment="Center" />
+                <TextBlock
+                    Classes="H6"
+                    Grid.Column="0"
+                    Grid.Row="3"
+                    HorizontalAlignment="Center"
+                    Text="俯仰"
+                    Theme="{StaticResource TitleTextBlock}"
+                    VerticalAlignment="Center" />
+                <TextBlock
+                    Classes="H6"
+                    Grid.Column="0"
+                    Grid.Row="4"
+                    HorizontalAlignment="Center"
+                    Text="滚转"
+                    Theme="{StaticResource TitleTextBlock}"
+                    VerticalAlignment="Center" />
+                <TextBlock
+                    Classes="H6"
+                    Grid.Column="0"
+                    Grid.Row="5"
+                    HorizontalAlignment="Center"
+                    Text="偏航"
+                    Theme="{StaticResource TitleTextBlock}"
+                    VerticalAlignment="Center" />
 
-                <cc:DeadZoneIndicator Grid.Row="0" Grid.Column="1"
-                                      HorizontalAlignment="Stretch"
-                                      CornerRadius="30"
-                                      Height="50"
-                                      Maximum="1.6" Minimum="-1.6"
-                                      DeadZoneLower="{Binding XDeadZoneLower, Mode=TwoWay}"
-                                      DeadZoneUpper="{Binding XDeadZoneUpper, Mode=TwoWay}"
-                                      Value="{Binding XData}" />
-                <cc:DeadZoneIndicator Grid.Row="1" Grid.Column="1"
-                                      HorizontalAlignment="Stretch"
-                                      CornerRadius="30"
-                                      Height="50"
-                                      Maximum="1.6" Minimum="-1.6"
-                                      DeadZoneLower="{Binding YDeadZoneLower, Mode=TwoWay}"
-                                      DeadZoneUpper="{Binding YDeadZoneUpper, Mode=TwoWay}"
-                                      Value="{Binding YData}" />
-                <cc:DeadZoneIndicator Grid.Row="2" Grid.Column="1"
-                                      HorizontalAlignment="Stretch"
-                                      CornerRadius="30"
-                                      Height="50"
-                                      Maximum="1.6" Minimum="-1.6"
-                                      DeadZoneLower="{Binding ZDeadZoneLower, Mode=TwoWay}"
-                                      DeadZoneUpper="{Binding ZDeadZoneUpper, Mode=TwoWay}"
-                                      Value="{Binding ZData}" />
-                <cc:DeadZoneIndicator Grid.Row="3" Grid.Column="1"
-                                      HorizontalAlignment="Stretch"
-                                      CornerRadius="30"
-                                      Height="50"
-                                      Maximum="1.6" Minimum="-1.6"
-                                      DeadZoneLower="{Binding PitchDeadZoneLower, Mode=TwoWay}"
-                                      DeadZoneUpper="{Binding PitchDeadZoneUpper, Mode=TwoWay}"
-                                      Value="{Binding PitchData}" />
-                <cc:DeadZoneIndicator Grid.Row="4" Grid.Column="1"
-                                      HorizontalAlignment="Stretch"
-                                      CornerRadius="30"
-                                      Height="50"
-                                      Maximum="1.6" Minimum="-1.6"
-                                      DeadZoneLower="{Binding RollDeadZoneLower, Mode=TwoWay}"
-                                      DeadZoneUpper="{Binding RollDeadZoneUpper, Mode=TwoWay}"
-                                      Value="{Binding RollData}" />
-                <cc:DeadZoneIndicator Grid.Row="5" Grid.Column="1"
-                                      HorizontalAlignment="Stretch"
-                                      CornerRadius="30"
-                                      Height="50"
-                                      Maximum="1.6" Minimum="-1.6"
-                                      DeadZoneLower="{Binding YawDeadZoneLower, Mode=TwoWay}"
-                                      DeadZoneUpper="{Binding YawDeadZoneUpper, Mode=TwoWay}"
-                                      Value="{Binding YawData}" />
+                <cc:DeadZoneIndicator
+                    CornerRadius="30"
+                    DeadZoneLower="{Binding XDeadZoneLower, Mode=TwoWay}"
+                    DeadZoneUpper="{Binding XDeadZoneUpper, Mode=TwoWay}"
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    Height="50"
+                    HorizontalAlignment="Stretch"
+                    Maximum="1.6"
+                    Minimum="-1.6"
+                    Value="{Binding XData}" />
+                <cc:DeadZoneIndicator
+                    CornerRadius="30"
+                    DeadZoneLower="{Binding YDeadZoneLower, Mode=TwoWay}"
+                    DeadZoneUpper="{Binding YDeadZoneUpper, Mode=TwoWay}"
+                    Grid.Column="1"
+                    Grid.Row="1"
+                    Height="50"
+                    HorizontalAlignment="Stretch"
+                    Maximum="1.6"
+                    Minimum="-1.6"
+                    Value="{Binding YData}" />
+                <cc:DeadZoneIndicator
+                    CornerRadius="30"
+                    DeadZoneLower="{Binding ZDeadZoneLower, Mode=TwoWay}"
+                    DeadZoneUpper="{Binding ZDeadZoneUpper, Mode=TwoWay}"
+                    Grid.Column="1"
+                    Grid.Row="2"
+                    Height="50"
+                    HorizontalAlignment="Stretch"
+                    Maximum="1.6"
+                    Minimum="-1.6"
+                    Value="{Binding ZData}" />
+                <cc:DeadZoneIndicator
+                    CornerRadius="30"
+                    DeadZoneLower="{Binding PitchDeadZoneLower, Mode=TwoWay}"
+                    DeadZoneUpper="{Binding PitchDeadZoneUpper, Mode=TwoWay}"
+                    Grid.Column="1"
+                    Grid.Row="3"
+                    Height="50"
+                    HorizontalAlignment="Stretch"
+                    Maximum="1.6"
+                    Minimum="-1.6"
+                    Value="{Binding PitchData}" />
+                <cc:DeadZoneIndicator
+                    CornerRadius="30"
+                    DeadZoneLower="{Binding RollDeadZoneLower, Mode=TwoWay}"
+                    DeadZoneUpper="{Binding RollDeadZoneUpper, Mode=TwoWay}"
+                    Grid.Column="1"
+                    Grid.Row="4"
+                    Height="50"
+                    HorizontalAlignment="Stretch"
+                    Maximum="1.6"
+                    Minimum="-1.6"
+                    Value="{Binding RollData}" />
+                <cc:DeadZoneIndicator
+                    CornerRadius="30"
+                    DeadZoneLower="{Binding YawDeadZoneLower, Mode=TwoWay}"
+                    DeadZoneUpper="{Binding YawDeadZoneUpper, Mode=TwoWay}"
+                    Grid.Column="1"
+                    Grid.Row="5"
+                    Height="50"
+                    HorizontalAlignment="Stretch"
+                    Maximum="1.6"
+                    Minimum="-1.6"
+                    Value="{Binding YawData}" />
 
-                <Grid Grid.Row="0" Grid.Column="2" ColumnDefinitions="Auto, Auto" VerticalAlignment="Center"
-                      HorizontalAlignment="Center">
-                    <TextBlock Grid.Column="0" Text="轴反转" Margin="5 0 5 0"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"></TextBlock>
-                    <CheckBox Grid.Column="1"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              IsChecked="{Binding XIsAxisInverse, Mode=TwoWay}"></CheckBox>
+                <Grid
+                    ColumnDefinitions="Auto, Auto"
+                    Grid.Column="2"
+                    Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Margin="5,0,5,0"
+                        Text="轴反转"
+                        VerticalAlignment="Center" />
+                    <CheckBox
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        IsChecked="{Binding XIsAxisInverse, Mode=TwoWay}"
+                        VerticalAlignment="Center" />
                 </Grid>
-                
-                <Grid Grid.Row="1" Grid.Column="2" ColumnDefinitions="Auto, Auto" VerticalAlignment="Center"
-                      HorizontalAlignment="Center">
-                    <TextBlock Grid.Column="0" Text="轴反转" Margin="5 0 5 0"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"></TextBlock>
-                    <CheckBox Grid.Column="1"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              IsChecked="{Binding YIsAxisInverse, Mode=TwoWay}"></CheckBox>
+
+                <Grid
+                    ColumnDefinitions="Auto, Auto"
+                    Grid.Column="2"
+                    Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Margin="5,0,5,0"
+                        Text="轴反转"
+                        VerticalAlignment="Center" />
+                    <CheckBox
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        IsChecked="{Binding YIsAxisInverse, Mode=TwoWay}"
+                        VerticalAlignment="Center" />
                 </Grid>
-                
-                <Grid Grid.Row="2" Grid.Column="2" ColumnDefinitions="Auto, Auto" VerticalAlignment="Center"
-                      HorizontalAlignment="Center">
-                    <TextBlock Grid.Column="0" Text="轴反转" Margin="5 0 5 0"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"></TextBlock>
-                    <CheckBox Grid.Column="1"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              IsChecked="{Binding ZIsAxisInverse, Mode=TwoWay}"></CheckBox>
+
+                <Grid
+                    ColumnDefinitions="Auto, Auto"
+                    Grid.Column="2"
+                    Grid.Row="2"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Margin="5,0,5,0"
+                        Text="轴反转"
+                        VerticalAlignment="Center" />
+                    <CheckBox
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        IsChecked="{Binding ZIsAxisInverse, Mode=TwoWay}"
+                        VerticalAlignment="Center" />
                 </Grid>
-                
-                <Grid Grid.Row="3" Grid.Column="2" ColumnDefinitions="Auto, Auto" VerticalAlignment="Center"
-                      HorizontalAlignment="Center">
-                    <TextBlock Grid.Column="0" Text="轴反转" Margin="5 0 5 0"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"></TextBlock>
-                    <CheckBox Grid.Column="1"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              IsChecked="{Binding PitchIsAxisInverse, Mode=TwoWay}"></CheckBox>
+
+                <Grid
+                    ColumnDefinitions="Auto, Auto"
+                    Grid.Column="2"
+                    Grid.Row="3"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Margin="5,0,5,0"
+                        Text="轴反转"
+                        VerticalAlignment="Center" />
+                    <CheckBox
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        IsChecked="{Binding PitchIsAxisInverse, Mode=TwoWay}"
+                        VerticalAlignment="Center" />
                 </Grid>
-                
-                <Grid Grid.Row="4" Grid.Column="2" ColumnDefinitions="Auto, Auto" VerticalAlignment="Center"
-                      HorizontalAlignment="Center">
-                    <TextBlock Grid.Column="0" Text="轴反转" Margin="5 0 5 0"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"></TextBlock>
-                    <CheckBox Grid.Column="1"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              IsChecked="{Binding RollIsAxisInverse, Mode=TwoWay}"></CheckBox>
+
+                <Grid
+                    ColumnDefinitions="Auto, Auto"
+                    Grid.Column="2"
+                    Grid.Row="4"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Margin="5,0,5,0"
+                        Text="轴反转"
+                        VerticalAlignment="Center" />
+                    <CheckBox
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        IsChecked="{Binding RollIsAxisInverse, Mode=TwoWay}"
+                        VerticalAlignment="Center" />
                 </Grid>
-                <Grid Grid.Row="5" Grid.Column="2" ColumnDefinitions="Auto, Auto" VerticalAlignment="Center"
-                      HorizontalAlignment="Center">
-                    <TextBlock Grid.Column="0" Text="轴反转" Margin="5 0 5 0"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"></TextBlock>
-                    <CheckBox Grid.Column="1"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              IsChecked="{Binding YawIsAxisInverse, Mode=TwoWay}"></CheckBox>
+                <Grid
+                    ColumnDefinitions="Auto, Auto"
+                    Grid.Column="2"
+                    Grid.Row="5"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                    <TextBlock
+                        Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        Margin="5,0,5,0"
+                        Text="轴反转"
+                        VerticalAlignment="Center" />
+                    <CheckBox
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        IsChecked="{Binding YawIsAxisInverse, Mode=TwoWay}"
+                        VerticalAlignment="Center" />
                 </Grid>
-                
+
 
             </Grid>
-            <Grid Grid.Row="2" ColumnDefinitions="*, *, *">
-                <Button Grid.Column="0"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
-                        Margin="10"
-                        Command="{Binding ApplyDeadZoneCommand}">
+            <Grid ColumnDefinitions="*, *, *" Grid.Row="2">
+                <Button
+                    Command="{Binding ApplyDeadZoneCommand}"
+                    Grid.Column="0"
+                    HorizontalAlignment="Stretch"
+                    Margin="10"
+                    VerticalAlignment="Stretch">
                     测试
                 </Button>
 
-                <Button Grid.Column="1"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
-                        Margin="10"
-                        Command="{Binding LoadDeadZoneAsyncCommand}">
+                <Button
+                    Command="{Binding LoadDeadZoneAsyncCommand}"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    Margin="10"
+                    VerticalAlignment="Stretch">
                     撤销
                 </Button>
-                <Button Grid.Column="2"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
-                        Margin="10"
-                        Command="{Binding SaveDeadZoneCommand}">
+                <Button
+                    Command="{Binding SaveDeadZoneCommand}"
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    Margin="10"
+                    VerticalAlignment="Stretch">
                     保存
                 </Button>
             </Grid>
 
         </Grid>
     </Border>
-</u:UrsaView>
+</UserControl>

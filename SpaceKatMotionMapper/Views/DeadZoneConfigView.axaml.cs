@@ -1,9 +1,9 @@
-﻿using SpaceKatMotionMapper.ViewModels;
-using Ursa.Controls;
+﻿using Avalonia.Controls;
+using SpaceKatMotionMapper.ViewModels;
 
 namespace SpaceKatMotionMapper.Views;
 
-public partial class DeadZoneConfigView : UrsaView
+public partial class DeadZoneConfigView : UserControl
 {
     public DeadZoneConfigView()
     {

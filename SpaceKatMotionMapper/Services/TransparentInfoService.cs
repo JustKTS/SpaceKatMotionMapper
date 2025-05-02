@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Media;
 using Avalonia.Threading;
 using SpaceKat.Shared.Models;
+using SpaceKat.Shared.Services.Contract;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services.Contract;
@@ -76,6 +77,7 @@ public class TransparentInfoService
 
     public void SetActionInfoMotion(bool isAction, KeyActionConfig[]? actionInfo = null)
     {
+        // TODO:预设中的动作显示需要从这边套用一下
         actionInfo ??= [];
         Dispatcher.UIThread.Invoke(() =>
         {

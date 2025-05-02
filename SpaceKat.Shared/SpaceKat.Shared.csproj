@@ -10,12 +10,40 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Avalonia" Version="11.2.6" />
-      <PackageReference Include="Avalonia.Win32" Version="11.2.6" />
+      <PackageReference Include="Avalonia" Version="11.2.8" />
+      <PackageReference Include="Avalonia.Win32" Version="11.2.8" />
+      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
       <PackageReference Include="H.InputSimulator" Version="1.5.0" />
+      <PackageReference Include="Irihi.Ursa" Version="1.11.0" />
+      <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="1.11.0" />
       <PackageReference Include="LanguageExt.Core" Version="4.4.9" />
       <PackageReference Include="NetEscapades.EnumGenerators" Version="1.0.0-beta11" />
+      <PackageReference Include="Semi.Avalonia" Version="11.2.1.7" />
       <PackageReference Include="Serilog" Version="4.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Views\CombinationKeysConfigView.axaml.cs">
+        <DependentUpon>CombinationKeysConfigView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\KeyActionConfigView.axaml.cs">
+        <DependentUpon>KeyActionConfigView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\RunningProgramSelector.axaml.cs">
+        <DependentUpon>RunningProgramSelector.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SpaceKatHIDWrapper\SpaceKatHIDWrapper.csproj" />
+      <ProjectReference Include="..\Win32Helpers\Win32Helpers.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="CustomControls\" />
     </ItemGroup>
 
 </Project>

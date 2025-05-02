@@ -1,4 +1,4 @@
-﻿<u:UrsaView
+﻿<UserControl
     Margin="10"
     d:DesignHeight="800"
     d:DesignWidth="600"
@@ -11,7 +11,7 @@
     xmlns:helpers="clr-namespace:SpaceKat.Shared.Helpers;assembly=SpaceKat.Shared"
     xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="clr-namespace:SpaceKatMotionMapper.Models"
+    xmlns:shareModels="clr-namespace:SpaceKat.Shared.Models;assembly=SpaceKat.Shared"
     xmlns:u="https://irihi.tech/ursa"
     xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
@@ -19,7 +19,7 @@
         <vm:SettingsViewModel />
     </Design.DataContext>
 
-    <u:UrsaView.Styles>
+    <UserControl.Styles>
         <Style Selector="Expander:down Border#ExpanderContent">
             <Setter Property="BorderThickness" Value="0" />
         </Style>
@@ -48,12 +48,12 @@
             <Setter Property="MinHeight" Value="50" />
         </Style>
 
-    </u:UrsaView.Styles>
+    </UserControl.Styles>
 
-    <u:UrsaView.Resources>
+    <UserControl.Resources>
         <local:KatButtonEnumToStrConverter x:Key="KatButtonEnumToStrConverter" />
         <helpers:VirtualKeyCodeConverter x:Key="VirtualKeyCodeConverter" />
-    </u:UrsaView.Resources>
+    </UserControl.Resources>
 
     <ScrollViewer VerticalAlignment="Stretch">
         <StackPanel Spacing="10">
@@ -260,7 +260,7 @@
                                 SelectedItem="{Binding SelectedKatButton, Mode=TwoWay}"
                                 Theme="{DynamicResource PureCardRadioGroupListBox}">
                                 <ListBox.ItemTemplate>
-                                    <DataTemplate x:DataType="models:KatButtonEnum">
+                                    <DataTemplate x:DataType="shareModels:KatButtonEnum">
                                         <TextBlock Text="{Binding Converter={StaticResource KatButtonEnumToStrConverter}}" />
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
@@ -321,12 +321,56 @@
                     <Expander.Header>
                         <TextBlock Classes="SettingTitle" Foreground="{DynamicResource SemiColorPrimary}">应用快捷键预设配置工具</TextBlock>
                     </Expander.Header>
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        Orientation="Horizontal"
-                        Spacing="10">
-                        <Button Command="{Binding OpenProgramSpecificConfigCreatorCommand}">打开应用快捷键预设配置工具</Button>
-                    </StackPanel>
+                    <Grid HorizontalAlignment="Stretch" RowDefinitions="*,*">
+                        <Grid ColumnDefinitions="*,*" HorizontalAlignment="Stretch">
+                            <Button
+                                Command="{Binding OpenFavPresetsEditorCommand}"
+                                HorizontalAlignment="Stretch"
+                                Margin="5">
+                                配置我的收藏
+                            </Button>
+                            <Button
+                                Command="{Binding OpenProgramSpecificConfigCreatorCommand}"
+                                Grid.Column="1"
+                                HorizontalAlignment="Stretch"
+                                Margin="5">
+                                启动配置工具
+                            </Button>
+                        </Grid>
+                        <Grid
+                            ColumnDefinitions="Auto, Auto, Auto, Auto"
+                            Grid.Row="1"
+                            HorizontalAlignment="Stretch">
+                            <u:IconButton
+                                Command="{Binding GetPresetsFromInternetCommand}"
+                                HorizontalAlignment="Stretch"
+                                IsLoading="{Binding GetPresetsFromInternetCommand.IsRunning}"
+                                Margin="5">
+                                从网络获取已知配置
+                            </u:IconButton>
+                            <Button
+                                Command="{Binding OpenMetaKeysConfigFolderCommand}"
+                                Grid.Column="1"
+                                HorizontalAlignment="Stretch"
+                                Margin="5">
+                                打开预设配置文件夹
+                            </Button>
+                            <HyperlinkButton
+                                Classes="WithIcon Underline"
+                                Content="预设下载地址(gitee)"
+                                Grid.Column="2"
+                                Height="20"
+                                Margin="5"
+                                NavigateUri="https://gitee.com/justkts/space-kat-motion-mapper-meta-key-presets/releases/tag/latest"
+                                VerticalAlignment="Center" />
+                            <PathIcon
+                                Data="{StaticResource SemiIconHelpCircle}"
+                                Grid.Column="3"
+                                HorizontalAlignment="Left"
+                                ToolTip.Tip="遇到网络问题无法下载预设时，可以手动下载预设文件，解压后把json文件放在配置文件夹内。"
+                                VerticalAlignment="Center" />
+                        </Grid>
+                    </Grid>
                 </Expander>
             </Border>
 
@@ -352,4 +396,4 @@
         </StackPanel>
     </ScrollViewer>
 
-</u:UrsaView>
+</UserControl>

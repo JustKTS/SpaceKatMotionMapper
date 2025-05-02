@@ -26,7 +26,8 @@ public partial class KatMotionViewModel : ObservableObject
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsAvailable))]
     private int _toModeNum;
-
+    
+    // TODO:增加一个Kat长按与释放自动对应按键的长按与释放的检测
     public bool IsAvailable => CheckIsAvailable();
 
     // TODO：此处的重复性检查，如果两个同时错误，在一个修复后另一个不会恢复正常状态

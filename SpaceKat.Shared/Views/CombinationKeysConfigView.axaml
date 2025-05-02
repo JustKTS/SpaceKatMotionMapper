@@ -1,0 +1,91 @@
+﻿<UserControl
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="SpaceKat.Shared.Views.CombinationKeysConfigView"
+    x:DataType="vm:CombinationKeysConfigViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:SpaceKat.Shared.Helpers;assembly=SpaceKat.Shared"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:vm="clr-namespace:SpaceKat.Shared.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Resources>
+        <helpers:ActionTypeKeyOrButtonConverter x:Key="ActionTypeKeyOrButtonConverter" />
+    </UserControl.Resources>
+    <Border Classes="Shadow" Theme="{StaticResource CardBorder}">
+        <Grid ColumnDefinitions="*, 3*, Auto">
+            <TextBox
+                Grid.Column="0"
+                Text="{Binding Description, Mode=TwoWay}"
+                Watermark="请输入描述名" />
+            <Grid
+                ColumnDefinitions="*,*,*,*,2*"
+                Grid.Column="1"
+                Margin="5"
+                MinWidth="350">
+                <CheckBox
+                    Grid.Column="0"
+                    Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    IsChecked="{Binding UseCtrl}"
+                    Margin="5"
+                    Name="UseCtrlCBox"
+                    VerticalAlignment="Center">
+                    Ctrl
+                </CheckBox>
+
+                <CheckBox
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    IsChecked="{Binding UseShift}"
+                    Margin="5"
+                    Name="UseShiftCBox"
+                    VerticalAlignment="Center">
+                    Shift
+                </CheckBox>
+                <CheckBox
+                    Grid.Column="2"
+                    Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    IsChecked="{Binding UseWin}"
+                    Margin="5"
+                    Name="UseWinCBox"
+                    VerticalAlignment="Center">
+                    Win
+                </CheckBox>
+                <CheckBox
+                    Grid.Column="3"
+                    Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    IsChecked="{Binding UseAlt}"
+                    Margin="5"
+                    Name="UseAltCBox"
+                    VerticalAlignment="Center">
+                    Alt
+                </CheckBox>
+
+                <TextBox
+                    AcceptsTab="False"
+                    Grid.Column="4"
+                    Grid.Row="0"
+                    KeyUp="HotKeyTextBox_OnKeyUp"
+                    Name="HotKeyTextBox"
+                    Text="{Binding HotKey, Converter={StaticResource ActionTypeKeyOrButtonConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                    Watermark="请按下所需的按键" />
+            </Grid>
+            <u:IconButton
+                Classes="Primary"
+                Command="{Binding RemoveSelfCommand}"
+                Grid.Column="2"
+                Icon="{StaticResource SemiIconDelete}"
+                Margin="5"
+                MinWidth="30"
+                Theme="{DynamicResource SolidIconButton}" />
+        </Grid>
+    </Border>
+
+</UserControl>

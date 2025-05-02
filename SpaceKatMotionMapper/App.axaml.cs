@@ -11,9 +11,11 @@ using HidApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ProgramSpecificConfigCreator.Helpers;
+using MetaKeyPresetsEditor.Helpers;
 using Serilog;
+using SpaceKat.Shared.Functions;
 using SpaceKat.Shared.Services;
+using SpaceKat.Shared.Services.Contract;
 using SpaceKatHIDWrapper.DeviceWrappers;
 using SpaceKatHIDWrapper.Services;
 using SpaceKatMotionMapper.Functions;
@@ -26,6 +28,7 @@ using WindowsInput;
 using ILogger = Serilog.ILogger;
 using Path = System.IO.Path;
 using SpaceKat.Shared.States;
+using SpaceKat.Shared.ViewModels;
 using SpaceKatMotionMapper.NavVMs;
 using SpaceKatMotionMapper.States;
 
@@ -90,6 +93,11 @@ public class App : Application
 
                 services.AddTransient<TransparentInfoWindow>();
                 services.AddSingleton<TransparentInfoViewModel>();
+                
+                services.AddTransient<FavPresetsEditorView>();
+                services.AddTransient<FavPresetsEditorViewModel>();
+                services.AddTransient<FirstDownloadPresetsView>();
+                services.AddTransient<FirstDownloadPresetsViewModel>();
 
                 services.AddSingleton<MainView>();
                 services.AddSingleton<MainViewModel>();
@@ -99,6 +107,7 @@ public class App : Application
                 services.AddSingleton<ListeningInfoViewModel>();
                 services.AddSingleton<ConnectAndEnableViewModel>();
                 services.AddSingleton<AutoDisableViewModel>();
+                services.AddSingleton<RunningProgramSelectorViewModel>();
 
                 services.AddSingleton<IDeviceDataWrapper, SpaceCompatDataWrapper>();
                 services.AddSingleton<KatMotionRecognizeService>();
@@ -118,7 +127,6 @@ public class App : Application
                 services.AddSingleton<TransparentInfoService>();
                 services.AddSingleton<GlobalStates>();
 
-                services.AddSingleton<ITopLevelHelper, TopLevelHelper>();
                 services.AddSingleton<IStorageProviderService, StorageProviderService>();
                 services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
                 services.AddSingleton<IFileService, FileService>();
@@ -130,14 +138,13 @@ public class App : Application
                 services.AddSingleton<CommonConfigViewModel>();
                 services.AddTransient<KatMotionConfigViewModel>();
                 services.AddSingleton<OtherConfigsViewModel>();
-                services.AddTransient<CurrentRunningProcessSelectorViewModel>();
                 services.AddSingleton<ModeChangeService>();
                 services.AddSingleton<ConflictKatMotionService>();
                 services.AddSingleton<KatMotionConfigVMManageService>();
-                services.AddSingleton<OfficialMapperHotKeyService>();
-                services.AddSingleton<ProgramSpecMetaKeyService>();
-                services.AddSingleton<ProgramSpecMetaKeyFileService>();
-                
+                services.AddSingleton<IOfficialMapperHotKeyService, OfficialMapperHotKeyService>();
+                services.AddSingleton<MetaKeyPresetService>();
+                services.AddSingleton<MetaKeyPresetFileService>();
+
                 // 分应用快捷键预设配置工具
                 DIHelper.RegisterServices(services);
             })
@@ -208,7 +215,7 @@ public class App : Application
         {
             case IClassicDesktopStyleApplicationLifetime desktop:
                 var ofMs =
-                    GetRequiredService<OfficialMapperHotKeyService>();
+                    GetRequiredService<IOfficialMapperHotKeyService>();
                 ofMs.UnregisterHotKeyWrapper();
                 ofMs.UnregisterHandle();
                 OfficialWareConfigFunctions.CleanAllChange().GetAwaiter().GetResult();

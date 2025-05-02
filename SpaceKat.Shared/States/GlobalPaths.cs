@@ -8,4 +8,6 @@ public static class GlobalPaths
     public static string AppLogPath => Path.Combine(AppDataPath, "Logs");
     
     public static string MetaKeysConfigPath => Path.Combine(AppDataPath, "ProgramSpecificMetaKeys");
+    
+    public static string DownloadTempDir => Path.Combine(AppDataPath, "DownloadTemp");
 }

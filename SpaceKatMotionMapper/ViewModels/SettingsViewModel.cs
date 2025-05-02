@@ -1,17 +1,24 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using ProgramSpecificConfigCreator.Views;
+using MetaKeyPresetsEditor.Views;
 using SpaceKat.Shared.Helpers;
+using SpaceKat.Shared.Models;
+using SpaceKat.Shared.Services.Contract;
 using SpaceKat.Shared.States;
+using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.States;
+using SpaceKatMotionMapper.Views;
+using Ursa.Common;
+using Ursa.Controls;
 using WindowsInput;
 
 namespace SpaceKatMotionMapper.ViewModels;
@@ -73,12 +80,9 @@ public partial class SettingsViewModel : ObservableObject
 
     #region 禁用官方映射
 
-    private readonly OfficialMapperHotKeyService _officialMapperHotKeyService =
-        App.GetRequiredService<OfficialMapperHotKeyService>();
-
-    private readonly KatMotionActivateService _katMotionActivateService =
-        App.GetRequiredService<KatMotionActivateService>();
-
+    private readonly IOfficialMapperHotKeyService _officialMapperHotKeyService =
+        App.GetRequiredService<IOfficialMapperHotKeyService>();
+    
     private readonly ILocalSettingsService _localSettingsService = App.GetRequiredService<ILocalSettingsService>();
 
 
@@ -186,10 +190,49 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private static void OpenProgramSpecificConfigCreator()
     {
-        var mainWindow = App.GetRequiredService<ProgramSpecificConfigMainWindow>();
+        var mainWindow = App.GetRequiredService<PresetsEditorMainWindow>();
         mainWindow.Show();
     }   
     
+    [RelayCommand]
+    private static void OpenMetaKeysConfigFolder()
+    {
+        _ = Process.Start("explorer.exe", GlobalPaths.MetaKeysConfigPath);
+    }
 
+    private static readonly DialogOptions FavEditorDialogOptions = new()
+    {
+        StartupLocation = WindowStartupLocation.CenterOwner,
+        Mode = DialogMode.Info,
+        Button = DialogButton.None,
+        IsCloseButtonVisible = true,
+        ShowInTaskBar = false,
+        CanDragMove = true,
+        CanResize = true
+    };
+    
+    [RelayCommand]
+    private async Task OpenFavPresetsEditor()
+    {
+        await Dialog.ShowCustomModal<FavPresetsEditorView, FavPresetsEditorViewModel, object>(
+            App.GetRequiredService<FavPresetsEditorViewModel>(), App.GetRequiredService<MainWindow>(), FavEditorDialogOptions
+            );
+    }
+    
+    [RelayCommand]
+    private async Task GetPresetsFromInternet()
+    {
+        var ret = await DownloadMetaKeyPresetsHelper.DownloadAndCopyMetaKeyPresetsAsync();
+        _ = ret.Match(s =>
+        {
+            _popUpNotificationService.Pop(NotificationType.Success, "预设下载成功");
+            return true;
+        }, ex =>
+        {
+            _popUpNotificationService.Pop(NotificationType.Error, $"预设下载失败：{ex.Message}");
+            return false;
+        });
+    }
+    
     #endregion
 }

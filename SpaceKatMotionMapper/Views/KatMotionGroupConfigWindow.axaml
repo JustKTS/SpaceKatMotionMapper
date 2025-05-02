@@ -112,7 +112,6 @@
                                     VerticalAlignment="Center">
                                     触发次数：
                                 </TextBlock>
-
                                 <u:NumericIntUpDown
                                     EmptyInputValue="1"
                                     Maximum="5"

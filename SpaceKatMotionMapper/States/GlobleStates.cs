@@ -1,6 +1,7 @@
 ﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using LanguageExt;
+using SpaceKat.Shared.Services.Contract;
 using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.States;

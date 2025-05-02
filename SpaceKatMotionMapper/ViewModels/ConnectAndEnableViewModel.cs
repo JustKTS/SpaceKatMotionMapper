@@ -6,6 +6,9 @@ using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LanguageExt;
+using Semi.Avalonia.Locale;
+using SpaceKat.Shared.Functions;
 using SpaceKatHIDWrapper.DeviceWrappers;
 using SpaceKatHIDWrapper.Functions;
 using SpaceKatHIDWrapper.Services;
@@ -107,8 +110,14 @@ public partial class ConnectAndEnableViewModel : ObservableObject
         _isUseConnectButton = false;
     }
 
-    private static void OnDeviceIsConnectedChange(object? sender, bool value) =>
-        Dispatcher.UIThread.InvokeAsync(() => GlobalStates.IsConnected = value);
+    private static void OnDeviceIsConnectedChange(object? sender, Either<Exception, bool> eitherValue)
+    {
+        eitherValue.Match(value => Dispatcher.UIThread.InvokeAsync(() => GlobalStates.IsConnected = value), ex =>
+        {
+            Dispatcher.UIThread.InvokeAsync(() => GlobalStates.IsConnected = false);
+        });
+    }
+       
 
     private void DisconnectDevice()
     {

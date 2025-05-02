@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using LanguageExt;
 using SpaceKatHIDWrapper.DeviceWrappers;
 using SpaceKatHIDWrapper.Models;
 
@@ -7,7 +8,7 @@ namespace SpaceKatHIDWrapper.Services;
 public partial class KatMotionRecognizeService : ObservableObject
 {
     private bool IsConnected => _deviceDataWrapper.IsConnected;
-    public event EventHandler<bool>? ConnectionChanged;
+    public event EventHandler<Either<Exception,bool>>? ConnectionChanged;
     private readonly KatDeadZoneConfig _deadZoneConfig = new();
 
     private readonly Dictionary<KatMotionEnum, KatTriggerTimesConfig> _motionTimeConfigs =

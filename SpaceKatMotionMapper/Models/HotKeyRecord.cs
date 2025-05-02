@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using SpaceKat.Shared.Models;
 using WindowsInput;
 
 namespace SpaceKatMotionMapper.Models;

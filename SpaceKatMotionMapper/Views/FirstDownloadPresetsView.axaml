@@ -1,0 +1,41 @@
+﻿<UserControl
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="SpaceKatMotionMapper.Views.FirstDownloadPresetsView"
+    x:DataType="vm:FirstDownloadPresetsViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid RowDefinitions="Auto, *">
+        <TextBlock
+            Classes="h4"
+            Grid.Row="0"
+            HorizontalAlignment="Center"
+            Theme="{StaticResource TitleTextBlock}"
+            VerticalAlignment="Center">
+            还未下载过预设文件，是否现在下载？
+        </TextBlock>
+        <Grid ColumnDefinitions="*, *" Grid.Row="1">
+            <u:IconButton
+                Command="{Binding DownloadCommand}"
+                Content="下载预设"
+                Grid.Column="0"
+                HorizontalAlignment="Center"
+                Icon="{StaticResource SemiIconDownload}"
+                IsLoading="{Binding DownloadCommand.IsRunning}"
+                VerticalAlignment="Center" />
+            <u:IconButton
+                Command="{Binding CancelCommand}"
+                Content="取消"
+                Grid.Column="1"
+                HorizontalAlignment="Center"
+                Icon="{StaticResource SemiIconClose}"
+                VerticalAlignment="Center" />
+        </Grid>
+
+    </Grid>
+</UserControl>

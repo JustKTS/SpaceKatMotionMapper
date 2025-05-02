@@ -12,7 +12,14 @@
     <ItemGroup>
       <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
       <PackageReference Include="HidApi.Net" Version="1.1.0" />
+      <PackageReference Include="LanguageExt.Core" Version="4.4.9" />
       <PackageReference Include="NetEscapades.EnumGenerators" Version="1.0.0-beta11" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <None Update="hidapi.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

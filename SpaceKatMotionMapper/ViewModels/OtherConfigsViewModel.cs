@@ -8,6 +8,8 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
 using LanguageExt.Common;
 using SpaceKat.Shared.Defines;
+using SpaceKat.Shared.Services;
+using SpaceKat.Shared.Services.Contract;
 using SpaceKatMotionMapper.Defines;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;

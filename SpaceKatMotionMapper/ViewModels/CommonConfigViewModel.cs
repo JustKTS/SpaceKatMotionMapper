@@ -1,6 +1,7 @@
 ﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using LanguageExt.Common;
+using SpaceKat.Shared.Services;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Services;
 

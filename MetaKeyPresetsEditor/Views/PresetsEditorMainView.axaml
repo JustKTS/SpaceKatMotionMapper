@@ -1,0 +1,120 @@
+﻿<UserControl
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="MetaKeyPresetsEditor.Views.PresetsEditorMainView"
+    x:DataType="vm:ProgramSpecMainViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MetaKeyPresetsEditor.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:vm="using:MetaKeyPresetsEditor.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Panel>
+        <Grid
+            HorizontalAlignment="Stretch"
+            Margin="20,30,20,20"
+            RowDefinitions="Auto,*"
+            VerticalAlignment="Top">
+
+            <Grid Grid.Row="0" RowDefinitions="*, *">
+                <Grid ColumnDefinitions="*, *, *, *">
+                    <u:IconButton
+                        Command="{Binding GetPresetsFromInternetCommand}"
+                        Grid.Column="0"
+                        HorizontalAlignment="Stretch"
+                        Icon="{StaticResource SemiIconDownload}"
+                        IsLoading="{Binding GetPresetsFromInternetCommand.IsRunning}"
+                        Margin="5">
+                        从网络获取已知配置
+                    </u:IconButton>
+                    <u:IconButton
+                        Classes="Primary"
+                        Command="{Binding OpenConfigFolderCommand}"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        Icon="{StaticResource SemiIconFolderOpen}"
+                        Margin="5">
+                        打开配置文件夹
+                    </u:IconButton>
+                    <Grid
+                        ColumnDefinitions="*,Auto"
+                        Grid.Column="2"
+                        Margin="5,0">
+                        <HyperlinkButton
+                            Classes="WithIcon Underline"
+                            Content="预设下载地址(gitee)"
+                            Grid.Column="0"
+                            Height="20"
+                            NavigateUri="https://gitee.com/justkts/space-kat-motion-mapper-meta-key-presets/releases/tag/latest"
+                            VerticalAlignment="Center" />
+                        <PathIcon
+                            Data="{StaticResource SemiIconHelpCircle}"
+                            Grid.Column="1"
+                            HorizontalAlignment="Left"
+                            ToolTip.Tip="遇到网络问题无法下载预设时，可以手动下载预设文件，解压后把json文件放在配置文件夹内。"
+                            VerticalAlignment="Center" />
+                    </Grid>
+
+                    <u:IconButton
+                        Classes="Primary"
+                        Command="{Binding GetPresetsFromFileCommand}"
+                        Grid.Column="3"
+                        HorizontalAlignment="Stretch"
+                        Icon="{StaticResource SemiIconImport}"
+                        Margin="5">
+                        从文件导入配置
+                    </u:IconButton>
+                </Grid>
+                <Grid ColumnDefinitions="*, *, *" Grid.Row="1">
+                    <u:IconButton
+                        Classes="Primary"
+                        Command="{Binding ModifyDefaultConfigCommand}"
+                        Grid.Column="0"
+                        HorizontalAlignment="Stretch"
+                        Icon="{StaticResource SemiIconBox}"
+                        Margin="5,15,5,5"
+                        Theme="{DynamicResource SolidIconButton}">
+                        修改默认配置
+                    </u:IconButton>
+                    <u:IconButton
+                        Classes="Primary"
+                        Command="{Binding AddNewConfigCommand}"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        Icon="{StaticResource SemiIconPlusCircle}"
+                        Margin="5,15,5,5"
+                        Theme="{DynamicResource SolidIconButton}">
+                        新建程序配置
+                    </u:IconButton>
+                    <u:IconButton
+                        Classes="Primary"
+                        Command="{Binding OpenExistProgramSelectorCommand}"
+                        Grid.Column="2"
+                        HorizontalAlignment="Stretch"
+                        Icon="{StaticResource SemiIconMenu}"
+                        Margin="5,15,5,5"
+                        Theme="{DynamicResource SolidIconButton}">
+                        已知程序配置
+                    </u:IconButton>
+                </Grid>
+
+
+            </Grid>
+
+            <u:LoadingContainer
+                CornerRadius="5"
+                Grid.Row="1"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Stretch"
+                Name="LoadingContainer"
+                VerticalAlignment="Stretch"
+                VerticalContentAlignment="Stretch">
+                <local:PresetEditView />
+            </u:LoadingContainer>
+        </Grid>
+
+        <u:OverlayDialogHost HostId="{x:Static local:PresetsEditorMainWindow.LocalHost}" />
+    </Panel>
+</UserControl>

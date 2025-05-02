@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
@@ -16,11 +17,16 @@ using SpaceKatMotionMapper.Services;
 using LanguageExt.Common;
 using SpaceKat.Shared.Defines;
 using SpaceKat.Shared.Models;
+using SpaceKat.Shared.Services.Contract;
+using SpaceKat.Shared.ViewModels;
+using SpaceKat.Shared.Views;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Defines;
 using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.Views;
+using Ursa.Controls;
+using Win32Helpers;
 using Dispatcher = Avalonia.Threading.Dispatcher;
 
 namespace SpaceKatMotionMapper.ViewModels;
@@ -458,6 +464,15 @@ public partial class KatMotionConfigViewModel : ViewModelBase
             Debug.WriteLine(e);
             return false;
         }
+    }
+    
+    [RelayCommand]
+    private async Task OpenRunningProgramSelector()
+    {
+        var ret = await Dialog.ShowCustomModal<RunningProgramSelector, RunningProgramSelectorViewModel, object?>(
+            App.GetRequiredService<RunningProgramSelectorViewModel>(), null, RunningProgramSelectorViewModel.DialogOptions);
+        if (ret is not ForeProgramInfo info) return;
+        await Dispatcher.UIThread.InvokeAsync(() => { ProcessPath = info.ProcessFileAddress; });
     }
 
     [RelayCommand]

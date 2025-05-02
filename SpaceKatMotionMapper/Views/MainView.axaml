@@ -1,20 +1,22 @@
-﻿<u:UrsaView xmlns="https://github.com/avaloniaui"
-            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-            xmlns:u="https://irihi.tech/ursa"
-            xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
-            xmlns:view="clr-namespace:SpaceKatMotionMapper.Views"
-            mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="600"
-            x:Class="SpaceKatMotionMapper.Views.MainView"
-            x:DataType="vm:MainViewModel">
+﻿<UserControl
+    d:DesignHeight="600"
+    d:DesignWidth="400"
+    mc:Ignorable="d"
+    x:Class="SpaceKatMotionMapper.Views.MainView"
+    x:DataType="vm:MainViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:view="clr-namespace:SpaceKatMotionMapper.Views"
+    xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Design.DataContext>
-        <vm:MainViewModel></vm:MainViewModel>
+        <vm:MainViewModel />
     </Design.DataContext>
-    
+
     <Grid RowDefinitions="Auto, *">
-        <view:ListeningInfoView Grid.Row="0"></view:ListeningInfoView>
-        <view:ConfigCenterView Grid.Row="1"></view:ConfigCenterView>
+        <view:ListeningInfoView Grid.Row="0" />
+        <view:ConfigCenterView Grid.Row="1" />
     </Grid>
-    
-</u:UrsaView>
+
+</UserControl>

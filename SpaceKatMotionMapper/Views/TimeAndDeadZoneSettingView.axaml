@@ -1,105 +1,131 @@
-﻿<u:UrsaView xmlns="https://github.com/avaloniaui"
-            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-            xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-            xmlns:u="https://irihi.tech/ursa"
-            xmlns:view="clr-namespace:SpaceKatMotionMapper.Views"
-            xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
-            mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="450"
-            x:Class="SpaceKatMotionMapper.Views.TimeAndDeadZoneSettingView"
-            x:DataType="vm:TimeAndDeadZoneSettingViewModel"
-            Width="1400"
-            MinWidth="1000"
-            MinHeight="600"
-            Background="Transparent"
-            Margin="50">
+﻿<UserControl
+    Background="Transparent"
+    Margin="50"
+    MinHeight="600"
+    MinWidth="1000"
+    Width="1400"
+    d:DesignHeight="450"
+    d:DesignWidth="1200"
+    mc:Ignorable="d"
+    x:Class="SpaceKatMotionMapper.Views.TimeAndDeadZoneSettingView"
+    x:DataType="vm:TimeAndDeadZoneSettingViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:view="clr-namespace:SpaceKatMotionMapper.Views"
+    xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid RowDefinitions="*,Auto">
         <Grid ColumnDefinitions="1.5*,*">
-            <Grid RowDefinitions="Auto, *" Margin="10">
-                <Grid ColumnDefinitions="*,Auto" Margin="30 0 30 0">
+            <Grid Margin="10" RowDefinitions="Auto, *">
+                <Grid ColumnDefinitions="*,Auto" Margin="30,0,30,0">
                     <TextBlock
                         Classes="H5"
-                        Theme="{StaticResource TitleTextBlock}" HorizontalAlignment="Center">
+                        HorizontalAlignment="Center"
+                        Theme="{StaticResource TitleTextBlock}">
                         触发时间设置
                     </TextBlock>
-                    <ToggleSwitch Name="TimeToggleSwitch"
-                                  Theme="{StaticResource SimpleToggleSwitch}"
-                                  Grid.Column="1"
-                                  OnContent="开" OffContent="关"
-                                  IsVisible="{Binding !IsDefault}"
-                                  IsChecked="{Binding IsTimeConfigEnable }">
-                    </ToggleSwitch>
+                    <ToggleSwitch
+                        Grid.Column="1"
+                        IsChecked="{Binding IsTimeConfigEnable}"
+                        IsVisible="{Binding !IsDefault}"
+                        Name="TimeToggleSwitch"
+                        OffContent="关"
+                        OnContent="开"
+                        Theme="{StaticResource SimpleToggleSwitch}" />
                 </Grid>
-                <view:KatMotionTimeConfigView
-                    Grid.Row="1"
-                    IsEnabled="{Binding #TimeToggleSwitch.IsChecked}" />
+                <view:KatMotionTimeConfigView Grid.Row="1" IsEnabled="{Binding #TimeToggleSwitch.IsChecked}" />
             </Grid>
-            <Grid Grid.Column="1" RowDefinitions="Auto, *" Margin="10">
-                <Grid ColumnDefinitions="*,Auto" >
+            <Grid
+                Grid.Column="1"
+                Margin="10"
+                RowDefinitions="Auto, *">
+                <Grid ColumnDefinitions="*,Auto">
                     <TextBlock
                         Classes="H5"
-                        Theme="{StaticResource TitleTextBlock}" HorizontalAlignment="Center">
+                        HorizontalAlignment="Center"
+                        Theme="{StaticResource TitleTextBlock}">
                         死区设置
                     </TextBlock>
-                    <ToggleSwitch Name="DeadZoneToggleSwitch"
-                                  Theme="{StaticResource SimpleToggleSwitch}"
-                                  Grid.Column="1"
-                                  OnContent="开" OffContent="关"
-                                  IsVisible="{Binding !IsDefault}"
-                                  IsChecked="{Binding IsDeadZoneConfigEnable }">
-                    </ToggleSwitch>
+                    <ToggleSwitch
+                        Grid.Column="1"
+                        IsChecked="{Binding IsDeadZoneConfigEnable}"
+                        IsVisible="{Binding !IsDefault}"
+                        Name="DeadZoneToggleSwitch"
+                        OffContent="关"
+                        OnContent="开"
+                        Theme="{StaticResource SimpleToggleSwitch}" />
                 </Grid>
-                <view:DeadZoneConfigView
-                    Grid.Row="1"
-                    IsEnabled="{Binding #DeadZoneToggleSwitch.IsChecked}" />
+                <view:DeadZoneConfigView Grid.Row="1" IsEnabled="{Binding #DeadZoneToggleSwitch.IsChecked}" />
             </Grid>
         </Grid>
-        <Border Grid.Row="1" Theme="{StaticResource CardBorder}"
-                Margin="15, 0,15,0">
+        <Border
+            Grid.Row="1"
+            Margin="15,0,15,0"
+            Theme="{StaticResource CardBorder}">
             <Grid RowDefinitions="Auto,*">
                 <TextBlock
                     Classes="H4"
-                    Theme="{StaticResource TitleTextBlock}" HorizontalAlignment="Center">
+                    HorizontalAlignment="Center"
+                    Theme="{StaticResource TitleTextBlock}">
                     当前Kat状态
                 </TextBlock>
-                <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                      ColumnDefinitions="*,*,*"
-                      RowDefinitions="*,*"
-                      Margin="10">
-                    <TextBlock Grid.Row="0" Grid.Column="0"
-                               Classes="H6" Theme="{StaticResource TitleTextBlock}"
-                               HorizontalAlignment="Center">
+                <Grid
+                    ColumnDefinitions="*,*,*"
+                    Grid.Row="1"
+                    HorizontalAlignment="Stretch"
+                    Margin="10"
+                    RowDefinitions="*,*"
+                    VerticalAlignment="Stretch">
+                    <TextBlock
+                        Classes="H6"
+                        Grid.Column="0"
+                        Grid.Row="0"
+                        HorizontalAlignment="Center"
+                        Theme="{StaticResource TitleTextBlock}">
                         触发动作：
                     </TextBlock>
-                    <TextBlock Grid.Row="1" Grid.Column="0"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               Text="{Binding KatMotion}" />
+                    <TextBlock
+                        Grid.Column="0"
+                        Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        Text="{Binding KatMotion}"
+                        VerticalAlignment="Center" />
 
-                    <TextBlock Grid.Row="0" Grid.Column="1"
-                               Classes="H6" Theme="{StaticResource TitleTextBlock}"
-                               HorizontalAlignment="Center">
+                    <TextBlock
+                        Classes="H6"
+                        Grid.Column="1"
+                        Grid.Row="0"
+                        HorizontalAlignment="Center"
+                        Theme="{StaticResource TitleTextBlock}">
                         触发状态：
                     </TextBlock>
-                    <TextBlock Grid.Row="1" Grid.Column="1"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               Text="{Binding PressMode}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        Text="{Binding PressMode}"
+                        VerticalAlignment="Center" />
 
-                    <TextBlock Grid.Row="0" Grid.Column="2"
-                               Classes="H6" Theme="{StaticResource TitleTextBlock}"
-                               HorizontalAlignment="Center">
+                    <TextBlock
+                        Classes="H6"
+                        Grid.Column="2"
+                        Grid.Row="0"
+                        HorizontalAlignment="Center"
+                        Theme="{StaticResource TitleTextBlock}">
                         多击次数：
                     </TextBlock>
-                    <TextBlock Grid.Row="1" Grid.Column="2"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               Text="{Binding RepeatCount}" />
+                    <TextBlock
+                        Grid.Column="2"
+                        Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        Text="{Binding RepeatCount}"
+                        VerticalAlignment="Center" />
                 </Grid>
             </Grid>
-            
+
         </Border>
     </Grid>
 
 
-</u:UrsaView>
+</UserControl>

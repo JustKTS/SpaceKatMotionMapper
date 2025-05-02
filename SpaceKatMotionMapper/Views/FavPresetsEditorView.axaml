@@ -1,0 +1,150 @@
+﻿<UserControl
+    Margin="10"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="SpaceKatMotionMapper.Views.FavPresetsEditorView"
+    x:DataType="vms:FavPresetsEditorViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:viewModels="clr-namespace:SpaceKat.Shared.ViewModels;assembly=SpaceKat.Shared"
+    xmlns:views="clr-namespace:SpaceKat.Shared.Views;assembly=SpaceKat.Shared"
+    xmlns:vms="clr-namespace:SpaceKatMotionMapper.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Styles>
+        <Style Selector="Expander:down Border#ExpanderContent">
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:checked /template/ ContentPresenter">
+            <Setter Property="BorderBrush" Value="{DynamicResource SemiColorPrimary}" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+        </Style>
+        <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:pointerover:unchecked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}" />
+            <Setter Property="CornerRadius" Value="5" />
+        </Style>
+        <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:pointerover:checked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}" />
+            <Setter Property="CornerRadius" Value="5, 5,0,0" />
+        </Style>
+        <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:unchecked:pointerover">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="Expander:down:expanded /template/ ToggleButton#ExpanderHeader:checked:pointerover">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="TextBlock.SettingTitle">
+            <Setter Property="FontSize" Value="17" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+        <Style Selector="Border.Hover">
+            <Setter Property="MinHeight" Value="50" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto, *, Auto">
+        <TextBlock
+            Classes="H4"
+            HorizontalAlignment="Center"
+            Theme="{StaticResource TitleTextBlock}"
+            VerticalAlignment="Center">
+            我的收藏
+        </TextBlock>
+        <Border
+            Classes="Hover"
+            Grid.Row="1"
+            Margin="10"
+            Padding="2"
+            Theme="{StaticResource CardBorder}"
+            VerticalAlignment="Stretch">
+            <Grid RowDefinitions="Auto, *">
+                <Grid ColumnDefinitions="Auto, *, Auto">
+                    <TextBlock
+                        Classes="SettingTitle"
+                        Foreground="{DynamicResource SemiColorPrimary}"
+                        Grid.Column="0"
+                        HorizontalAlignment="Left"
+                        Margin="10,0,0,0"
+                        MinWidth="200"
+                        VerticalAlignment="Center">
+                        自定义组合按键设置
+                    </TextBlock>
+                    <Grid
+                        ColumnDefinitions="Auto, *"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center">
+                        <ToggleButton
+                            Content="筛选"
+                            IsChecked="{Binding IsKeyActionFilter}"
+                            Margin="10,0" />
+                        <TextBox
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            IsEnabled="{Binding IsKeyActionFilter}"
+                            Margin="10,0"
+                            MaxWidth="300"
+                            MinWidth="200"
+                            Text="{Binding KeyActionFilterStr}"
+                            Watermark="输入需要筛选的名称" />
+                    </Grid>
+                    <u:IconButton
+                        Command="{Binding AddKeyActionConfigCommand}"
+                        Content="添加新设置"
+                        Grid.Column="2"
+                        HorizontalAlignment="Right"
+                        Icon="{StaticResource SemiIconPlus}"
+                        Margin="10" />
+                </Grid>
+                <ScrollViewer
+                    Grid.Row="1"
+                    IsVisible="{Binding !IsKeyActionFilter}"
+                    MaxHeight="800"
+                    VerticalAlignment="Stretch">
+                    <ItemsControl
+                        HorizontalAlignment="Stretch"
+                        ItemsSource="{Binding KeyActionConfigs}"
+                        VerticalAlignment="Stretch">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="viewModels:KeyActionConfigForPresetsViewModel">
+                                <views:KeyActionConfigView DataContext="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <ScrollViewer
+                    Grid.Row="1"
+                    IsVisible="{Binding IsKeyActionFilter}"
+                    VerticalAlignment="Stretch">
+                    <ItemsControl
+                        HorizontalAlignment="Stretch"
+                        ItemsSource="{Binding KeyActionConfigsFiltered}"
+                        VerticalAlignment="Stretch">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="viewModels:KeyActionConfigForPresetsViewModel">
+                                <views:KeyActionConfigView DataContext="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+            </Grid>
+        </Border>
+
+        <u:IconButton
+            Command="{Binding SaveToConfigDirCommand}"
+            Content="保存"
+            Grid.Row="2"
+            HorizontalAlignment="Stretch"
+            Icon="{StaticResource SemiIconSave}"
+            Margin="10,0" />
+        <u:OverlayDialogHost
+            Grid.Row="0"
+            Grid.RowSpan="3"
+            HostId="{x:Static local:FavPresetsEditorView.LocalHost}" />
+    </Grid>
+
+</UserControl>

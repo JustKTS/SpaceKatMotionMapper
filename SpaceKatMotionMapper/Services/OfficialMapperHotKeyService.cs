@@ -2,17 +2,19 @@
 using System.Threading.Tasks;
 using LanguageExt.Common;
 using SpaceKatMotionMapper.Models;
-using SpaceKatMotionMapper.Services.Contract;
 using Avalonia.Controls;
+using SpaceKat.Shared.Functions;
+using SpaceKat.Shared.Models;
 using SpaceKatMotionMapper.Functions;
+using SpaceKatMotionMapper.Helpers;
+using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.States;
-using SpaceKatMotionMapper.ViewModels;
 using Win32Helpers;
 using WindowsInput;
 
 namespace SpaceKatMotionMapper.Services;
 
-public class OfficialMapperHotKeyService(ITopLevelHelper topLevelHelper)
+public class OfficialMapperHotKeyService : IOfficialMapperHotKeyService
 {
     # region 热键注册
 
@@ -28,7 +30,7 @@ public class OfficialMapperHotKeyService(ITopLevelHelper topLevelHelper)
         if (useShift) modifierKeys |= 4;
 
 
-        var handle = topLevelHelper.GetTopLevel().TryGetPlatformHandle();
+        var handle = TopLevelHelper.GetTopLevel().TryGetPlatformHandle();
         if (handle is null) return new Result<bool>(new Exception("获取窗口句柄失败"));
         // ReSharper disable once InvertIf
         if (handle.Handle is { } nativeHandle)
@@ -48,7 +50,7 @@ public class OfficialMapperHotKeyService(ITopLevelHelper topLevelHelper)
 
     public Result<bool> UnregisterHotKeyWrapper()
     {
-        var handle = topLevelHelper.GetTopLevel().TryGetPlatformHandle();
+        var handle = TopLevelHelper.GetTopLevel().TryGetPlatformHandle();
         if (handle is null) return new Result<bool>(new Exception("获取窗口句柄失败"));
         // ReSharper disable once InvertIf
         if (handle.Handle is { } nativeHandle)
@@ -83,12 +85,12 @@ public class OfficialMapperHotKeyService(ITopLevelHelper topLevelHelper)
 
     public void RegisterHandle()
     {
-        Win32Properties.AddWndProcHookCallback(topLevelHelper.GetTopLevel(), HwndHook);
+        Win32Properties.AddWndProcHookCallback(TopLevelHelper.GetTopLevel(), HwndHook);
     }
 
     public void UnregisterHandle()
     {
-        Win32Properties.RemoveWndProcHookCallback(topLevelHelper.GetTopLevel(), HwndHook);
+        Win32Properties.RemoveWndProcHookCallback(TopLevelHelper.GetTopLevel(), HwndHook);
     }
 
     #endregion

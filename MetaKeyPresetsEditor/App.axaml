@@ -1,0 +1,14 @@
+<Application
+    RequestedThemeVariant="Default"
+    x:Class="MetaKeyPresetsEditor.App"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:semi="https://irihi.tech/semi"
+    xmlns:u-Semi="https://irihi.tech/ursa/themes/semi"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--  "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options.  -->
+
+    <Application.Styles>
+        <semi:SemiTheme Locale="zh-CN" />
+        <u-Semi:SemiTheme Locale="zh-CN" />
+    </Application.Styles>
+</Application>

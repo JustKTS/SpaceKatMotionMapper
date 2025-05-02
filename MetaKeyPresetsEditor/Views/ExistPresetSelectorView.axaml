@@ -1,0 +1,55 @@
+﻿<UserControl
+    Background="Transparent"
+    MinWidth="400"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="MetaKeyPresetsEditor.Views.ExistPresetSelectorView"
+    x:DataType="vm:ExistSpecConfigSelectorViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="clr-namespace:SpaceKat.Shared.Models;assembly=SpaceKat.Shared"
+    xmlns:vm="clr-namespace:MetaKeyPresetsEditor.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.DataContext>
+        <vm:ExistSpecConfigSelectorViewModel />
+    </Design.DataContext>
+
+    <Grid Margin="10" RowDefinitions="Auto,Auto, *">
+        <TextBlock
+            Classes="H3"
+            Grid.Row="0"
+            HorizontalAlignment="Center"
+            Theme="{StaticResource TitleTextBlock}">
+            当前已有配置：
+        </TextBlock>
+
+        <Grid Grid.Row="1" Margin="5,0">
+            <TextBox Text="{Binding FilterStr}" Watermark="筛选" />
+        </Grid>
+        <Border
+            Classes="Shadow"
+            Grid.Row="2"
+            Margin="5"
+            Theme="{StaticResource CardBorder}"
+            VerticalAlignment="Stretch">
+            <ListBox ItemsSource="{Binding ConfigsFiltered}" SelectedItem="{Binding SelectedConfig}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="model:ProgramSpecMetaKeysRecord">
+                        <Border
+                            BorderBrush="{DynamicResource SemiColorPrimaryLightActive}"
+                            BorderThickness="0,0,0,2"
+                            HorizontalAlignment="Stretch">
+                            <TextBlock
+                                Classes="H4"
+                                HorizontalAlignment="Stretch"
+                                Text="{Binding ConfigName}"
+                                Theme="{StaticResource TitleTextBlock}" />
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+    </Grid>
+</UserControl>

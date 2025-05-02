@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+        <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+        <PublishAot>true</PublishAot>
+        <PublishTrimmed>true</PublishTrimmed>
+        <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
+        <TrimMode>link</TrimMode>
+        <ApplicationIcon>Assets\configuration.ico</ApplicationIcon>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**"/>
+    </ItemGroup>
+    
+    
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.2.8" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.2.8" />
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.8" />
+        <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.2.7.1" />
+        <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.2.7.1" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="H.InputSimulator" Version="1.5.0" />
+        <PackageReference Include="Irihi.Ursa" Version="1.11.0" />
+        <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="1.11.0" />
+        <PackageReference Include="LanguageExt.Core" Version="4.4.9" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.4" />
+        <PackageReference Include="Semi.Avalonia" Version="11.2.1.7" />
+        <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SpaceKat.Shared\SpaceKat.Shared.csproj" />
+      <ProjectReference Include="..\Win32Helpers\Win32Helpers.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <DirectPInvoke Include="libHarfBuzzSharp" />
+        <NativeLibrary  Include="E:\codeDir\CSharp\Avalonia\AotLibs\libHarfBuzzSharp.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+        <DirectPInvoke Include="libSkiaSharp" />
+        <NativeLibrary  Include="E:\codeDir\CSharp\Avalonia\AotLibs\libSkiaSharp.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+        <DirectPInvoke Include="av_libglesv2" />
+        <NativeLibrary  Include="E:\codeDir\CSharp\Avalonia\AotLibs\av_libglesv2.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+    </ItemGroup>
+    
+    </Project>

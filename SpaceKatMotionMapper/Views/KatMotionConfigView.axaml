@@ -1,121 +1,126 @@
-﻿<u:UrsaView
+﻿<UserControl
+    d:DesignHeight="720"
+    d:DesignWidth="1280"
+    mc:Ignorable="d"
     x:Class="SpaceKatMotionMapper.Views.KatMotionConfigView"
+    x:DataType="vm:KatMotionConfigViewModel"
     xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:u="https://irihi.tech/ursa"
     xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels;assembly=SpaceKatMotionMapper"
-    d:DesignHeight="720"
-    d:DesignWidth="1280"
-    x:DataType="vm:KatMotionConfigViewModel"
-    mc:Ignorable="d">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Design.DataContext>
         <vm:KatMotionConfigViewModel />
     </Design.DataContext>
 
-    <u:UrsaView.Styles>
+    <UserControl.Styles>
         <Style Selector="Expander:down Border#ExpanderContent">
             <Setter Property="BorderThickness" Value="0" />
         </Style>
         <Style Selector="Expander:down /template/ ToggleButton#ExpanderHeader:unchecked:pointerover">
-            <Setter Property="Background" Value="Transparent"></Setter>
+            <Setter Property="Background" Value="Transparent" />
         </Style>
         <Style Selector="Expander:down:expanded /template/ ToggleButton#ExpanderHeader:checked:pointerover">
-            <Setter Property="Background" Value="Transparent"></Setter>
+            <Setter Property="Background" Value="Transparent" />
         </Style>
         <Style Selector="TabItem:selected">
-            <Setter Property="Background" Value="#FFA3691F"></Setter>
-            <Setter Property="CornerRadius" Value="5"></Setter>
+            <Setter Property="Background" Value="#FFA3691F" />
+            <Setter Property="CornerRadius" Value="5" />
         </Style>
-    </u:UrsaView.Styles>
+    </UserControl.Styles>
 
     <ScrollViewer
-        MaxHeight="600"
         Margin="5"
+        MaxHeight="600"
         VerticalScrollBarVisibility="Auto">
-        <Border Classes="Hover"
-                Theme="{StaticResource CardBorder}"
-                Padding="10" Margin="0">
+        <Border
+            Classes="Hover"
+            Margin="0"
+            Padding="10"
+            Theme="{StaticResource CardBorder}">
 
             <Grid
+                HorizontalAlignment="Stretch"
                 RowDefinitions="Auto,*"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Stretch">
-                <Grid Grid.Row="0" Grid.Column="0"
-                      ColumnDefinitions="Auto, * ,Auto"
-                      HorizontalAlignment="Stretch">
-                    <TextBlock Grid.Column="1" Classes="H5" VerticalAlignment="Center"
-                               HorizontalAlignment="Center"
-                               Theme="{StaticResource TitleTextBlock}"
-                               Text="全局配置" IsVisible="{Binding IsDefault}" />
-                    <Button Grid.Column="0" Classes="Primary"
-                            IsVisible="{Binding !IsDefault}">
-                        <Grid ColumnDefinitions="Auto, *">
-                            <PathIcon Data="{StaticResource SemiIconLink}"></PathIcon>
-                            <TextBlock Grid.Column="1" Classes="H5" Theme="{StaticResource TitleTextBlock}"
-                                       VerticalAlignment="Center"
-                                       Margin="5, 0,0, 0"
-                                       IsVisible="{Binding !IsDefault}">
-                                关联程序
-                            </TextBlock>
-                        </Grid>
-                        <Button.Flyout>
-                            <Flyout>
-                                <local:CurrentRunningProcessSelector Margin="10"></local:CurrentRunningProcessSelector>
-                            </Flyout>
-                        </Button.Flyout>
-                    </Button>
-                    <TextBlock Grid.Column="1" Classes="Underline H6"
-                               HorizontalAlignment="Stretch"
-                               Theme="{StaticResource TitleTextBlock}"
-                               VerticalAlignment="Center" Margin="20, 0,20, 0"
-                               IsVisible="{Binding !IsDefault}"
-                               Text="{Binding ProcessFilename}"
-                               ToolTip.Tip="{Binding ProcessPath}" />
-                    <Button Grid.Column="2"
-                            Classes="Warning"
-                            Theme="{StaticResource BorderlessButton}"
-                            ToolTip.Tip="删除当前配置"
-                            IsVisible="{Binding !IsDefault}"
-                            Command="{Binding RemoveSelfCommand}">
+                VerticalAlignment="Center">
+                <Grid
+                    ColumnDefinitions="Auto, * ,Auto"
+                    Grid.Column="0"
+                    Grid.Row="0"
+                    HorizontalAlignment="Stretch">
+                    <TextBlock
+                        Classes="H5"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        IsVisible="{Binding IsDefault}"
+                        Text="全局配置"
+                        Theme="{StaticResource TitleTextBlock}"
+                        VerticalAlignment="Center" />
+                    <u:IconButton Icon="{StaticResource SemiIconLink}"
+                        Classes="Primary"
+                        Grid.Column="0"
+                        IsVisible="{Binding !IsDefault}"
+                        Content="关联程序"
+                        Command="{Binding OpenRunningProgramSelectorCommand}">
+                       
+                    </u:IconButton>
+                    <TextBlock
+                        Classes="Underline H6"
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        IsVisible="{Binding !IsDefault}"
+                        Margin="20,0,20,0"
+                        Text="{Binding ProcessFilename}"
+                        Theme="{StaticResource TitleTextBlock}"
+                        ToolTip.Tip="{Binding ProcessPath}"
+                        VerticalAlignment="Center" />
+                    <Button
+                        Classes="Warning"
+                        Command="{Binding RemoveSelfCommand}"
+                        Grid.Column="2"
+                        IsVisible="{Binding !IsDefault}"
+                        Theme="{StaticResource BorderlessButton}"
+                        ToolTip.Tip="删除当前配置">
                         <PathIcon Data="{StaticResource SemiIconCheckBoxIndeterminate}" />
                     </Button>
                 </Grid>
 
-                <Grid Grid.Row="1"
-                      ColumnDefinitions="Auto, *"
-                      Margin="0,10,0,0">
+                <Grid
+                    ColumnDefinitions="Auto, *"
+                    Grid.Row="1"
+                    Margin="0,10,0,0">
                     <ToggleSwitch
+                        Classes="Large"
+                        Command="{Binding ActivateActionsCommand}"
+                        Grid.Column="0"
                         HorizontalAlignment="Left"
-                        Grid.Column="0" VerticalAlignment="Center" Classes="Large"
                         IsChecked="{Binding IsActivated, Mode=OneWay}"
-                        Command="{Binding ActivateActionsCommand}" OnContent="" OffContent="" />
+                        OffContent=""
+                        OnContent=""
+                        VerticalAlignment="Center" />
 
                     <u:ButtonGroup
-                        Grid.Column="1"
                         Classes="Primary"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Right">
-                        <Button
-                            Command="{Binding OpenEditDialogCommand}">
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center">
+                        <Button Command="{Binding OpenEditDialogCommand}">
                             <StackPanel Orientation="Horizontal">
                                 <PathIcon Data="{StaticResource SemiIconEdit}" />
                                 <TextBlock Margin="5,0,0,0">修改配置</TextBlock>
                             </StackPanel>
 
                         </Button>
-                        <Button
-                            Command="{Binding SetTimeAndDeadZoneCommand}">
+                        <Button Command="{Binding SetTimeAndDeadZoneCommand}">
                             <StackPanel Orientation="Horizontal">
                                 <PathIcon Data="{StaticResource SemiIconSetting}" />
                                 <TextBlock Margin="5,0,0,0">配置触发时间/死区</TextBlock>
                             </StackPanel>
                         </Button>
 
-                        <Button
-                            ToolTip.Tip="导入导出">
+                        <Button ToolTip.Tip="导入导出">
                             <PathIcon Data="{StaticResource SemiIconMore}" />
                             <Button.Flyout>
                                 <MenuFlyout>
@@ -123,8 +128,10 @@
                                         <MenuItem.Header>
                                             <Grid ColumnDefinitions="Auto,*">
                                                 <PathIcon Data="{StaticResource SemiIconExport}" />
-                                                <TextBlock Grid.Column="1" HorizontalAlignment="Left"
-                                                           Margin="20,0,0,0">
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    HorizontalAlignment="Left"
+                                                    Margin="20,0,0,0">
                                                     从文件中导入
                                                 </TextBlock>
                                             </Grid>
@@ -134,8 +141,10 @@
                                         <MenuItem.Header>
                                             <Grid ColumnDefinitions="Auto,*">
                                                 <PathIcon Data="{StaticResource SemiIconImport}" />
-                                                <TextBlock Grid.Column="1" HorizontalAlignment="Left"
-                                                           Margin="20,0,0,0">
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    HorizontalAlignment="Left"
+                                                    Margin="20,0,0,0">
                                                     另存为到文件
                                                 </TextBlock>
                                             </Grid>
@@ -150,4 +159,4 @@
         </Border>
 
     </ScrollViewer>
-</u:UrsaView>
+</UserControl>

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Frozen;
 using System.Collections.ObjectModel;
 using HidApi;
+using LanguageExt;
 using SpaceKatHIDWrapper.Functions;
 using SpaceKatHIDWrapper.Models;
 
@@ -9,8 +10,7 @@ namespace SpaceKatHIDWrapper.DeviceWrappers;
 public class SpaceCompatDataWrapper : IDeviceDataWrapper
 {
     private const string Name = "SpaceMouse Compact";
-
-    public event EventHandler<bool>? ConnectionChanged;
+    public event EventHandler<Either<Exception, bool>>? ConnectionChanged;
 
     // vendor ID and product ID
     private readonly int[] _hidId = [0x256F, 0xC635];
@@ -52,9 +52,9 @@ public class SpaceCompatDataWrapper : IDeviceDataWrapper
     
     private readonly KatDeviceBuffer _buffer = new();
 
-    private void RetryConnect(object? obj, bool isConnected)
+    private void RetryConnect(object? obj, Either<Exception, bool> isConnected)
     {
-        if (IsConnected) return;
+        if (isConnected.IsRight) return;
         const int maxRetry = 5;
         Task.Run(async () =>
         {
@@ -110,7 +110,7 @@ public class SpaceCompatDataWrapper : IDeviceDataWrapper
             Console.WriteLine(e);
             Hid.Exit();
             _device = null;
-            ConnectionChanged?.Invoke(this, IsConnected);
+            ConnectionChanged?.Invoke(this, e);
             _readFailedCount = 0;
             return null;
         }
@@ -119,5 +119,8 @@ public class SpaceCompatDataWrapper : IDeviceDataWrapper
     public void Disconnect()
     {
         KatDeviceFunction.StopDevice();
+        _device?.Dispose();
+        _device = null;
+        ConnectionChanged?.Invoke(this, IsConnected);
     }
 }

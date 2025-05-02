@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceKatHIDWrapper", "Space
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Win32Helpers", "Win32Helpers\Win32Helpers.csproj", "{F79CA2E8-97ED-4CD7-BA25-4E98DC6075B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgramSpecificConfigCreator", "ProgramSpecificConfigCreator\ProgramSpecificConfigCreator.csproj", "{1482F207-F037-4DC0-B32B-38E704AA3CF8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetaKeyPresetsEditor", "MetaKeyPresetsEditor\MetaKeyPresetsEditor.csproj", "{1482F207-F037-4DC0-B32B-38E704AA3CF8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceKat.Shared", "SpaceKat.Shared\SpaceKat.Shared.csproj", "{A28A5E00-7E89-46B5-88BD-20909C5B10F0}"
 EndProject

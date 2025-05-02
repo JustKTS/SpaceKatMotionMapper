@@ -1,0 +1,37 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Expander Classes="CornerRadius" >
+            <Expander.Header>
+                <TextBlock>Header</TextBlock>
+            </Expander.Header>
+            <Expander.Content>
+                <TextBlock Height="100">Content</TextBlock>
+            </Expander.Content>
+        </Expander>
+    </Design.PreviewWith>
+    
+    <Style Selector="Expander.CornerRadius">
+        <Style Selector="^:down Border#ExpanderContent">
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="^:down /template/ ToggleButton#ExpanderHeader:checked /template/ ContentPresenter">
+            <Setter Property="BorderBrush" Value="{DynamicResource SemiColorPrimary}" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+        </Style>
+        <Style Selector="^:down /template/ ToggleButton#ExpanderHeader:pointerover:unchecked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}" />
+            <Setter Property="CornerRadius" Value="5" />
+        </Style>
+        <Style Selector="^:down /template/ ToggleButton#ExpanderHeader:pointerover:checked /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}" />
+            <Setter Property="CornerRadius" Value="5, 5,0,0" />
+        </Style>
+        <Style Selector="^:down /template/ ToggleButton#ExpanderHeader:unchecked:pointerover">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="^:down:expanded /template/ ToggleButton#ExpanderHeader:checked:pointerover">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+    </Style>
+</Styles>
