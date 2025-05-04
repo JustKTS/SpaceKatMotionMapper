@@ -2,6 +2,11 @@
 
 本项目用于 SpaceKat DIY 3D鼠标，可将3D动作转换为键鼠按键组合，扩展用法。
 
+希望大家多给快捷键预设贡献配置文件，方便大家使用。
+
+**快捷键预设项目地址**
+[https://gitee.com/justkts/space-kat-motion-mapper-meta-key-presets](https://gitee.com/justkts/space-kat-motion-mapper-meta-key-presets)
+
 ## 介绍视频
 
 ### v0.1.x
@@ -9,6 +14,9 @@
 
 ### v0.2.x
 [https://www.bilibili.com/video/BV1Y3QaYjEKv](https://www.bilibili.com/video/BV1Y3QaYjEKv)
+
+### v0.2.7
+[https://www.bilibili.com/video/BV18KVKzSE9Y](https://www.bilibili.com/video/BV18KVKzSE9Y)
 
 ## 视频所述之外新特性
 1. 添加顶层透明浮窗提示，并可自定义大小及位置（v0.1.6+)

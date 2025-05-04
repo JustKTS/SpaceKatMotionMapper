@@ -5,8 +5,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>SpaceKat.Shared</RootNamespace>
-        <PublishAot>true</PublishAot>
-        <PublishTrimmed>true</PublishTrimmed>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+        <IsTrimmable>false</IsTrimmable>
     </PropertyGroup>
 
     <ItemGroup>

@@ -21,6 +21,9 @@
     <ItemGroup>
         <AvaloniaResource Include="Assets\**"/>
     </ItemGroup>
+    <ItemGroup>
+        <TrimmerRootAssembly Include="SpaceKat.Shared" />
+    </ItemGroup>
     
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="11.2.8" />
@@ -29,7 +32,6 @@
         <PackageReference Include="Avalonia.Desktop" Version="11.2.8" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.8" />
-        <PackageReference Include="Avalonia.Win32.Interoperability" Version="11.2.8" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="H.InputSimulator" Version="1.5.0" />
         <PackageReference Include="Irihi.Ursa" Version="1.11.0" />
@@ -55,12 +57,6 @@
       <ProjectReference Include="..\SpaceKat.Shared\SpaceKat.Shared.csproj" />
       <ProjectReference Include="..\SpaceKatHIDWrapper\SpaceKatHIDWrapper.csproj" />
       <ProjectReference Include="..\Win32Helpers\Win32Helpers.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="hidapi.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
    
 </Project>

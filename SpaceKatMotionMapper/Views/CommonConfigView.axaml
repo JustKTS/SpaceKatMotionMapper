@@ -22,6 +22,7 @@
         Margin="10"
         Name="ScrollViewer"
         VerticalScrollBarVisibility="Auto">
-        <views:KatMotionConfigView DataContext="{Binding DefaultKatMotionConfig}" />
+        <views:KatMotionConfigView
+            DataContext="{Binding DefaultKatMotionConfig}" />
     </ScrollViewer>
 </UserControl>

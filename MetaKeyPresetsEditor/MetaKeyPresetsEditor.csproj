@@ -8,10 +8,10 @@
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
         <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
-        <PublishAot>true</PublishAot>
+<!--        <PublishAot>true</PublishAot>-->
         <PublishTrimmed>true</PublishTrimmed>
         <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
-        <TrimMode>link</TrimMode>
+<!--        <TrimMode>link</TrimMode>-->
         <ApplicationIcon>Assets\configuration.ico</ApplicationIcon>
     </PropertyGroup>
     

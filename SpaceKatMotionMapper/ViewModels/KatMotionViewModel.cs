@@ -87,6 +87,12 @@ public partial class KatMotionViewModel : ObservableObject
             ModeNum = motionConfig.ModeNum;
             ToModeNum = motionConfig.ToModeNum;
             OnPropertyChanged(nameof(IsAvailable));
+            if (motionConfig.IsCustomDescription)
+            {
+                KeyActionConfigGroup.IsCustomDescription = true;
+                KeyActionConfigGroup.KeyActionsDescription = motionConfig.KeyActionsDescription;
+            }
+
             return KeyActionConfigGroup.FromKeyActionConfig(motionConfig.ActionConfigs);
         }
         catch (Exception e)
