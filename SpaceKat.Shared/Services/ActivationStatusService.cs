@@ -1,13 +1,21 @@
-﻿using SpaceKat.Shared.Services.Contract;
+﻿using System.Text.Json.Serialization;
+using SpaceKat.Shared.Services.Contract;
 
 namespace SpaceKat.Shared.Services;
 
-public class ActivationStatusService(ILocalSettingsService localSettingsService)
+public class ActivationStatusService
 {
     private Dictionary<Guid, bool> _activationStatus = [];
     private const string SaveToken = "ActivationStatus";
-    private ManualResetEventSlim _isLoadedEvent = new(false);
+    private readonly ManualResetEventSlim _isLoadedEvent = new(false);
+    private readonly ILocalSettingsService _localSettingsService;
 
+    public ActivationStatusService(ILocalSettingsService localSettingsService)
+    {
+        _localSettingsService = localSettingsService;
+        WaitForActivationStatusLoaded();
+    }
+    
     public void WaitForActivationStatusLoaded()
     {
         Task.Run(async () => await LoadActivationStatusAsync());
@@ -18,7 +26,7 @@ public class ActivationStatusService(ILocalSettingsService localSettingsService)
     {
         try
         {
-            var ret = await localSettingsService.ReadSettingAsync<Dictionary<Guid, bool>>(SaveToken);
+            var ret = await _localSettingsService.ReadSettingAsync<Dictionary<Guid, bool>>(SaveToken);
             _activationStatus = ret ?? new Dictionary<Guid, bool>();
             _isLoadedEvent.Set();
         }
@@ -31,12 +39,13 @@ public class ActivationStatusService(ILocalSettingsService localSettingsService)
 
     public void SaveActivationStatus()
     {
-        _ = localSettingsService.SaveSettingAsync(SaveToken, _activationStatus);
+        _ = _localSettingsService.SaveSettingAsync(SaveToken, _activationStatus);
     }
 
     public void SetActivationStatus(Guid configGroupId, bool isActivated)
     {
         _activationStatus[configGroupId] = isActivated;
+        SaveActivationStatus();
     }
 
     public bool IsConfigGroupActivated(Guid configGroupId)
@@ -55,5 +64,12 @@ public class ActivationStatusService(ILocalSettingsService localSettingsService)
     public void DeleteActivationStatus(Guid configGroupId)
     {
         _activationStatus.Remove(configGroupId);
+        SaveActivationStatus();
     }
+}
+
+[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSerializable(typeof(Dictionary<Guid, bool>))]
+public partial class ActivationStatusJsonSgContext : JsonSerializerContext
+{
 }
