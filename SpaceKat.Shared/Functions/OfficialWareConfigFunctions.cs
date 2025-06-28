@@ -1,4 +1,5 @@
 ﻿using System.Xml;
+using LanguageExt;
 using LanguageExt.Common;
 using SpaceKat.Shared.Helpers;
 using SpaceKat.Shared.Models;
@@ -202,12 +203,12 @@ public static class OfficialWareConfigFunctions
         return true;
     }
 
-    public static async Task<Result<bool>> BindHotKeyToKatButton(
+    public static async Task<Either<Exception,bool>> BindHotKeyToKatButton(
         KatButtonEnum button, bool useCtrl, bool useAlt, bool useShift, VirtualKeyCode hotKey)
     {
         var doc = LoadDocument();
         var node1 = doc.SelectSingleNode("Global");
-        if (node1 == null) return new Result<bool>(new Exception("配置文件解析失败，请检查配置文件是否有被不正确的修改！"));
+        if (node1 == null) return new Exception("配置文件解析失败，请检查配置文件是否有被不正确的修改！");
         var node2 = node1.SelectSingleNode("Devices")?.SelectSingleNode("Device")?.SelectSingleNode("ButtonBank");
         if (node2 != null)
         {

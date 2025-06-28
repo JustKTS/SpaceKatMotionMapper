@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using LanguageExt;
 using LanguageExt.Common;
 using SpaceKat.Shared.Services.Contract;
 using SpaceKatMotionMapper.Defines;
@@ -39,7 +40,7 @@ public class KatMotionFileService
         }
     }
 
-    public Result<bool> SaveDefaultConfigGroup(KatMotionConfigGroup configGroup)
+    public Either<Exception, bool> SaveDefaultConfigGroup(KatMotionConfigGroup configGroup)
     {
         try
         {
@@ -48,12 +49,11 @@ public class KatMotionFileService
         }
         catch (Exception e)
         {
-            Debug.WriteLine(e);
-            return new Result<bool>(new Exception("保存配置文件失败"));
+            return new Exception("保存配置文件失败");
         }
     }
 
-    public Result<KatMotionConfigGroup> LoadDefaultConfigGroup()
+    public Either<Exception, KatMotionConfigGroup> LoadDefaultConfigGroup()
     {
         try
         {
@@ -61,20 +61,20 @@ public class KatMotionFileService
         }
         catch (Exception e)
         {
-            return new Result<KatMotionConfigGroup>(new Exception("读取配置文件失败", innerException: e));
+            return new Exception("读取配置文件失败", innerException: e);
         }
     }
 
-    public Result<KatMotionConfigGroup> LoadConfigGroup(string configFilePath)
+    public Either<Exception, KatMotionConfigGroup> LoadConfigGroup(string configFilePath)
     {
         try
         {
             var dir = Path.GetDirectoryName(configFilePath);
-            if (dir is null) return new Result<KatMotionConfigGroup>(new Exception("输入地址有误，无法提取文件夹"));
+            if (dir is null) return new Exception("输入地址有误，无法提取文件夹");
             var fileName = Path.GetFileName(configFilePath);
             var configGroupMayNull = _fileService.Read<KatMotionConfigGroup>(dir, fileName);
             if (configGroupMayNull is not { } configGroup)
-                return new Result<KatMotionConfigGroup>(new Exception("读取配置文件失败"));
+                return new Exception("读取配置文件失败");
 
             while (configGroup.Version != GlobalConstConfigs.ConfigFileVersion)
             {
@@ -90,11 +90,11 @@ public class KatMotionFileService
         }
         catch (Exception e)
         {
-            return new Result<KatMotionConfigGroup>(new Exception("读取配置文件失败", innerException: e));
+            return new Exception("读取配置文件失败", innerException: e);
         }
     }
 
-    public Result<List<KatMotionConfigGroup>> LoadConfigGroupsFromSysConf()
+    public Either<Exception, List<KatMotionConfigGroup>> LoadConfigGroupsFromSysConf()
     {
         try
         {
@@ -103,37 +103,34 @@ public class KatMotionFileService
             List<KatMotionConfigGroup> configGroups = [];
             foreach (var configFile in configFiles)
             {
-                var ret = LoadConfigGroup(Path.Combine(_customConfigDirPath, configFile));
-                _ = ret.Match((configGroup) =>
-                {
-                    configGroups.Add(configGroup);
-                    return new Result<bool>(true);
-                }, exception => new Result<bool>(false));
+                // TODO: 处理部分文件读取失败的情况
+                LoadConfigGroup(Path.Combine(_customConfigDirPath, configFile))
+                    .Iter(configGroups.Add);
             }
 
             return configGroups;
         }
         catch (Exception e)
         {
-            return new Result<List<KatMotionConfigGroup>>(new Exception("读取配置文件错误", innerException: e));
+            return new Exception("读取配置文件错误", innerException: e);
         }
     }
 
-    public Result<bool> SaveConfigGroupToSysConf(KatMotionConfigGroup configGroup)
+    public Either<Exception, bool> SaveConfigGroupToSysConf(KatMotionConfigGroup configGroup)
     {
         var fileName = configGroup.Guid + ".json";
         var path = Path.Combine(_customConfigDirPath, fileName);
         return SaveConfigGroup(configGroup, path);
     }
 
-    public Result<bool> SaveConfigGroup(KatMotionConfigGroup configGroup, string configFilePath)
+    public Either<Exception, bool> SaveConfigGroup(KatMotionConfigGroup configGroup, string configFilePath)
     {
         try
         {
             var dir = Path.GetDirectoryName(configFilePath);
             if (string.IsNullOrEmpty(dir))
             {
-                return new Result<bool>(new ArgumentException($"输入的地址有误，请检查！错误地址：{configFilePath}"));
+                return new ArgumentException($"输入的地址有误，请检查！错误地址：{configFilePath}");
             }
 
             var fileName = Path.GetFileName(configFilePath);
@@ -142,38 +139,37 @@ public class KatMotionFileService
         }
         catch (Exception e)
         {
-            return new Result<bool>(e);
+            return e;
         }
     }
 
-    public Result<bool> SaveConfigGroupsToSysConf(IEnumerable<KatMotionConfigGroup> configGroups)
+    public Either<Exception, bool> SaveConfigGroupsToSysConf(IEnumerable<KatMotionConfigGroup> configGroups)
     {
-        var retFlag = true;
         foreach (var configGroup in configGroups)
         {
-            var ret = SaveConfigGroupToSysConf(configGroup);
-            _ = ret.Match<Result<bool>>(flag => flag, exception =>
+            var ret = SaveConfigGroupToSysConf(configGroup)
+                .Match<Either<Exception, bool>>(flag => flag, exception => exception);
+            if (ret.IsLeft)
             {
-                retFlag = false;
-                return false;
-            });
+                return ret;
+            }
         }
 
-        return retFlag;
+        return true;
     }
 
-    public Result<bool> DeleteConfigGroupFromSysConf(Guid id)
+    public Either<Exception, bool> DeleteConfigGroupFromSysConf(Guid id)
     {
         try
         {
             var configFilePath = Path.Combine(_customConfigDirPath, id + ".json");
-            if (!File.Exists(configFilePath)) return new Result<bool>(new Exception("找不到配置文件"));
+            if (!File.Exists(configFilePath)) return new Exception("找不到配置文件");
             File.Delete(configFilePath);
             return true;
         }
         catch (Exception e)
         {
-            return new Result<bool>(e);
+            return e;
         }
     }
 
@@ -181,7 +177,7 @@ public class KatMotionFileService
 
     private static KatMotionConfigGroup TreatV1ToV2ConfigGroup(KatMotionConfigGroup configGroup)
     {
-        return configGroup  with { Version = 2};
+        return configGroup with { Version = 2 };
         // return configGroup with { Version = 2, Motions = motionConfigs.ToList() };
     }
 

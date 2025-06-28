@@ -1,11 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SpaceKat.Shared.Models;
-using WindowsInput;
 
 namespace SpaceKat.Shared.ViewModels;
 
-public partial class KeyActionForPresetsViewModel : ObservableObject
+public partial class KeyActionWithCommandViewModel : ObservableObject
 {
     #region 属性定义
 
@@ -20,10 +20,7 @@ public partial class KeyActionForPresetsViewModel : ObservableObject
 
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsAvailable))]
     private int _multiplier;
-
-
-    private readonly KeyActionConfigForPresetsViewModel _parent;
-
+    
     public bool IsDelay => ActionType == ActionType.Delay;
 
     #endregion
@@ -64,11 +61,10 @@ public partial class KeyActionForPresetsViewModel : ObservableObject
     }
 
     #endregion
-
-    public KeyActionForPresetsViewModel(KeyActionConfigForPresetsViewModel parent, ActionType actionType, string key,
+    
+    public KeyActionWithCommandViewModel(ActionType actionType, string key,
         PressModeEnum pressMode, int multiplier)
     {
-        _parent = parent;
         ActionType = actionType;
         Key = key;
         PressMode = pressMode;
@@ -76,38 +72,12 @@ public partial class KeyActionForPresetsViewModel : ObservableObject
         OnPropertyChanged(nameof(IsAvailable));
     }
 
-    public KeyActionForPresetsViewModel(KeyActionConfigForPresetsViewModel parent) : this(parent, ActionType.KeyBoard,
-        VirtualKeyCode.None.ToString(), PressModeEnum.None, 1)
-    {
-        OnPropertyChanged(nameof(IsAvailable));
-    }
-
     # region 添加删除
 
-    [RelayCommand]
-    private void Remove()
-    {
-        var index = _parent.ActionConfigGroups.IndexOf(this);
-        _parent.RemoveActionConfigCommand.Execute(index);
-        OnPropertyChanged(nameof(IsAvailable));
-
-    }
-
-    [RelayCommand]
-    private void InsertNextAction()
-    {
-        var index = _parent.ActionConfigGroups.IndexOf(this);
-        _parent.InsertNextActionConfig(index);
-        OnPropertyChanged(nameof(IsAvailable));
-    }
-
-    [RelayCommand]
-    private void InsertNextDelay()
-    {
-        var index = _parent.ActionConfigGroups.IndexOf(this);
-        _parent.InsertNextDelayConfig(index);
-        OnPropertyChanged(nameof(IsAvailable));
-    }
+    public ICommand? RemoveActionConfigCommand { get; set; }
+    public ICommand? InsertNextActionConfigCommand { get; set; }
+    public ICommand? InsertNextDelayConfigCommand { get; set; }
+    
 
     #endregion
 

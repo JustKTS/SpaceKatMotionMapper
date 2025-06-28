@@ -1,0 +1,102 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:DataType="vm:KeyActionConfigV2ViewModel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="clr-namespace:SpaceKat.Shared.ViewModels"
+             xmlns:local="clr-namespace:SpaceKat.Shared.Views"
+             x:Class="SpaceKat.Shared.Views.KeyActionConfigV2Control">
+    <Design.DataContext>
+        <vm:KeyActionConfigV2ViewModel />
+    </Design.DataContext>
+
+
+    <UserControl.Styles>
+        <Style Selector="Border.WrongDefine">
+            <Setter Property="Background" Value="{DynamicResource SemiColorDanger}" />
+        </Style>
+        <Style Selector="ToggleButton.Borderless">
+            <Setter Property="CornerRadius" Value="5"></Setter>
+        </Style>
+        <Style Selector="ToggleButton.Borderless:unchecked /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonBorderlessBackground}" />
+        </Style>
+        <Style Selector="ToggleButton.Borderless:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}" />
+        </Style>
+    </UserControl.Styles>
+
+    <!-- <Border -->
+    <!--     Classes="Shadow" -->
+    <!--     Padding="5" -->
+    <!--     Theme="{StaticResource CardBorder}"> -->
+    <Grid RowDefinitions="Auto, *">
+        <Grid ColumnDefinitions="Auto, Auto, *,Auto">
+            <StackPanel
+                Margin="5"
+                Orientation="Horizontal"
+                Spacing="10">
+                <TextBlock
+                    Classes="H4"
+                    Theme="{StaticResource TitleTextBlock}"
+                    VerticalAlignment="Center">
+                    按键配置
+                </TextBlock>
+            </StackPanel>
+            <Border
+                Margin="5"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Theme="{StaticResource RadioButtonGroupBorder}">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton
+                        Name="CombinationRBtn"
+                        IsChecked="True"
+                        Theme="{DynamicResource ButtonRadioButton}"
+                        VerticalContentAlignment="Center">
+                        组合/单键
+                    </RadioButton>
+                    <RadioButton
+                        Name="MacroRBtn"
+                        Theme="{DynamicResource ButtonRadioButton}"
+                        VerticalContentAlignment="Center">
+                        宏
+                    </RadioButton>
+                </StackPanel>
+            </Border>
+
+            <TextBox
+                Grid.Column="2"
+                Grid.Row="0"
+                IsVisible="{Binding $parent[local:KeyActionConfigV2Control].IsCustomDescription}"
+                HorizontalAlignment="Stretch"
+                Margin="5"
+                Text="{Binding KeyActionsDescription, Mode=TwoWay}"
+                VerticalAlignment="Stretch"
+                Watermark="自定义动作描述" />
+        </Grid>
+
+        <Panel Grid.Row="1"
+               Margin="5">
+            <local:CombinationKeyActionConfigControl
+                DataContext="{Binding CombinationKeysWithCommandVM}"
+                IsVisible="{Binding #CombinationRBtn.IsChecked }">
+            </local:CombinationKeyActionConfigControl>
+            <Border
+                Classes="Shadow"
+                Padding="5"
+                Theme="{StaticResource CardBorder}"
+                IsVisible="{Binding #MacroRBtn.IsChecked }">
+                <ScrollViewer MaxHeight="500">
+                    <local:KeyActionsItemsControl
+                        Margin="10"
+                        DataContext="{Binding  ActionConfigGroups}">
+                    </local:KeyActionsItemsControl>
+                </ScrollViewer>
+            </Border>
+        </Panel>
+    </Grid>
+    <!-- </Border> -->
+</UserControl>

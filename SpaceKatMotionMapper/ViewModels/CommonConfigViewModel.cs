@@ -1,5 +1,6 @@
 ﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
+using LanguageExt;
 using LanguageExt.Common;
 using SpaceKat.Shared.Services;
 using SpaceKatHIDWrapper.Models;
@@ -9,8 +10,7 @@ namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class CommonConfigViewModel : ViewModelBase
 {
-    [ObservableProperty] private KatMotionConfigViewModel _defaultKatMotionConfig =
-        App.GetRequiredService<KatMotionConfigViewModel>();
+    [ObservableProperty] private KatMotionConfigViewModel _defaultKatMotionConfig;
 
     private readonly KatMotionFileService _katMotionFileService =
         App.GetRequiredService<KatMotionFileService>();
@@ -26,20 +26,21 @@ public partial class CommonConfigViewModel : ViewModelBase
 
     public CommonConfigViewModel()
     {
+        DefaultKatMotionConfig = App.GetRequiredService<KatMotionConfigViewModel>();
         var configGroupRet = _katMotionFileService.LoadDefaultConfigGroup();
-        _ = configGroupRet.Match(cg =>
-            {
-                DefaultKatMotionConfig.Id = Guid.Parse(cg.Guid);
-                var ret2 = DefaultKatMotionConfig.LoadFromConfigGroup(cg);
-                if (!ret2) return ret2;
-                DefaultKatMotionConfig.IsDefault = true;
-                if (!_activationStatusService.IsConfigGroupActivated(DefaultKatMotionConfig.Id)) return true;
-                DefaultKatMotionConfig.ActivateActionsCommand.Execute(null);
-                _katMotionConfigVmManageService.RegisterDefaultConfig(DefaultKatMotionConfig);
-                _katMotionTimeConfigService.ApplyDefaultMotionTimeConfig();
-                _katDeadZoneConfigService.ApplyDefaultDeadZoneConfig();
-                return true;
-            },
+        _ = configGroupRet.Bind<Unit>(cg =>
+        {
+            DefaultKatMotionConfig.Id = Guid.Parse(cg.Guid);
+            var ret2 = DefaultKatMotionConfig.LoadFromConfigGroup(cg);
+            if (!ret2) return Unit.Default;
+            DefaultKatMotionConfig.IsDefault = true;
+            if (!_activationStatusService.IsConfigGroupActivated(DefaultKatMotionConfig.Id)) return Unit.Default;
+            DefaultKatMotionConfig.ActivateActionsCommand.Execute(null);
+            _katMotionConfigVmManageService.RegisterDefaultConfig(DefaultKatMotionConfig);
+            _katMotionTimeConfigService.ApplyDefaultMotionTimeConfig();
+            _katDeadZoneConfigService.ApplyDefaultDeadZoneConfig();
+            return Unit.Default;
+        }).IfLeft(
             ex =>
             {
                 DefaultKatMotionConfig.IsDefault = true;
@@ -48,9 +49,9 @@ public partial class CommonConfigViewModel : ViewModelBase
                 DefaultKatMotionConfig.IsCustomMotionTimeConfigs = true;
                 DefaultKatMotionConfig.MotionTimeConfigs = new KatMotionTimeConfigs();
                 _katMotionConfigVmManageService.RegisterDefaultConfig(DefaultKatMotionConfig);
-                var cgRet = DefaultKatMotionConfig.ToKatMotionConfigGroups();
-                return cgRet.Match(cg => _katMotionFileService.SaveDefaultConfigGroup(cg),
-                    e2 => new Result<bool>(e2));
-            });
+                _ = DefaultKatMotionConfig.ToKatMotionConfigGroups().Bind(cg => _katMotionFileService.SaveDefaultConfigGroup(cg));
+                return Unit.Default;
+            }
+        );
     }
 }

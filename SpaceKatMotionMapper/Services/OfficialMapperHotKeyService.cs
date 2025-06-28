@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using LanguageExt.Common;
 using SpaceKatMotionMapper.Models;
 using Avalonia.Controls;
+using LanguageExt;
 using SpaceKat.Shared.Functions;
 using SpaceKat.Shared.Models;
 using SpaceKatMotionMapper.Functions;
@@ -20,7 +21,7 @@ public class OfficialMapperHotKeyService : IOfficialMapperHotKeyService
 
     private const int HotKeyEventId = 9876;
 
-    public async Task<Result<bool>> RegisterHotKeyWrapper(bool useCtrl, bool useAlt, bool useShift, VirtualKeyCode hotKey,
+    public async Task<Either<Exception,bool>> RegisterHotKeyWrapper(bool useCtrl, bool useAlt, bool useShift, VirtualKeyCode hotKey,
         KatButtonEnum katButtonEnum)
     {
         await OfficialWareConfigFunctions.UnbindHotKeyToKatButton();
@@ -31,13 +32,13 @@ public class OfficialMapperHotKeyService : IOfficialMapperHotKeyService
 
 
         var handle = TopLevelHelper.GetTopLevel().TryGetPlatformHandle();
-        if (handle is null) return new Result<bool>(new Exception("获取窗口句柄失败"));
+        if (handle is null) return new Exception("获取窗口句柄失败");
         // ReSharper disable once InvertIf
         if (handle.Handle is { } nativeHandle)
         {
             HotKeyHelpers.UnregisterHotKeyWrapper(nativeHandle, HotKeyEventId);
             var ret = HotKeyHelpers.RegisterHotKeyWrapper(nativeHandle, HotKeyEventId, modifierKeys, (int)hotKey);
-            if (!ret) return new Result<bool>(new Exception("注册热键失败"));
+            if (!ret) return new Exception("注册热键失败");
             if (katButtonEnum != KatButtonEnum.None)
             {
                  return await OfficialWareConfigFunctions.BindHotKeyToKatButton(katButtonEnum, useCtrl, useAlt, useShift, hotKey);
@@ -48,10 +49,10 @@ public class OfficialMapperHotKeyService : IOfficialMapperHotKeyService
         return false;
     }
 
-    public Result<bool> UnregisterHotKeyWrapper()
+    public Either<Exception,bool> UnregisterHotKeyWrapper()
     {
         var handle = TopLevelHelper.GetTopLevel().TryGetPlatformHandle();
-        if (handle is null) return new Result<bool>(new Exception("获取窗口句柄失败"));
+        if (handle is null) return new Exception("获取窗口句柄失败");
         // ReSharper disable once InvertIf
         if (handle.Handle is { } nativeHandle)
         {

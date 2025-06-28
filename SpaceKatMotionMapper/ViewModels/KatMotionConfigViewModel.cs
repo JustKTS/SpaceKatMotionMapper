@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
@@ -12,6 +11,7 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using LanguageExt;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;
 using LanguageExt.Common;
@@ -21,9 +21,7 @@ using SpaceKat.Shared.Services.Contract;
 using SpaceKat.Shared.ViewModels;
 using SpaceKat.Shared.Views;
 using SpaceKatHIDWrapper.Models;
-using SpaceKatMotionMapper.Defines;
 using SpaceKatMotionMapper.Functions;
-using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.Views;
 using Ursa.Controls;
 using Win32Helpers;
@@ -82,7 +80,7 @@ public partial class KatMotionConfigViewModel : ViewModelBase
     {
         _parent = parent;
         KatMotionsWithMode = [];
-        KatMotionsWithMode.CollectionChanged += (sender, e) =>
+        KatMotionsWithMode.CollectionChanged += (_, e) =>
         {
             // 处理新增项：订阅PropertyChanged
             if (e.NewItems != null)
@@ -199,7 +197,7 @@ public partial class KatMotionConfigViewModel : ViewModelBase
         return Task.CompletedTask;
     }
 
-    private Result<bool> ValidateKatMotionModeGraph()
+    private Either<Exception, bool> ValidateKatMotionModeGraph()
     {
         var modeChangeValidator = new ModeChangeValidator();
         foreach (var configWithMode in KatMotionsWithMode)
@@ -219,10 +217,10 @@ public partial class KatMotionConfigViewModel : ViewModelBase
             stringBuilder.Append($"\n模式 {string.Join("、", cannotReturnModes)} 无法返回到模式0");
         return cannotToModes.Count == 0 && cannotReturnModes.Count == 0
             ? true
-            : new Result<bool>(new Exception(stringBuilder.ToString()));
+            : new Exception(stringBuilder.ToString());
     }
 
-    private Result<bool> ValidateKatMotionConfig()
+    private Either<Exception, bool> ValidateKatMotionConfig()
     {
         List<string> pressKeys = [];
         List<string> releaseKeys = [];
@@ -260,28 +258,22 @@ public partial class KatMotionConfigViewModel : ViewModelBase
             exceptionStr += $"按键{string.Join(",", pressButNotReleaseKeys)}配置了释放但没有被按下";
         }
 
-        return new Result<bool>(new Exception(exceptionStr));
+        return new Exception(exceptionStr);
     }
 
-    public Result<KatMotionConfigGroup> ToKatMotionConfigGroups()
+    public Either<Exception, KatMotionConfigGroup> ToKatMotionConfigGroups()
     {
-        var ret = ValidateKatMotionConfig();
-        return ret.Match(s =>
+        return ValidateKatMotionConfig().Bind(_=>ValidateKatMotionModeGraph()).Bind<KatMotionConfigGroup>(s1 =>
         {
-            if (!s) return new Result<KatMotionConfigGroup>(new Exception("转换失败"));
-            var retMode = ValidateKatMotionModeGraph();
-            return retMode.Match(s1 =>
-            {
-                if (!s1) return new Result<KatMotionConfigGroup>(new Exception("转换失败"));
-                var katActions = KatMotionsWithMode.SelectMany(e => e.KatMotions).ToList();
+            if (!s1) return new Exception("转换失败");
+            var katActions = KatMotionsWithMode.SelectMany(e => e.KatMotions).ToList();
 
-                var configGroups = new KatMotionConfigGroup(
-                    Id.ToString(), IsDefault, ProcessPath,
-                    katActions.Select(x => x.ToKatMotionConfig()).ToList(),
-                    IsCustomDeadZone, DeadZoneConfig, IsCustomMotionTimeConfigs, MotionTimeConfigs);
-                return configGroups;
-            }, ex => new Result<KatMotionConfigGroup>(ex));
-        }, ex => new Result<KatMotionConfigGroup>(ex));
+            var configGroups = new KatMotionConfigGroup(
+                Id.ToString(), IsDefault, ProcessPath,
+                katActions.Select(x => x.ToKatMotionConfig()).ToList(),
+                IsCustomDeadZone, DeadZoneConfig, IsCustomMotionTimeConfigs, MotionTimeConfigs);
+            return configGroups;
+        });
     }
 
     [RelayCommand]
@@ -346,7 +338,7 @@ public partial class KatMotionConfigViewModel : ViewModelBase
         });
     }
 
-    private Result<bool> SaveConfigGroupToSystemConfig()
+    private Either<Exception, bool> SaveConfigGroupToSystemConfig()
     {
         try
         {
@@ -356,11 +348,11 @@ public partial class KatMotionConfigViewModel : ViewModelBase
                     IsDefault
                         ? _katMotionFileService.SaveDefaultConfigGroup(configGroup)
                         : _katMotionFileService.SaveConfigGroupToSysConf(configGroup),
-                ex => new Result<bool>(ex));
+                ex => ex);
         }
         catch (Exception e)
         {
-            return new Result<bool>(e);
+            return e;
         }
     }
 
@@ -368,25 +360,22 @@ public partial class KatMotionConfigViewModel : ViewModelBase
     private async Task SaveToFile()
     {
         var ret = await SaveConfigGroupToFileAsync();
-        ret.IfFail(ex => { _popUpNotificationService.Pop(NotificationType.Error, ex.Message); });
+        ret.IfLeft(ex => { _popUpNotificationService.Pop(NotificationType.Error, ex.Message); });
     }
 
-    private async Task<Result<bool>> SaveConfigGroupToFileAsync()
+    private async Task<Either<Exception,bool>> SaveConfigGroupToFileAsync()
     {
         try
         {
-            var configGroupRet = ToKatMotionConfigGroups();
-            return await configGroupRet.Match<Task<Result<bool>>>(
-                async configGroup => await SaveConfigGroupToFileAsync(configGroup),
-                ex => Task.FromResult(new Result<bool>(ex)));
+            return await ToKatMotionConfigGroups().BindAsync(async configGroup => await SaveConfigGroupToFileAsync(configGroup));
         }
         catch (Exception e)
         {
-            return new Result<bool>(e);
+            return e;
         }
     }
 
-    private async Task<Result<bool>> SaveConfigGroupToFileAsync(KatMotionConfigGroup configGroup)
+    private async Task<Either<Exception,bool>> SaveConfigGroupToFileAsync(KatMotionConfigGroup configGroup)
     {
         var storageProvider =
             App.GetRequiredService<IStorageProviderService>().GetStorageProvider();
@@ -431,8 +420,7 @@ public partial class KatMotionConfigViewModel : ViewModelBase
     {
         try
         {
-            Id = Guid.Parse(configGroup.Guid);
-            IsDefault = configGroup.IsDefault;
+            Id = Guid.Parse(configGroup.Guid); 
             ProcessPath = configGroup.ProcessPath;
             IsCustomDeadZone = configGroup.IsCustomDeadZone;
             DeadZoneConfig = configGroup.DeadZoneConfig;
@@ -464,6 +452,7 @@ public partial class KatMotionConfigViewModel : ViewModelBase
             Debug.WriteLine(e);
             return false;
         }
+        
     }
     
     [RelayCommand]
@@ -474,7 +463,7 @@ public partial class KatMotionConfigViewModel : ViewModelBase
         if (ret is not ForeProgramInfo info) return;
         await Dispatcher.UIThread.InvokeAsync(() => { ProcessPath = info.ProcessFileAddress; });
     }
-
+    
     [RelayCommand]
     private async Task<bool> SelectProcessPath()
     {

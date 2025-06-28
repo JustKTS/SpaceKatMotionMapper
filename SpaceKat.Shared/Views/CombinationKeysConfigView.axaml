@@ -12,6 +12,9 @@
     xmlns:vm="clr-namespace:SpaceKat.Shared.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <Design.DataContext>
+        <vm:CombinationKeysConfigViewModel />
+    </Design.DataContext>
     <UserControl.Resources>
         <helpers:ActionTypeKeyOrButtonConverter x:Key="ActionTypeKeyOrButtonConverter" />
     </UserControl.Resources>

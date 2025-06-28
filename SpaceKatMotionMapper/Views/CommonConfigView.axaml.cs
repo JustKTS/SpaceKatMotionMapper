@@ -10,7 +10,7 @@ public partial class CommonConfigView : UserControl
 {
     public CommonConfigView()
     {
-        DataContext = App.GetService<CommonConfigViewModel>();
         InitializeComponent();
+        DataContext = App.GetService<CommonConfigViewModel>();
     }
 }

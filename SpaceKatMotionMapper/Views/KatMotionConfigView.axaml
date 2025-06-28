@@ -6,14 +6,13 @@
     x:DataType="vm:KatMotionConfigViewModel"
     xmlns="https://github.com/avaloniaui"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:u="https://irihi.tech/ursa"
     xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels;assembly=SpaceKatMotionMapper"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Design.DataContext>
-        <vm:KatMotionConfigViewModel />
-    </Design.DataContext>
+    <!-- <Design.DataContext> -->
+    <!--     <vm:KatMotionConfigViewModel /> -->
+    <!-- </Design.DataContext> -->
 
     <UserControl.Styles>
         <Style Selector="Expander:down Border#ExpanderContent">

@@ -86,7 +86,7 @@
             <ItemsControl ItemsSource="{Binding KatMotionConfigGroups}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:KatMotionConfigViewModel">
-                        <local:KatMotionConfigView />
+                        <local:KatMotionConfigView DataContext="{Binding .}" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

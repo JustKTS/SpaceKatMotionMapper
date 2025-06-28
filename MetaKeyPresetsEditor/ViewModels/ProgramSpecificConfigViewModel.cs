@@ -9,6 +9,7 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LanguageExt;
 using LanguageExt.Common;
 using MetaKeyPresetsEditor.Helpers;
 using MetaKeyPresetsEditor.Services;
@@ -139,14 +140,14 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
         KeyActionConfigs.Add(new KeyActionConfigForPresetsViewModel() { Parent = KeyActionConfigs });
     }
 
-    private Result<bool> CheckAvailable()
+    private Either<Exception,bool> CheckAvailable()
     {
-        if (string.IsNullOrEmpty(ConfigName)) return new Result<bool>(new Exception("未指定关联程序，请选择。"));
+        if (!IsGeneral && string.IsNullOrEmpty(ConfigName)) return new Exception("未指定关联程序，请选择。");
         var ret = CombinationKeysConfigs.Any(vm =>
             string.IsNullOrEmpty(vm.Description) || string.IsNullOrEmpty(vm.HotKey));
-        if (ret) return new Result<bool>(new Exception("组合式快捷键配置出现错误，请检查。"));
+        if (ret) return new Exception("组合式快捷键配置出现错误，请检查。");
         ret = KeyActionConfigs.Any(vm => string.IsNullOrEmpty(vm.Description) || vm.IsAvailable is false);
-        return ret ? new Result<bool>(new Exception("宏配置出现错误，请检查。")) : true;
+        return ret ? new Exception("宏配置出现错误，请检查。") : true;
     }
 
     private ProgramSpecMetaKeysRecord ToConfigRecord()
@@ -195,7 +196,7 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
     private async Task SaveToFile()
     {
         var ret = await CheckAvailable()
-            .MapAsync(async _ =>
+            .BindAsync(async _ =>
             {
                 FilePickerSaveOptions options = new()
                 {
@@ -213,12 +214,14 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
                     _metaKeyPresetFileService.SaveToFile(ToConfigRecord(), retFilepath.Path.LocalPath));
             });
 
-        _ = ret.Match(_ =>
+        _ = ret.Match(s =>
         {
-            DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
-                new PopupNotificationData(
-                    NotificationType.Success,
-                    $"保存成功!"));
+            if (!s) return false;
+            DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
+                .ShowPopUpNotificationAsync(
+                    new PopupNotificationData(
+                        NotificationType.Success,
+                        $"保存成功!"));
             return true;
         }, ex =>
         {

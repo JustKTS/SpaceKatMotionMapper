@@ -39,8 +39,7 @@ public class KatMotionActivateService
 
     private GlobalStates GlobalStates => App.GetRequiredService<GlobalStates>();
 
-    private KatMotionWithTimeStamp _lastKatMotionWithTimeStamp =
-        new KatMotionWithTimeStamp(KatMotionEnum.Null, KatPressModeEnum.Null, 0);
+    private KatMotionWithTimeStamp _lastKatMotionWithTimeStamp = new(KatMotionEnum.Null, KatPressModeEnum.Null, 0);
 
     public KatMotionActivateService(InputSimulator inputSimulator,
         KatMotionRecognizeService katMotionRecognizeService)

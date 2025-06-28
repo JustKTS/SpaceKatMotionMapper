@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Net.Mail;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Channels;
@@ -82,6 +83,45 @@ public class CurrentForeProgramHelper : IDisposable
             return true;
         }
     }
+    
+    public static async IAsyncEnumerable<ForeProgramInfo> FindAllAsyncEnumerable([EnumeratorCancellation] CancellationToken cancellation=default)
+    {
+        var channel = Channel.CreateUnbounded<ForeProgramInfo>();
+    
+        // 在独立线程中执行窗口枚举
+        await Task.Run(() =>
+        {
+            try
+            {
+                EnumWindows((hWnd, param1) =>
+                {
+                    if (!GetParent(hWnd).IsNull) return true;
+                    if (!IsWindowVisible(hWnd)) return true;
+                
+                    var w = new Win32Window(hWnd);
+                    // 通过channel异步发送窗口信息
+                    channel.Writer.TryWrite(new ForeProgramInfo(
+                        w.Title, 
+                        w.ProcessName, 
+                        w.ClassName, 
+                        w.ProcessFileAddress));
+                    
+                    return true;
+                }, 0);
+            }
+            finally
+            {
+                channel.Writer.Complete(); // 枚举完成后关闭channel
+            }
+        }, cancellation);
+
+        // 异步流式接收数据
+        await foreach (var item in channel.Reader.ReadAllAsync(cancellation))
+        {
+            yield return item;
+        }
+    }
+    
 }
 
 public record ForeProgramInfo(string Title, string ProcessName, string ClassName, string ProcessFileAddress)

@@ -12,13 +12,5 @@ public partial class KeyActionConfigView : UserControl
         InitializeComponent();
     }
 
-    private void HotKeyTextBox_OnKeyUp(object? sender, KeyEventArgs e)
-    {
-        if (sender is not TextBox textBox) return;
-        
-        Dispatcher.UIThread.InvokeAsync(() =>
-        {
-            textBox.Text = e.Key.ToVirtualKeyCode().GetWrappedName();
-        });
-    }
+  
 }

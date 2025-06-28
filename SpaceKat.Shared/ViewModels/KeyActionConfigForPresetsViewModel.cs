@@ -10,13 +10,12 @@ namespace SpaceKat.Shared.ViewModels;
 
 public partial class KeyActionConfigForPresetsViewModel : ObservableObject
 {
-    
     [ObservableProperty] private bool _isCustomDescription;
     [ObservableProperty] private string _description = string.Empty;
 
     public ObservableCollection<KeyActionConfigForPresetsViewModel>? Parent { get; init; }
 
-    public ObservableCollection<KeyActionForPresetsViewModel> ActionConfigGroups { get; set; }
+    public ObservableCollection<KeyActionWithCommandViewModel> ActionConfigGroups { get; set; }
 
     public static IReadOnlyList<string> KeyNames => VirtualKeyHelpers.KeyNames;
 
@@ -36,7 +35,7 @@ public partial class KeyActionConfigForPresetsViewModel : ObservableObject
             // 处理新增项：订阅PropertyChanged
             if (e.NewItems != null)
             {
-                foreach (KeyActionForPresetsViewModel item in e.NewItems)
+                foreach (KeyActionWithCommandViewModel item in e.NewItems)
                 {
                     item.PropertyChanged += ChildPropertyChanged;
                 }
@@ -45,7 +44,7 @@ public partial class KeyActionConfigForPresetsViewModel : ObservableObject
             // 处理移除项：取消订阅避免内存泄漏
             if (e.OldItems == null) return;
 
-            foreach (KeyActionForPresetsViewModel item in e.OldItems)
+            foreach (KeyActionWithCommandViewModel item in e.OldItems)
             {
                 item.PropertyChanged -= ChildPropertyChanged;
             }
@@ -56,7 +55,7 @@ public partial class KeyActionConfigForPresetsViewModel : ObservableObject
 
     private void ChildPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(KeyActionForPresetsViewModel.IsAvailable))
+        if (e.PropertyName == nameof(KeyActionWithCommandViewModel.IsAvailable))
         {
             OnPropertyChanged(nameof(IsAvailable));
         }
@@ -67,38 +66,52 @@ public partial class KeyActionConfigForPresetsViewModel : ObservableObject
     [RelayCommand]
     private void AddActionConfig()
     {
-        ActionConfigGroups.Add(new KeyActionForPresetsViewModel(this));
+        ActionConfigGroups.Add(CreateKeyActionVm());
         OnPropertyChanged(nameof(IsAvailable));
     }
 
-    [RelayCommand]
-    private void RemoveActionConfig(int index)
+    private KeyActionWithCommandViewModel CreateKeyActionVm(ActionType actionType = ActionType.KeyBoard,
+        string key = nameof(VirtualKeyCode.None),
+        PressModeEnum pressMode = PressModeEnum.None,
+        int multiplier = 1)
     {
-        if (index < 0 || index >= ActionConfigGroups.Count) return;
+        var item = new KeyActionWithCommandViewModel(actionType, key, pressMode, multiplier);
+        item.RemoveActionConfigCommand = new RelayCommand(() => RemoveActionConfig(item));
+        item.InsertNextActionConfigCommand = new RelayCommand(() => InsertNextActionConfig(item));
+        item.InsertNextDelayConfigCommand = new RelayCommand(() => InsertNextDelayConfig(item));
+        return item;
+    }
+
+    private void RemoveActionConfig(KeyActionWithCommandViewModel vm)
+    {
+        var index = ActionConfigGroups.IndexOf(vm);
         ActionConfigGroups.RemoveAt(index);
+
+        vm.RemoveActionConfigCommand = null;
+        vm.InsertNextActionConfigCommand = null;
+        vm.InsertNextDelayConfigCommand = null;
+
         if (ActionConfigGroups.Count == 0)
         {
-            ActionConfigGroups.Add(new KeyActionForPresetsViewModel(this, ActionType.KeyBoard, VirtualKeyCode.None.ToString(),
-                PressModeEnum.None, 1));
+            AddActionConfigCommand.Execute(null);
         }
 
         OnPropertyChanged(nameof(IsAvailable));
     }
 
-    public void InsertNextActionConfig(int index)
+    private void InsertNextActionConfig(KeyActionWithCommandViewModel vm)
     {
-        if (index < 0 || index >= ActionConfigGroups.Count) return;
-        ActionConfigGroups.Insert(index + 1, new KeyActionForPresetsViewModel(this, ActionType.KeyBoard,
-            VirtualKeyCode.None.ToString(),
-            PressModeEnum.None, 1));
+        var index = ActionConfigGroups.IndexOf(vm);
+        ActionConfigGroups.Insert(index + 1, CreateKeyActionVm());
         OnPropertyChanged(nameof(IsAvailable));
     }
 
-    public void InsertNextDelayConfig(int index)
+    private void InsertNextDelayConfig(KeyActionWithCommandViewModel vm)
     {
-        if (index < 0 || index >= ActionConfigGroups.Count) return;
-        ActionConfigGroups.Insert(index + 1, new KeyActionForPresetsViewModel(this, ActionType.Delay,
-            VirtualKeyCode.None.ToString(),
+        var index = ActionConfigGroups.IndexOf(vm);
+
+        ActionConfigGroups.Insert(index + 1, CreateKeyActionVm(ActionType.Delay,
+            nameof(VirtualKeyCode.None),
             PressModeEnum.None, 15));
         OnPropertyChanged(nameof(IsAvailable));
     }
@@ -119,7 +132,7 @@ public partial class KeyActionConfigForPresetsViewModel : ObservableObject
             ActionConfigGroups.Clear();
             foreach (var keyActionConfig in keyActionConfigs)
             {
-                var actionConfigGroup = new KeyActionForPresetsViewModel(this);
+                var actionConfigGroup = CreateKeyActionVm();
                 var ret = actionConfigGroup.FromKeyActionConfig(keyActionConfig);
                 if (!ret) return false;
                 ActionConfigGroups.Add(actionConfigGroup);
@@ -130,7 +143,6 @@ public partial class KeyActionConfigForPresetsViewModel : ObservableObject
         }
         catch (Exception e)
         {
-            Debug.WriteLine(e);
             return false;
         }
     }
@@ -138,11 +150,12 @@ public partial class KeyActionConfigForPresetsViewModel : ObservableObject
     #endregion
 
     #region 移除自身
+
     [RelayCommand]
     private void RemoveSelf()
     {
         Parent?.Remove(this);
     }
+
     #endregion
-    
 }

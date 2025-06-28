@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Avalonia.Automation;
+using LanguageExt;
 using LanguageExt.Common;
 using SpaceKatMotionMapper.ViewModels;
 
@@ -19,7 +20,7 @@ public class KatMotionConfigVMManageService
     }
     
 
-    public Result<KatMotionConfigViewModel> GetConfig(Guid id)
+    public Either<Exception, KatMotionConfigViewModel> GetConfig(Guid id)
     {
         try
         {
@@ -28,7 +29,7 @@ public class KatMotionConfigVMManageService
         catch (Exception e)
         {
             Debug.WriteLine(e);
-            return new Result<KatMotionConfigViewModel>(new Exception("获取配置组失败"));
+            return new Exception("获取配置组失败");
         }
     }
     
@@ -38,10 +39,10 @@ public class KatMotionConfigVMManageService
         _configs[configVm.Id] = configVm;
     }
     
-    public  Result<KatMotionConfigViewModel> GetDefaultConfig()
+    public  Either<Exception,KatMotionConfigViewModel> GetDefaultConfig()
     {
         return _commonConfigGuid == Guid.Empty 
-            ? new Result<KatMotionConfigViewModel>(new Exception("全局配置未设置")) 
+            ? new Exception("全局配置未设置") 
             : _configs[_commonConfigGuid];
     }
 

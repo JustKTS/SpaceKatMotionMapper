@@ -29,7 +29,7 @@ public class MetaKeyPresetFileService : IMetaKeyPresetFileService
         SaveToConfigDir(favConfig);
     }
 
-    public Result<bool> SaveToConfigDir(ProgramSpecMetaKeysRecord config)
+    public Either<Exception, bool> SaveToConfigDir(ProgramSpecMetaKeysRecord config)
     {
         try
         {
@@ -38,11 +38,11 @@ public class MetaKeyPresetFileService : IMetaKeyPresetFileService
         }
         catch (Exception e)
         {
-            return new Result<bool>(e);
+            return e;
         }
     }
 
-    public Result<bool> SaveToFile(ProgramSpecMetaKeysRecord config, string filepath)
+    public Either<Exception, bool> SaveToFile(ProgramSpecMetaKeysRecord config, string filepath)
     {
         try
         {
@@ -53,7 +53,7 @@ public class MetaKeyPresetFileService : IMetaKeyPresetFileService
         }
         catch (Exception e)
         {
-            return new Result<bool>(e);
+            return e;
         }
     }
 

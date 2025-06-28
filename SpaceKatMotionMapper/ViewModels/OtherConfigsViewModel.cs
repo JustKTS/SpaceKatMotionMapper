@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -6,14 +7,12 @@ using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
-using LanguageExt.Common;
+using LanguageExt;
 using SpaceKat.Shared.Defines;
 using SpaceKat.Shared.Services;
 using SpaceKat.Shared.Services.Contract;
-using SpaceKatMotionMapper.Defines;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;
-using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
@@ -127,11 +126,12 @@ public partial class OtherConfigsViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private Task<Result<bool>> SaveGroupsToConfigDir()
+    private Task<Either<Exception, bool>> SaveGroupsToConfigDir()
     {
         List<KatMotionConfigGroup> groups = [];
         // ReSharper disable once IdentifierTypo
-        return Task.FromResult(KatMotionConfigGroups.Select(cgvm => cgvm.ToKatMotionConfigGroups()).Select(ret =>
+        return Task.FromResult(
+            KatMotionConfigGroups.Select(cgvm => cgvm.ToKatMotionConfigGroups()).Select(ret =>
             ret.Match(cg =>
             {
                 groups.Add(cg);
@@ -140,8 +140,8 @@ public partial class OtherConfigsViewModel : ViewModelBase
             {
                 _popUpNotificationService.Pop(NotificationType.Error, ex.Message);
                 return false;
-            })).Any(flag => !flag)
-            ? new Result<bool>(false)
+            })).Any(flag => !flag) // TODO: 处理部分失败的情况
+            ? new Exception("保存部分文件失败！")
             : _katMotionFileService.SaveConfigGroupsToSysConf(groups));
     }
 
@@ -166,8 +166,8 @@ public partial class OtherConfigsViewModel : ViewModelBase
                 var dirPath = folders[0].Path.LocalPath;
                 var path = Path.Join(dirPath, filename);
                 return _katMotionFileService.SaveConfigGroup(cg, path);
-            }, ex => new Result<bool>(ex));
-            ret.IfFail(ex => { _popUpNotificationService.Pop(NotificationType.Error, ex.Message); });
+            }, ex => ex);
+            ret.IfLeft(ex => { _popUpNotificationService.Pop(NotificationType.Error, ex.Message); });
         }
     }
 }

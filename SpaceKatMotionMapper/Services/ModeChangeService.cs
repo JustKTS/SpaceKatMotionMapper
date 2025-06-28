@@ -39,7 +39,7 @@ public class ModeChangeService
         {
             CurrentForeProgramInfo = data;
             var ret = BindProcessPathList.TryGetValue(CurrentForeProgramInfo.ProcessFileAddress, out var id);
-            ConfigIsDefault = string.IsNullOrEmpty(data.ProcessFileAddress) || !ret;
+            ConfigIsDefault = string.IsNullOrEmpty(CurrentForeProgramInfo.ProcessFileAddress) || !ret;
 
             if (ConfigIsDefault)
             {
@@ -50,14 +50,15 @@ public class ModeChangeService
             else
             {
                 CurrentActivatedConfig = id;
-                var configRet = _katMotionConfigVmManageService.GetConfig(id);
-                configRet.IfSucc(configVm =>
-                {
-                    if (configVm.IsCustomMotionTimeConfigs) _katMotionTimeConfigService.ApplyMotionTimeConfigById(id);
-                    else _katMotionTimeConfigService.ApplyDefaultMotionTimeConfig();
-                    if (configVm.IsCustomDeadZone) _katDeadZoneConfigService.ApplyDeadZoneConfigById(id);
-                    else _katDeadZoneConfigService.ApplyDefaultDeadZoneConfig();
-                });
+                _katMotionConfigVmManageService.GetConfig(id)
+                    .Iter(configVm =>
+                    {
+                        if (configVm.IsCustomMotionTimeConfigs)
+                            _katMotionTimeConfigService.ApplyMotionTimeConfigById(id);
+                        else _katMotionTimeConfigService.ApplyDefaultMotionTimeConfig();
+                        if (configVm.IsCustomDeadZone) _katDeadZoneConfigService.ApplyDeadZoneConfigById(id);
+                        else _katDeadZoneConfigService.ApplyDefaultDeadZoneConfig();
+                    });
             }
         });
     }

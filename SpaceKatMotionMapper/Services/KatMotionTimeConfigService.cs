@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
+using LanguageExt;
 using LanguageExt.Common;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatHIDWrapper.Services;
@@ -25,58 +26,55 @@ public class KatMotionTimeConfigService(
         return configRet.Match<KatMotionTimeConfigs?>(config => config.MotionTimeConfigs with {}, ex => null);
     }
 
-    public Result<bool> SaveDefaultTimeConfig(KatMotionTimeConfigs timeConfig)
+    public Either<Exception, bool> SaveDefaultTimeConfig(KatMotionTimeConfigs timeConfig)
     {
-        var configRet = katMotionConfigVmManageService.GetDefaultConfig();
-        return configRet.Match(configVm =>
+        return katMotionConfigVmManageService.GetDefaultConfig().Bind<bool>(configVm =>
         {
             try
             {
                 configVm.MotionTimeConfigs = timeConfig;
-                var newConfigRet = configVm.ToKatMotionConfigGroups();
-                return newConfigRet.Match(katMotionFileService.SaveDefaultConfigGroup, ex => new Result<bool>(ex));
+                return configVm.ToKatMotionConfigGroups().Bind<bool>(katMotionFileService.SaveDefaultConfigGroup);
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e);
-                return false;
+                return e;
             }
-        }, ex => false);
+        });
     }
 
-    public Result<bool> SaveTimeConfig(KatMotionTimeConfigs timeConfig, Guid configGroupId)
+    public Either<Exception,bool> SaveTimeConfig(KatMotionTimeConfigs timeConfig, Guid configGroupId)
     {
-        var configRet = katMotionConfigVmManageService.GetConfig(configGroupId);
-        return configRet.Match(configVm =>
+        return katMotionConfigVmManageService.GetConfig(configGroupId).Bind(
+            configVm =>
         {
             try
             {
                 configVm.IsCustomMotionTimeConfigs = true;
                 configVm.MotionTimeConfigs = timeConfig;
-                var newConfigRet = configVm.ToKatMotionConfigGroups();
-                return newConfigRet.Match(katMotionFileService.SaveConfigGroupToSysConf, ex => new Result<bool>(ex));
+                return configVm.ToKatMotionConfigGroups().Bind(katMotionFileService.SaveConfigGroupToSysConf);
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e);
-                return false;
+                return e;
             }
-        }, ex => false);
+        });
     }
     
     public bool ApplyMotionTimeConfigById(Guid id)
     {
-        var vmRet = katMotionConfigVmManageService.GetConfig(id);
-        if (!vmRet.IsSuccess) return false;
-        vmRet.IfSucc(vm => katMotionRecognizeService.UpdateMotionTimeConfigs(vm.MotionTimeConfigs));
-        return true;
+        return katMotionConfigVmManageService.GetConfig(id).Match(vm =>
+        {
+            katMotionRecognizeService.UpdateMotionTimeConfigs(vm.MotionTimeConfigs);
+            return true;
+        }, _ => false);
     }
     
     public bool ApplyDefaultMotionTimeConfig()
     {
-        var vmRet = katMotionConfigVmManageService.GetDefaultConfig();
-        if (!vmRet.IsSuccess) return false;
-        vmRet.IfSucc(vm => katMotionRecognizeService.UpdateMotionTimeConfigs(vm.MotionTimeConfigs));
-        return true;
+        return katMotionConfigVmManageService.GetDefaultConfig().Match(vm =>
+        {
+            katMotionRecognizeService.UpdateMotionTimeConfigs(vm.MotionTimeConfigs);
+            return true;
+        }, _ => false);
     }
 }

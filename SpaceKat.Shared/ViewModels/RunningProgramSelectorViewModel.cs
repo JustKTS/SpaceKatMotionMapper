@@ -36,14 +36,19 @@ public partial class RunningProgramSelectorViewModel : ObservableObject, IDialog
     public RunningProgramSelectorViewModel(IStorageProviderService storageProviderService)
     {
         _storageProviderService = storageProviderService;
-        UpdateForeProcessInfos();
+        _ = UpdateForeProcessInfosAsync();
     }
-
-    private void UpdateForeProcessInfos()
+    
+    private async Task UpdateForeProcessInfosAsync(CancellationToken cancellationToken=default)
     {
         ForeProcessInfos.Clear();
-        var fpInfos = CurrentForeProgramHelper.FindAll();
-        fpInfos.Iter(ForeProcessInfos.Add);
+        await foreach(var fpInfo in CurrentForeProgramHelper.FindAllAsyncEnumerable(cancellationToken))
+        {
+            Dispatcher.UIThread.Invoke(()=>
+            {
+                ForeProcessInfos.Add(fpInfo);
+            });
+        }
     }
 
 
