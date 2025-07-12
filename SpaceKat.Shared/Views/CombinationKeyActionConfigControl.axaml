@@ -18,54 +18,57 @@
     <UserControl.Resources>
         <helpers:ActionTypeKeyOrButtonConverter x:Key="ActionTypeKeyOrButtonConverter" />
     </UserControl.Resources>
-    
-    <Border Classes="Shadow" Theme="{StaticResource CardBorder}">
+
+    <Border
+        Background="{DynamicResource SemiColorBackground3}"
+        Classes="Shadow"
+        Theme="{StaticResource CardBorder}">
         <Grid
             ColumnDefinitions="*,*,*,*,2*"
             Margin="5"
             MinWidth="350">
             <CheckBox
-                Theme="{StaticResource CardCheckBox}"
                 Grid.Column="0"
                 Grid.Row="0"
                 HorizontalAlignment="Center"
                 IsChecked="{Binding UseCtrl}"
                 Margin="5"
                 Name="UseCtrlCBox"
+                Theme="{StaticResource CardCheckBox}"
                 VerticalAlignment="Center">
                 Ctrl
             </CheckBox>
 
             <CheckBox
-                Theme="{StaticResource CardCheckBox}"
                 Grid.Column="1"
                 Grid.Row="0"
                 HorizontalAlignment="Center"
                 IsChecked="{Binding UseShift}"
                 Margin="5"
                 Name="UseShiftCBox"
+                Theme="{StaticResource CardCheckBox}"
                 VerticalAlignment="Center">
                 Shift
             </CheckBox>
             <CheckBox
-                Theme="{StaticResource CardCheckBox}"
                 Grid.Column="2"
                 Grid.Row="0"
                 HorizontalAlignment="Center"
                 IsChecked="{Binding UseWin}"
                 Margin="5"
                 Name="UseWinCBox"
+                Theme="{StaticResource CardCheckBox}"
                 VerticalAlignment="Center">
                 Win
             </CheckBox>
             <CheckBox
-                Theme="{StaticResource CardCheckBox}"
                 Grid.Column="3"
                 Grid.Row="0"
                 HorizontalAlignment="Center"
                 IsChecked="{Binding UseAlt}"
                 Margin="5"
                 Name="UseAltCBox"
+                Theme="{StaticResource CardCheckBox}"
                 VerticalAlignment="Center">
                 Alt
             </CheckBox>

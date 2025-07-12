@@ -109,7 +109,7 @@ public class App : Application
                 services.AddSingleton<AutoDisableViewModel>();
                 services.AddSingleton<RunningProgramSelectorViewModel>();
 
-                services.AddSingleton<IDeviceDataWrapper, SpaceCompatDataWrapper>();
+                services.AddSingleton<IDeviceDataWrapper, SpaceDeviceDataWrapper>();
                 services.AddSingleton<KatMotionRecognizeService>();
                 services.AddSingleton<TransparentInfoActionDisplayService>();
 

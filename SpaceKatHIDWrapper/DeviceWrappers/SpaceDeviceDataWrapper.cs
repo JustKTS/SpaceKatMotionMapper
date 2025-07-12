@@ -1,0 +1,102 @@
+﻿using System.Collections.Frozen;
+using System.Collections.ObjectModel;
+using System.Runtime.InteropServices.Swift;
+using HidApi;
+using LanguageExt;
+using SpaceKatHIDWrapper.DeviceHIDSpecs;
+using SpaceKatHIDWrapper.Functions;
+using SpaceKatHIDWrapper.Models;
+
+namespace SpaceKatHIDWrapper.DeviceWrappers;
+
+public class SpaceDeviceDataWrapper : IDeviceDataWrapper
+{
+    private DeviceHidSpec? _hidSpec = null;
+    public event EventHandler<Either<Exception, bool>>? ConnectionChanged;
+
+
+    private Device? _device;
+
+    private int _readFailedCount;
+
+    public bool IsConnected => _device != null;
+
+    private readonly KatDeviceBuffer _buffer = new();
+
+    private void RetryConnect(object? obj, Either<Exception, bool> isConnected)
+    {
+        if (isConnected.IsRight) return;
+        const int maxRetry = 5;
+        Task.Run(async () =>
+            {
+                for (var i = 0; i < maxRetry; i++)
+                {
+                    await Task.Delay(2000);
+                    var ret = await Connect();
+                    if (ret)
+                    {
+                        ConnectionChanged?.Invoke(this, IsConnected);
+                        return;
+                    }
+
+                    i++;
+                }
+            }
+        );
+    }
+
+    public async Task<bool> Connect()
+    {
+        var devicePack = await KatDeviceFunction.FindKatDevice();
+        return devicePack.Match((pair) =>
+        {
+            var (spec, device) = pair;
+            _hidSpec = spec;
+            _device = device;
+            _readLength = ReadFunctions.GetReadBytesCount(_hidSpec.AxesMappings);
+            ConnectionChanged?.Invoke(this, IsConnected);
+            return true;
+        }, _ => false);
+    }
+
+    private int _readLength;
+
+    public SpaceDeviceDataWrapper()
+    {
+        ConnectionChanged += RetryConnect;
+    }
+
+    public KatDeviceData? Read()
+    {
+        if (_device == null) return null;
+        if (_hidSpec == null) return null;
+
+        try
+        {
+            var rawData = _device.ReadTimeout(_readLength, 300);
+
+            var ret = ReadFunctions.UpdateDeviceData(rawData, in _buffer, _hidSpec.AxesMappings, _hidSpec.AxisScale,
+                _hidSpec.ButtonMappings);
+            return ret ? _buffer.ToKatDeviceData() : null;
+        }
+        catch (Exception e)
+        {
+            _readFailedCount += 1;
+            if (_readFailedCount < 5) return null;
+            Console.WriteLine(e);
+            Hid.Exit();
+            _device = null;
+            ConnectionChanged?.Invoke(this, e);
+            _readFailedCount = 0;
+            return null;
+        }
+    }
+
+    public void Disconnect()
+    {
+        KatDeviceFunction.StopDevice();
+        _device?.Dispose();
+        _device = null;
+        ConnectionChanged?.Invoke(this, IsConnected);
+    }
+}

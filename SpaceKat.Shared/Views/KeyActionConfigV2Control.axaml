@@ -1,12 +1,16 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             x:DataType="vm:KeyActionConfigV2ViewModel"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             xmlns:vm="clr-namespace:SpaceKat.Shared.ViewModels"
-             xmlns:local="clr-namespace:SpaceKat.Shared.Views"
-             x:Class="SpaceKat.Shared.Views.KeyActionConfigV2Control">
+﻿<UserControl
+    Background="{DynamicResource SemiColorBackground2}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="SpaceKat.Shared.Views.KeyActionConfigV2Control"
+    x:DataType="vm:KeyActionConfigV2ViewModel"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:SpaceKat.Shared.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:SpaceKat.Shared.ViewModels"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Design.DataContext>
         <vm:KeyActionConfigV2ViewModel />
     </Design.DataContext>
@@ -17,7 +21,7 @@
             <Setter Property="Background" Value="{DynamicResource SemiColorDanger}" />
         </Style>
         <Style Selector="ToggleButton.Borderless">
-            <Setter Property="CornerRadius" Value="5"></Setter>
+            <Setter Property="CornerRadius" Value="5" />
         </Style>
         <Style Selector="ToggleButton.Borderless:unchecked /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource ButtonBorderlessBackground}" />
@@ -27,10 +31,10 @@
         </Style>
     </UserControl.Styles>
 
-    <!-- <Border -->
-    <!--     Classes="Shadow" -->
-    <!--     Padding="5" -->
-    <!--     Theme="{StaticResource CardBorder}"> -->
+    <!--  <Border  -->
+    <!--  Classes="Shadow"  -->
+    <!--  Padding="5"  -->
+    <!--  Theme="{StaticResource CardBorder}">  -->
     <Grid RowDefinitions="Auto, *">
         <Grid ColumnDefinitions="Auto, Auto, *,Auto">
             <StackPanel
@@ -45,15 +49,15 @@
                 </TextBlock>
             </StackPanel>
             <Border
-                Margin="5"
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Theme="{StaticResource RadioButtonGroupBorder}">
+                Margin="5"
+                Theme="{StaticResource RadioButtonGroupBorder}"
+                VerticalAlignment="Stretch">
                 <StackPanel Orientation="Horizontal">
                     <RadioButton
-                        Name="CombinationRBtn"
                         IsChecked="True"
+                        Name="CombinationRBtn"
                         Theme="{DynamicResource ButtonRadioButton}"
                         VerticalContentAlignment="Center">
                         组合/单键
@@ -70,30 +74,24 @@
             <TextBox
                 Grid.Column="2"
                 Grid.Row="0"
-                IsVisible="{Binding $parent[local:KeyActionConfigV2Control].IsCustomDescription}"
                 HorizontalAlignment="Stretch"
+                IsVisible="{Binding $parent[local:KeyActionConfigV2Control].IsCustomDescription}"
                 Margin="5"
                 Text="{Binding KeyActionsDescription, Mode=TwoWay}"
                 VerticalAlignment="Stretch"
                 Watermark="自定义动作描述" />
         </Grid>
 
-        <Panel Grid.Row="1"
-               Margin="5">
-            <local:CombinationKeyActionConfigControl
-                DataContext="{Binding CombinationKeysWithCommandVM}"
-                IsVisible="{Binding #CombinationRBtn.IsChecked }">
-            </local:CombinationKeyActionConfigControl>
+        <Panel Grid.Row="1" Margin="5">
+            <local:CombinationKeyActionConfigControl DataContext="{Binding CombinationKeysWithCommandVM}" IsVisible="{Binding #CombinationRBtn.IsChecked}" />
             <Border
+                Background="{DynamicResource SemiColorBackground3}"
                 Classes="Shadow"
+                IsVisible="{Binding #MacroRBtn.IsChecked}"
                 Padding="5"
-                Theme="{StaticResource CardBorder}"
-                IsVisible="{Binding #MacroRBtn.IsChecked }">
+                Theme="{StaticResource CardBorder}">
                 <ScrollViewer MaxHeight="500">
-                    <local:KeyActionsItemsControl
-                        Margin="10"
-                        DataContext="{Binding  ActionConfigGroups}">
-                    </local:KeyActionsItemsControl>
+                    <local:KeyActionsItemsControl DataContext="{Binding ActionConfigGroups}" Margin="10" />
                 </ScrollViewer>
             </Border>
         </Panel>
