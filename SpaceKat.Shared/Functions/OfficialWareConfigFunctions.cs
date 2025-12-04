@@ -136,16 +136,26 @@ public static class OfficialWareConfigFunctions
             </ButtonBank>
         """;
 
-    private static XmlDocument LoadDocument()
+    // TODO: 当没有安装官方驱动时，要停止检测
+    private static XmlDocument? LoadDocument()
     {
-        var doc = new XmlDocument();
-        doc.Load(ConfigFilePath);
-        return doc;
+        try
+        {
+            var doc = new XmlDocument();
+            doc.Load(ConfigFilePath);
+            return doc;
+        }
+        // TODO：后续要明确异常是什么
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public static async Task<Result<bool>> OpenOfficialMapper(bool clearButtons = false)
     {
         var doc = LoadDocument();
+        if (doc == null) return new Result<bool>(new Exception("配置文件读取失败，请检查是否安装有官方驱动！"));
 
         var node1 = doc.SelectSingleNode("Global");
         if (node1 == null) return new Result<bool>(new Exception("配置文件解析失败，请检查配置文件是否有被不正确的修改！"));
@@ -176,6 +186,8 @@ public static class OfficialWareConfigFunctions
     public static async Task<Result<bool>> UnbindHotKeyToKatButton()
     {
         var doc = LoadDocument();
+        if (doc == null) return new Result<bool>(new Exception("配置文件读取失败，请检查是否安装有官方驱动！"));
+
         var node1 = doc.SelectSingleNode("Global");
         if (node1 == null) return new Result<bool>(new Exception("配置文件解析失败，请检查配置文件是否有被不正确的修改！"));
         var node2 = node1.SelectSingleNode("Devices")?.SelectSingleNode("Device")?.SelectSingleNode("ButtonBank");
@@ -207,6 +219,8 @@ public static class OfficialWareConfigFunctions
         KatButtonEnum button, bool useCtrl, bool useAlt, bool useShift, VirtualKeyCode hotKey)
     {
         var doc = LoadDocument();
+        if (doc == null) return new Exception("配置文件读取失败，请检查是否安装有官方驱动！");
+
         var node1 = doc.SelectSingleNode("Global");
         if (node1 == null) return new Exception("配置文件解析失败，请检查配置文件是否有被不正确的修改！");
         var node2 = node1.SelectSingleNode("Devices")?.SelectSingleNode("Device")?.SelectSingleNode("ButtonBank");
@@ -251,6 +265,8 @@ public static class OfficialWareConfigFunctions
     public static async Task<Result<bool>> CloseOfficialMapper(bool disableButton = false)
     {
         var doc = LoadDocument();
+        if (doc == null) return new Result<bool>(new Exception("配置文件读取失败，请检查是否安装有官方驱动！"));
+
         var node1 = doc.SelectSingleNode("Global");
         if (node1 == null) return new Result<bool>(new Exception("配置文件解析失败，请检查配置文件是否有被不正确的修改！"));
         var node2 = node1.SelectSingleNode("Devices");
@@ -292,6 +308,8 @@ public static class OfficialWareConfigFunctions
     public static async Task<Result<bool>> CleanAllChange()
     {
         var doc = LoadDocument();
+        if (doc == null) return new Result<bool>(new Exception("配置文件读取失败，请检查是否安装有官方驱动！"));
+
         var node1 = doc.SelectSingleNode("Global");
         if (node1 == null) return new Result<bool>(new Exception("配置文件解析失败，请检查配置文件是否有被不正确的修改！"));
         var node2 = node1.SelectSingleNode("Devices");
