@@ -12,9 +12,8 @@
 
 ## 介绍视频
 
-### v0.3.x
-<!-- TODO: 替换为实际视频链接 -->
-*待发布后更新*
+### v0.3.0
+[https://www.bilibili.com/video/BV182odBUELX](https://www.bilibili.com/video/BV182odBUELX)
 
 ### v0.2.7
 [https://www.bilibili.com/video/BV18KVKzSE9Y](https://www.bilibili.com/video/BV18KVKzSE9Y)
