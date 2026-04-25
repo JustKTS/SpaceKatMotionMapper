@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Avalonia.Media;
 using LanguageExt.Common;
 using Serilog;
 using SpaceKat.Shared.Models;

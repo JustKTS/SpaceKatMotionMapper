@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -15,7 +14,6 @@ using Serilog;
 using SpaceKat.Shared.Models;
 using SpaceKat.Shared.Services.Contract;
 using SpaceKat.Shared.ViewModels;
-using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Views;
 using Ursa.Controls;
 
@@ -152,7 +150,7 @@ public partial class FavPresetsEditorViewModel : ViewModelBase, IDialogContext
             return true;
         }, ex =>
         {
-            MessageBox.ShowOverlayAsync($"保存失败，{ex.Message}", hostId: FavPresetsEditorView.LocalHost,
+            OverlayMessageBox.ShowAsync($"保存失败，{ex.Message}", hostId: FavPresetsEditorView.LocalHost,
                 icon: MessageBoxIcon.Warning);
             // App.GetRequiredService<PopUpNotificationService>().Pop(
             //         NotificationType.Error,
@@ -213,7 +211,7 @@ public partial class FavPresetsEditorViewModel : ViewModelBase, IDialogContext
             catch (Exception e)
             {
                 _logger.Error(e, "");
-                MessageBox.ShowOverlayAsync(string.Empty, $"读取配置文件失败，具体错误信息为：{e.Message}",
+                OverlayMessageBox.ShowAsync(string.Empty, $"读取配置文件失败，具体错误信息为：{e.Message}",
                     hostId: FavPresetsEditorView.LocalHost, icon: MessageBoxIcon.Error);
                 // App.GetRequiredService<PopUpNotificationService>()
                 //     .Pop(

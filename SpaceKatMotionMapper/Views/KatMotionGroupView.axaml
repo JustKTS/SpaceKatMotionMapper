@@ -1,0 +1,133 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:SpaceKatMotionMapper.Helpers"
+    xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
+    x:Class="SpaceKatMotionMapper.Views.KatMotionGroupView"
+    x:DataType="vm:KatMotionGroupViewModel"
+    d:DesignHeight="100"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+
+    <Design.DataContext>
+        <vm:KatMotionGroupViewModel />
+    </Design.DataContext>
+
+    <UserControl.Resources>
+        <helpers:KatMotionConverter x:Key="KatMotionConverter" />
+        <helpers:KatConfigModeConverter x:Key="KatConfigModeConverter" />
+    </UserControl.Resources>
+
+    <Expander IsExpanded="True">
+        <Expander.Header>
+            <Border
+                Classes.WrongDefine="{Binding !IsAvailable}"
+                CornerRadius="5"
+                Padding="5">
+                <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="10">
+                    <!-- 删除按钮 -->
+                    <Button
+                        Grid.Column="0"
+                        Classes="Danger"
+                        Command="{Binding RemoveSelfCommand}"
+                        Theme="{DynamicResource SolidButton}"
+                        Width="32"
+                        Height="32">
+                        <PathIcon
+                            Data="{StaticResource SemiIconMinus}"
+                            Height="14"
+                            Width="14" />
+                    </Button>
+
+                    <!-- 运动方式选择 -->
+                    <StackPanel
+                        Grid.Column="1"
+                        Orientation="Horizontal"
+                        Spacing="5">
+                        <TextBlock
+                            Classes="H6"
+                            Theme="{StaticResource TitleTextBlock}"
+                            VerticalAlignment="Center">
+                            3D旋钮运动:
+                        </TextBlock>
+                    </StackPanel>
+                    <ComboBox
+                        Grid.Column="2"
+                        ItemsSource="{x:Static helpers:KatMotionHelper.KatMotionNames}"
+                        MinWidth="120"
+                        SelectedItem="{Binding KatMotion, Converter={StaticResource KatMotionConverter}, Mode=TwoWay}"
+                        VerticalAlignment="Center" />
+
+                    <!-- 配置模式选择 -->
+                    <StackPanel
+                        Grid.Column="3"
+                        Orientation="Horizontal"
+                        Spacing="5">
+                        <TextBlock
+                            Classes="H6"
+                            IsVisible="{Binding IsFirstConfig}"
+                            Theme="{StaticResource TitleTextBlock}"
+                            VerticalAlignment="Center">
+                            配置模式:
+                        </TextBlock>
+                    </StackPanel>
+                    <Border Grid.Column="4"
+                            HorizontalAlignment="Left" Theme="{StaticResource RadioButtonGroupBorder}">
+                        <ListBox
+                            IsEnabled="{Binding IsFirstConfig}"
+                            ItemsSource="{x:Static helpers:KatMotionHelper.KatConfigModeNames}"
+                            MinWidth="180"
+                            SelectedItem="{Binding FirstConfigMode, Converter={StaticResource KatConfigModeConverter}, Mode=TwoWay}"
+                            Theme="{DynamicResource ButtonRadioGroupListBox}"
+                            VerticalAlignment="Center"
+                            x:Name="ConfigModeSelector" />
+
+                  </Border>
+                </Grid>
+            </Border>
+        </Expander.Header>
+
+        <StackPanel>
+            <!-- 配置列表 -->
+            <ItemsControl ItemsSource="{Binding Configs}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vm:KatMotionViewModel">
+                        <StackPanel>
+                            <!-- 单动作模式：直接显示按键配置，无 Expander -->
+                            <local:KeyActionConfigView
+                                IsVisible="{Binding IsSingleActionMode}"
+                                DataContext="{Binding KeyActionConfigGroup}"
+                                IsSingleActionMode="{Binding IsSingleActionMode}" />
+
+                            <!-- 进阶/专家模式：显示 Expander -->
+                            <local:KatMotionConfigItemView
+                                DataContext="{Binding}"
+                                IsVisible="{Binding IsAdvancedOrExpertMode}"
+                                Margin="5" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- 添加配置按钮 -->
+            <Button
+                Command="{Binding AddConfigCommand}"
+                HorizontalAlignment="Center"
+                IsVisible="{Binding CanAddMoreConfigs}"
+                Margin="10"
+                Theme="{DynamicResource OutlineButton}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <PathIcon
+                        Data="{StaticResource SemiIconPlus}"
+                        Height="15"
+                        Width="15" />
+                    <TextBlock Classes="H6" Text="添加配置" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Expander>
+</UserControl>

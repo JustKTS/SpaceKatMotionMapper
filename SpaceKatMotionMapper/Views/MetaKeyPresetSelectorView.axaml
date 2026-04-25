@@ -53,7 +53,7 @@
                         ItemsSource="{Binding DisplayActions}"
                         Margin="0,5"
                         SelectedItem="{Binding SelectedMetaKey}"
-                        Watermark="点击查找或输入筛选">
+                        PlaceholderText="点击查找或输入筛选">
 
                         <u:AutoCompleteBox.ItemTemplate>
                             <DataTemplate DataType="vms:PresetKeyActionDisplay">

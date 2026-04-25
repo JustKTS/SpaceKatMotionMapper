@@ -79,7 +79,7 @@
                 Margin="5"
                 Text="{Binding KeyActionsDescription, Mode=TwoWay}"
                 VerticalAlignment="Stretch"
-                Watermark="自定义动作描述" />
+                PlaceholderText="自定义动作描述" />
         </Grid>
 
         <Panel Grid.Row="1" Margin="5">

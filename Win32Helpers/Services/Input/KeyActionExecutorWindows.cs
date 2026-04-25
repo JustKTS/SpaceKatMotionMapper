@@ -1,11 +1,13 @@
-﻿using SpaceKat.Shared.Models;
+#if WINDOWS
+using SpaceKat.Shared.Models;
+using SpaceKat.Shared.Services.Contract;
 using WindowsInput;
 
-namespace SpaceKat.Shared.Functions;
+namespace Win32Helpers.Services.Input;
 
-public static class KeyActionExecutor
+public class KeyActionExecutorWindows(IInputSimulator inputSimulator) : IKeyActionExecutor
 {
-    public static void MouseActionHandler(IInputSimulator inputSimulator, MouseActionConfig mouseActionConfig)
+    public void MouseActionHandler(MouseActionConfig mouseActionConfig)
     {
         switch (mouseActionConfig.Key)
         {
@@ -91,18 +93,19 @@ public static class KeyActionExecutor
         }
     }
 
-    public static void KeyBoardActionHandler(IInputSimulator inputSimulator, KeyBoardActionConfig keyBoardActionConfig)
+    public void KeyBoardActionHandler(KeyBoardActionConfig keyBoardActionConfig)
     {
+        var virtualKey = (VirtualKeyCode)(int)keyBoardActionConfig.Key;
         switch (keyBoardActionConfig.PressMode)
         {
             case PressModeEnum.Click:
-                inputSimulator.Keyboard.KeyPress(keyBoardActionConfig.Key);
+                inputSimulator.Keyboard.KeyPress(virtualKey);
                 break;
             case PressModeEnum.Release:
-                inputSimulator.Keyboard.KeyUp(keyBoardActionConfig.Key);
+                inputSimulator.Keyboard.KeyUp(virtualKey);
                 break;
             case PressModeEnum.Press:
-                inputSimulator.Keyboard.KeyDown(keyBoardActionConfig.Key);
+                inputSimulator.Keyboard.KeyDown(virtualKey);
                 break;
             case PressModeEnum.None:
             case PressModeEnum.DoubleClick:
@@ -111,18 +114,18 @@ public static class KeyActionExecutor
         }
     }
 
-    public static void ExecuteActions(IInputSimulator inputSimulator, IEnumerable<KeyActionConfig> configs)
+    public void ExecuteActions(IEnumerable<KeyActionConfig> configs)
     {
         foreach (var actionConfig in configs)
         {
             if (actionConfig.TryToMouseActionConfig(out var mouseActionConfig))
             {
-                MouseActionHandler(inputSimulator, mouseActionConfig);
+                MouseActionHandler(mouseActionConfig);
             }
 
             if (actionConfig.TryToKeyBoardActionConfig(out var keyboardActionConfig))
             {
-                KeyBoardActionHandler(inputSimulator, keyboardActionConfig);
+                KeyBoardActionHandler(keyboardActionConfig);
             }
 
             if (actionConfig.TryToDelayActionConfig(out var delayActionConfig))
@@ -132,3 +135,4 @@ public static class KeyActionExecutor
         }
     }
 }
+#endif

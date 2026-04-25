@@ -4,10 +4,16 @@ using SpaceKat.Shared.Helpers;
 
 namespace SpaceKat.Shared.Models;
 
+public static class KeyActionConstants
+{
+    public const int MinDelayMultiplier = 15;
+    public const int MaxMultiplier = 1000;
+    public const string NoneKeyValue = "None";
+}
 
 public record KeyActionConfig(ActionType ActionType, string Key, PressModeEnum PressMode, int Multiplier)
 {
-    public KeyActionConfig() : this(ActionType.KeyBoard, "None", PressModeEnum.None, 1)
+    public KeyActionConfig() : this(ActionType.KeyBoard, KeyActionConstants.NoneKeyValue, PressModeEnum.None, 1)
     {
     }
 

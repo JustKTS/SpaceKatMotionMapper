@@ -5,7 +5,6 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Messaging;
 using SpaceKat.Shared.Models;
-using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.ViewModels;
 using Ursa.Controls;
 using Notification = Ursa.Controls.Notification;
@@ -58,8 +57,12 @@ public partial class KatMotionGroupConfigWindow : UrsaWindow
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);
-        WeakReferenceMessenger.Default
-            .Unregister<PopupNotificationData, Guid>(this, (DataContext as KatMotionConfigViewModel)!.Id);
+
+        if (DataContext is KatMotionConfigViewModel vm)
+        {
+            WeakReferenceMessenger.Default
+                .Unregister<PopupNotificationData, Guid>(this, vm.Id);
+        }
     }
 
     private void CloseButton_OnClick(object? sender, RoutedEventArgs e)

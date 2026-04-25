@@ -8,7 +8,7 @@ namespace SpaceKat.Shared.Helpers;
 public static class ActionTypeHelper
 {
     public static IReadOnlyList<string> ActionTypeNames { get; } = ActionTypeExtensions.GetValues()
-        .Where(t => t is ActionType.Mouse or ActionType.KeyBoard).Select(t => t.ToStringFast()).ToList().AsReadOnly();
+        .Where(t => t is ActionType.Mouse or ActionType.KeyBoard).Select(t => t.ToStringFast(useMetadataAttributes:true)).ToList().AsReadOnly();
 
     public static ActionType Parse(string actionTypeStr)
     {
@@ -45,7 +45,7 @@ public class ActionTypeConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        return value is not ActionType actionType ? string.Empty : actionType.ToStringFast();
+        return value is not ActionType actionType ? string.Empty : actionType.ToStringFast(useMetadataAttributes:true);
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -92,7 +92,7 @@ public class ActionTypeKeyOrButtonConverter : IValueConverter
                 allowMatchingMetadataAttribute: true);
             if (ret)
             {
-                return button.ToStringFast();
+                return button.ToStringFast(useMetadataAttributes:true);
             }
 
             var keyCode = VirtualKeyHelpers.Parse(keyStr);

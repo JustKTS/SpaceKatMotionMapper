@@ -1,5 +1,4 @@
-﻿using HidApi;
-using LanguageExt;
+﻿using LanguageExt;
 using SpaceKatHIDWrapper.Models;
 
 namespace SpaceKatHIDWrapper.DeviceWrappers;

@@ -11,6 +11,7 @@ public static class DownloadMetaKeyPresetsHelper
             "https://gitee.com/justkts/space-kat-motion-mapper-meta-key-presets/releases/download/latest/space-kat-motion-mapper-meta-key-presets.zip");
 
     private static readonly string LocalFileName = Path.Combine(GlobalPaths.DownloadTempDir, "presets.zip");
+    private static readonly HttpClient Httpclient = new();
 
     public static async Task<Either<Exception, string>> DownloadMetaKeyPresetsAsync(Uri url, string localFileName)
     {
@@ -22,11 +23,10 @@ public static class DownloadMetaKeyPresetsHelper
         //发起请求并异步等待结果
         var cts = new CancellationTokenSource();
         cts.CancelAfter(TimeSpan.FromSeconds(20));
-        var httpclient = new HttpClient();
 
         try
         {
-            var response = await httpclient.GetAsync(url, cts.Token);
+            var response = await Httpclient.GetAsync(url, cts.Token);
 
             if (!response.IsSuccessStatusCode) return new Exception($"下载失败，状态码：{response.StatusCode}");
 

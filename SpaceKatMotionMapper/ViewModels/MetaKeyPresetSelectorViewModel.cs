@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Irihi.Avalonia.Shared.Contracts;
@@ -11,7 +10,6 @@ using SpaceKat.Shared.Models;
 using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;
-using WindowsInput;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
@@ -43,7 +41,7 @@ public partial class MetaKeyPresetSelectorViewModel : ViewModelBase, IDialogCont
         Configs = _metaKeyPresetService.Configs
             .Where(x =>
                 x.Value.IsGeneral ||
-                x.Key == Path.GetFileNameWithoutExtension(_parent.Parent.Parent.Parent.ProcessFilename))
+                x.Key == Path.GetFileNameWithoutExtension(_parent.Parent.Parent.Parent.Parent.ProcessFilename))
             .Select(x => new MetaKeySelectorSubViewModel(x.Value,
                 new RelayCommand(Close),
                AddCustomActionsCommand,
@@ -120,7 +118,7 @@ public partial class MetaKeySelectorSubViewModel : ViewModelBase
 
     #region 点击添加
 
-    [ObservableProperty] private PresetKeyActionDisplay? _selectedMetaKey = null;
+    [ObservableProperty] private PresetKeyActionDisplay? _selectedMetaKey;
 
     partial void OnSelectedMetaKeyChanged(PresetKeyActionDisplay? value)
     {

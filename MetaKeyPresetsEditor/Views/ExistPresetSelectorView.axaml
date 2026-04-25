@@ -26,7 +26,7 @@
         </TextBlock>
 
         <Grid Grid.Row="1" Margin="5,0">
-            <TextBox Text="{Binding FilterStr}" Watermark="筛选" />
+            <TextBox Text="{Binding FilterStr}" PlaceholderText="筛选" />
         </Grid>
         <Border
             Classes="Shadow"

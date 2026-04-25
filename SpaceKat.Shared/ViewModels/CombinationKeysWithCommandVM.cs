@@ -1,9 +1,8 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 using SpaceKat.Shared.Helpers;
 using SpaceKat.Shared.Models;
+// ReSharper disable UnusedParameterInPartialMethod
 
 namespace SpaceKat.Shared.ViewModels;
 

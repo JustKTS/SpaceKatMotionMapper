@@ -6,10 +6,10 @@
         mc:Ignorable="d" Width="300" Height="80"
         x:Class="SpaceKatMotionMapper.Views.SingletonWrongWindow"
         WindowStartupLocation="CenterScreen"
-        IsMinimizeButtonVisible="False"
+        CanMinimize="False"
         IsFullScreenButtonVisible="False"
         IsManagedResizerVisible="False"
-        IsRestoreButtonVisible="False"
+        CanMaximize="False"
         Title="错误！">
     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">程序已在运行！请查看系统托盘！</TextBlock>
 </u:UrsaWindow>

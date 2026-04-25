@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Avalonia.Controls">
+      <HintPath>..\..\..\..\.nuget\packages\avalonia\11.3.2\ref\net8.0\Avalonia.Controls.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

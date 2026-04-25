@@ -1,11 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Data.Converters;
-using Avalonia.Markup.Xaml;
-using SpaceKat.Shared.Models;
+﻿using Avalonia.Controls;
 
 namespace SpaceKatMotionMapper.Views;
 

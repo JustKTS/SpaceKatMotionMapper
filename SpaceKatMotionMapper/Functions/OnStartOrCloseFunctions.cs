@@ -1,7 +1,6 @@
 ﻿using Avalonia.Threading;
 using SpaceKat.Shared.Services;
 using SpaceKat.Shared.Services.Contract;
-using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.States;
 using SpaceKatMotionMapper.ViewModels;
@@ -29,7 +28,7 @@ public static class OnStartOrCloseFunctions
         App.GetRequiredService<ILocalSettingsService>()
             .ReadSettingAsync<bool>(GlobalStates.IsMapperEnableKey).ContinueWith(t =>
             {
-                if (t.IsFaulted) return;
+                if (t.IsFaulted || t.IsCanceled) return;
                 var globalStates = App.GetRequiredService<GlobalStates>();
                 Dispatcher.UIThread.InvokeAsync(() =>
                 {

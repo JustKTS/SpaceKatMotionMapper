@@ -39,7 +39,7 @@ public partial class KatMotionRecognizeService : ObservableObject
 
     public ManualResetEventSlim ExitEvent { get; } = new(false);
 
-    public void SetDeadZone(double[] uppers, double[] lowers, bool[] axesInverse)
+    public void SetDeadZone(double[] uppers, double[] lowers, bool[]? axesInverse)
     {
         if (uppers.Length != 6) return;
         for (var i = 0; i < uppers.Length; i++)
@@ -78,6 +78,7 @@ public partial class KatMotionRecognizeService : ObservableObject
         var lastMotion = KatMotionEnum.Stable;
         var lastLongReachTriggerTime = DateTimeOffset.Now;
         var longReachTriggerCount = 1;
+        var longReachTriggeredInCurrentPress = false;
 
         while (!ExitEvent.IsSet && IsConnected)
         {
@@ -91,12 +92,27 @@ public partial class KatMotionRecognizeService : ObservableObject
                 {
                     _pressTime = DateTimeOffset.Now;
                     _pressDone = false;
+                    longReachTriggeredInCurrentPress = false;
                 }
                 else
                 {
                     // 长按检测
                     if (DateTimeOffset.Now - _pressTime <=
                         TimeSpan.FromMilliseconds(_motionTimeConfigs[lastMotion].LongReachTimeoutMs)) continue;
+
+                    // scaleFactor <= 0 means: disable repeated long-reach triggers.
+                    if (_motionTimeConfigs[lastMotion].LongReachRepeatScaleFactor <= 0)
+                    {
+                        if (longReachTriggeredInCurrentPress)
+                        {
+                            continue;
+                        }
+
+                        CurrentKatMotion = new KatMotionWithTimeStamp(lastMotion, KatPressModeEnum.LongReach, 1);
+                        longReachTriggeredInCurrentPress = true;
+                        lastLongReachTriggerTime = DateTimeOffset.Now;
+                        continue;
+                    }
 
                     // 长按触发间隔调整, 以最短时间为基础，随着动作行程逐渐增加
                     var longReachRepeatMotionTimeSpan = DateTimeOffset.Now - lastLongReachTriggerTime;
@@ -134,6 +150,7 @@ public partial class KatMotionRecognizeService : ObservableObject
                     CurrentKatMotion =
                         new KatMotionWithTimeStamp(lastMotion, KatPressModeEnum.LongReach, longReachTriggerCount);
                     longReachTriggerCount += 1;
+                    longReachTriggeredInCurrentPress = true;
                     lastLongReachTriggerTime = DateTimeOffset.Now;
                 }
             }
@@ -156,6 +173,7 @@ public partial class KatMotionRecognizeService : ObservableObject
                 }
 
                 _pressDone = true;
+                longReachTriggeredInCurrentPress = false;
             }
         }
     }
@@ -197,10 +215,22 @@ public partial class KatMotionRecognizeService : ObservableObject
     {
         var data = _deviceDataWrapper.Read();
         if (data is null) return KatMotionEnum.Null;
+        
+        // TODO：z轴下压混动严重，所以单独给z轴下压一个缩放倍数，后续最好做成一个配置项
+        if (data.AxesData[2] < 0)
+        {
+            data.AxesData[2] *= 2;
+        }
+        // TODO：z轴上提可能由于重量比较轻微，所以也给z轴上提一个缩放倍数，后续最好做成一个配置项
+        if (data.AxesData[2] > 0)
+        {
+            data.AxesData[2] *= 1.5;
+        }
 
         var newData = data.AxesData.Select((v, i) =>
             _deadZoneConfig.AxesInverse[i] ? -v : v
         ).ToArray();
+        
 
         KatDeviceData = data with { AxesData = newData };
 

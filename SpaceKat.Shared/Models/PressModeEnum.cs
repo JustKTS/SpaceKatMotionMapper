@@ -5,7 +5,7 @@ using NetEscapades.EnumGenerators;
 namespace SpaceKat.Shared.Models;
 
 [JsonConverter(typeof(JsonStringEnumConverter<PressModeEnum>))]
-[EnumExtensions]
+[EnumExtensions(MetadataSource = MetadataSource.DisplayAttribute)]
 public enum PressModeEnum
 {
     [Display(Name="无操作")]

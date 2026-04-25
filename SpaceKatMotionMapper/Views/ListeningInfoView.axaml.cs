@@ -3,7 +3,6 @@ using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using SpaceKat.Shared.Models;
-using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.ViewModels;
 
 namespace SpaceKatMotionMapper.Views;
@@ -23,12 +22,12 @@ public class KatButtonEnumToStrConverter : IValueConverter
     {
         if (value is KatButtonEnum buttonEnum)
         {
-            return buttonEnum.ToStringFast();
+            return buttonEnum.ToStringFast(useMetadataAttributes:true);
         }
         return null;
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotSupportedException();
     }

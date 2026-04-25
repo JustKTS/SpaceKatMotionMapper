@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.Messaging;
+using PlatformAbstractions;
+using Serilog;
 using SpaceKat.Shared.Models;
+using SpaceKatMotionMapper.Extensions;
 using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.NavVMs;
-using SpaceKatMotionMapper.Services;
-using SpaceKatMotionMapper.ViewModels;
 using Ursa.Controls;
 using Notification = Ursa.Controls.Notification;
 using WindowNotificationManager = Ursa.Controls.WindowNotificationManager;
@@ -20,11 +21,25 @@ namespace SpaceKatMotionMapper.Views;
 public partial class MainWindow : UrsaWindow
 {
     private readonly WindowNotificationManager _manager;
+    private readonly IPlatformMinimizeService _minimizeService;
+    private readonly ILinuxNotificationManager? _notificationManager;
     public const string LocalHost = "LocalHost";
 
     public MainWindow()
     {
         DataContext = App.GetRequiredService<NavViewModel>();
+        _minimizeService = App.GetRequiredService<IPlatformMinimizeService>();
+
+        // 尝试获取Linux通知管理器
+        try
+        {
+            _notificationManager = App.GetRequiredService<ILinuxNotificationManager>();
+        }
+        catch
+        {
+            _notificationManager = null;
+        }
+
         InitializeComponent();
         PropertyChanged += OnPropertyChanged;
         var topLevel = GetTopLevel(this);
@@ -34,32 +49,100 @@ public partial class MainWindow : UrsaWindow
             Position = NotificationPosition.BottomCenter
         };
 
+        // 订阅最小化服务事件
+        _minimizeService.WindowMinimized += OnWindowMinimized;
+        _minimizeService.WindowRestored += OnWindowRestored;
+        _minimizeService.WindowHidden += OnWindowHidden;
+
         WeakReferenceMessenger.Default.Register<PopupNotificationData, string>(this, "PopUpNotification",
             PopupNotification
         );
     }
 
 
-    private void PopupNotification(object sender, PopupNotificationData e)
+    private async void PopupNotification(object sender, PopupNotificationData e)
     {
-        Dispatcher.UIThread.Invoke(() =>
+        await Dispatcher.UIThread.InvokeAsync(async () =>
         {
-            _manager.Show(
-                new Notification
-                {
-                    Content = e.Message,
-                    ShowIcon = true,
-                    Title = e.NotificationType.ToString(),
-                    Type = e.NotificationType
-                });
+            var notification = new Notification
+            {
+                Content = e.Message,
+                ShowIcon = true,
+                Title = e.NotificationType.ToString(),
+                Type = e.NotificationType
+            };
+
+            // 显示通知
+            _manager.Show(notification);
+
+            // 如果是Linux平台且运行在平铺窗口管理器上，应用防平铺属性
+            if (_notificationManager != null && _notificationManager.IsSupported)
+            {
+                // 异步获取通知窗口并应用防平铺属性
+                await ApplyAntiTilingToNotificationsAsync();
+            }
         });
+    }
+
+    private async Task ApplyAntiTilingToNotificationsAsync()
+    {
+        try
+        {
+            // 使用扩展方法异步获取通知窗口
+            var notificationWindows = await _manager.GetNotificationWindowsAsync(maxRetries: 10, delayMs: 50);
+
+            foreach (var window in notificationWindows)
+            {
+                if (_notificationManager != null &&
+                    _notificationManager.IsNotificationWindow(window))
+                {
+                    _notificationManager.ApplyAntiTilingProperties(window, this);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // 忽略错误，通知仍然可以正常显示
+            Log.Warning(ex, "[{View}] Error applying anti-tiling properties: {Message}", nameof(MainWindow), ex.Message);
+        }
     }
 
     private void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
-        if (e.Property != Window.WindowStateProperty) return;
+        if (e.Property != WindowStateProperty) return;
         var newState = (WindowState?)e.NewValue;
-        ShowInTaskbar = newState != WindowState.Minimized;
+
+        // 使用平台最小化服务处理最小化
+        if (newState == WindowState.Minimized)
+        {
+            _minimizeService.MinimizeWindow(this);
+        }
+    }
+
+    private void OnWindowMinimized(object? sender, object window)
+    {
+        // 窗口被最小化时的处理
+        if (Equals(window, this))
+        {
+            // 可以在这里添加额外的最小化处理逻辑
+        }
+    }
+
+    private void OnWindowRestored(object? sender, object window)
+    {
+        // 窗口被恢复时的处理
+        if (!Equals(window, this)) return;
+        ShowInTaskbar = true;
+        WindowState = WindowState.Normal;
+    }
+
+    private void OnWindowHidden(object? sender, object window)
+    {
+        // 窗口被隐藏时的处理
+        if (Equals(window, this))
+        {
+            ShowInTaskbar = false;
+        }
     }
 
     protected override void OnLoaded(RoutedEventArgs e)

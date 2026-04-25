@@ -4,7 +4,11 @@ using System.Text.Json.Serialization.Metadata;
 using System.Text.Unicode;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Models;
+using SpaceKat.Shared.Helpers;
 using SpaceKat.Shared.Models;
+#if LINUX
+using LinuxHelpers.Services.Window.Lswt;
+#endif
 
 namespace SpaceKatMotionMapper.Helpers;
 
@@ -37,6 +41,9 @@ public static class JsonSgOption
             PressModeEnumJsonSgContext.Default,
             TransparentInfoWindowConfigJsonSgContext.Default,
             CombinationKeysRecordJsonSgContext.Default
+#if LINUX
+            , LinuxHelpers.Services.Window.Lswt.LswtJsonContext.Default
+#endif
             ),
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         ReadCommentHandling = JsonCommentHandling.Skip,

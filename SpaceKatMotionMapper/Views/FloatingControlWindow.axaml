@@ -1,0 +1,80 @@
+<u:UrsaWindow xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:u="clr-namespace:Ursa.Controls;assembly=Ursa"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="160" d:DesignHeight="50"
+             x:Class="SpaceKatMotionMapper.Views.FloatingControlWindow"
+             Title="SpaceKat Motion Mapper"
+             Width="160" Height="50"
+             ShowInTaskbar="False"
+             ShowActivated="False"
+             ExtendClientAreaToDecorationsHint="False"
+             ExtendClientAreaTitleBarHeightHint="-1"
+             WindowDecorations="None"
+             Topmost="True"
+             CanResize="False"
+             CanMinimize="False"
+             IsFullScreenButtonVisible="False"
+             IsCloseButtonVisible="False"
+             CanMaximize="False"
+             Background="#80000000"
+             CornerRadius="8">
+
+    <Grid ColumnDefinitions="Auto,*,Auto">
+
+        <!-- 应用图标 -->
+        <Button Grid.Column="0"
+                Name="AppIconButton"
+                Width="30" Height="30"
+                Margin="5,0,0,0"
+                Background="Transparent"
+                BorderThickness="0"
+                Classes="floating-button"
+                Click="OnAppIconClick">
+            <Path Data="M4 8H2v10h10v-2H4V8zm12-4H6v10h10V4zm-2 8H8V6h6v6z"
+                  Fill="White"
+                  Stretch="Uniform"
+                  Width="20" Height="20"/>
+        </Button>
+
+        <!-- 应用标题 -->
+        <TextBlock Grid.Column="1"
+                   Text="SpaceKat"
+                   Foreground="White"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   FontSize="12"
+                   FontWeight="Medium"/>
+        
+
+        <!-- 退出按钮 -->
+        <Button Grid.Column="2"
+                Name="ExitButton"
+                Width="25" Height="25"
+                Background="#80FF0000"
+                BorderThickness="0"
+                Classes="floating-button"
+                Margin="0,0,5,0"
+                Click="OnExitClick">
+            <Path Data="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"
+                  Fill="White"
+                  Stretch="Uniform"
+                  Width="16" Height="16"/>
+        </Button>
+    </Grid>
+
+    <u:UrsaWindow.Styles>
+        <Style Selector="Button.floating-button">
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Opacity" Value="0.8"/>
+        </Style>
+        <Style Selector="Button.floating-button:pointerover">
+            <Setter Property="Opacity" Value="1"/>
+            <Setter Property="Background" Value="#40FFFFFF"/>
+        </Style>
+        <Style Selector="Button.floating-button:pressed">
+            <Setter Property="Background" Value="#60FFFFFF"/>
+        </Style>
+    </u:UrsaWindow.Styles>
+</u:UrsaWindow>

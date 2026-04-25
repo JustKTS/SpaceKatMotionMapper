@@ -1,0 +1,89 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
+             x:Class="SpaceKatMotionMapper.Views.ConfigModeChangeConfirmDialog"
+             x:DataType="vm:ConfigModeChangeConfirmDialogViewModel"
+             mc:Ignorable="d">
+
+    <Design.DataContext>
+        <vm:ConfigModeChangeConfirmDialogViewModel />
+    </Design.DataContext>
+
+    <UserControl.Styles>
+        <Style Selector="Button.ConfirmBtn">
+            <Setter Property="Background" Value="{DynamicResource SemiColorWarning}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="20,8" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.ConfirmBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SemiColorWarningLight}" />
+            <Setter Property="CornerRadius" Value="6" />
+        </Style>
+    </UserControl.Styles>
+
+    <StackPanel Margin="24,24,28,24" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="0">
+        <!-- 圆形警告图标 -->
+        <Border Width="56" Height="56" CornerRadius="28"
+                Background="{DynamicResource SemiColorWarningLight}"
+                HorizontalAlignment="Center"
+                Margin="0,0,0,12">
+            <PathIcon Data="{StaticResource SemiIconAlertTriangle}"
+                      Foreground="{DynamicResource SemiColorWarning}"
+                      Width="28" Height="28"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center" />
+        </Border>
+
+        <!-- 标题 -->
+        <TextBlock Text="切换配置模式"
+                   Classes="H5"
+                   HorizontalAlignment="Center" />
+
+        <!-- 副标题 -->
+        <TextBlock Text="此操作不可撤销"
+                   FontSize="13"
+                   Foreground="{DynamicResource SemiColorTertiary}"
+                   HorizontalAlignment="Center"
+                   Margin="0,4,0,16" />
+
+        <!-- 影响提示卡片 -->
+        <Border Background="{DynamicResource SemiColorWarningLight}"
+                CornerRadius="8"
+                Padding="12,10"
+                HorizontalAlignment="Center"
+                Margin="0,0,0,20">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Text="✕" Foreground="{DynamicResource SemiColorWarning}" FontSize="12" VerticalAlignment="Center" />
+                <TextBlock FontSize="13" VerticalAlignment="Center">
+                    当前按键映射配置将被<Run FontWeight="SemiBold" Foreground="{DynamicResource SemiColorWarning}" Text="重置" />
+                </TextBlock>
+            </StackPanel>
+        </Border>
+
+        <!-- 按钮 -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Spacing="12">
+            <Button Command="{Binding CancelCommand}"
+                    Content="取消"
+                    Theme="{DynamicResource OutlineButton}"
+                    Width="90" />
+            <Button Command="{Binding ConfirmCommand}"
+                    Content="确认切换"
+                    Classes="ConfirmBtn"
+                    Width="100" />
+        </StackPanel>
+    </StackPanel>
+
+</UserControl>

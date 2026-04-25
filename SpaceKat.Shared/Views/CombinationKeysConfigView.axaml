@@ -23,7 +23,7 @@
             <TextBox
                 Grid.Column="0"
                 Text="{Binding Description, Mode=TwoWay}"
-                Watermark="请输入描述名" />
+                PlaceholderText="请输入描述名" />
             <Grid
                 ColumnDefinitions="*,*,*,*,2*"
                 Grid.Column="1"
@@ -72,13 +72,11 @@
                 </CheckBox>
 
                 <TextBox
-                    AcceptsTab="False"
                     Grid.Column="4"
                     Grid.Row="0"
-                    KeyUp="HotKeyTextBox_OnKeyUp"
                     Name="HotKeyTextBox"
                     Text="{Binding HotKey, Converter={StaticResource ActionTypeKeyOrButtonConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                    Watermark="请按下所需的按键" />
+                    PlaceholderText="请按下所需的按键" />
             </Grid>
             <u:IconButton
                 Classes="Primary"

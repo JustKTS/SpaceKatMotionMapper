@@ -4,7 +4,7 @@ using NetEscapades.EnumGenerators;
 
 namespace SpaceKat.Shared.Models;
 
-[EnumExtensions]
+[EnumExtensions(MetadataSource = MetadataSource.DisplayAttribute)]
 public enum MouseButtonEnum
 {
     [Display(Name="无操作")] None = 0,

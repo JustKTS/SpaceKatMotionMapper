@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 using SpaceKat.Shared.Models;
-using WindowsInput;
 
 namespace SpaceKatMotionMapper.Models;
 
@@ -8,7 +7,7 @@ public record HotKeyRecord(
     bool UseCtrl,
     bool UseAlt,
     bool UseShift,
-    VirtualKeyCode HotKey,
+    KeyCodeWrapper HotKey,
     KatButtonEnum BindKatButtonEnum);
     
 [JsonSourceGenerationOptions(WriteIndented = true)]

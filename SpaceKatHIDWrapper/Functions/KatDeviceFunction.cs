@@ -14,7 +14,7 @@ public static class KatDeviceFunction
             return devices.Where(deviceInfo => deviceInfo.VendorId == vendorId && deviceInfo.ProductId == productId)
                 .Select(deviceInfo => deviceInfo.ConnectToDevice()).FirstOrDefault();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return null;
         }

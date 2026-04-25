@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -13,44 +13,50 @@
         <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
 <!--        <TrimMode>link</TrimMode>-->
         <ApplicationIcon>Assets\configuration.ico</ApplicationIcon>
+
+        <!-- 平台特定的编译符号 -->
+        <DefineConstants Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(DefineConstants);WINDOWS</DefineConstants>
+        <DefineConstants Condition="$([MSBuild]::IsOSPlatform('Linux'))">$(DefineConstants);LINUX</DefineConstants>
+        <DefineConstants Condition="$([MSBuild]::IsOSPlatform('OSX'))">$(DefineConstants);OSX;MACOS</DefineConstants>
     </PropertyGroup>
     
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
     
     
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.3.2" />
-        <PackageReference Include="Avalonia.Desktop" Version="11.3.2" />
+        <PackageReference Include="Avalonia" Version="12.0.1" />
+        <PackageReference Include="Avalonia.Controls.ColorPicker" Version="12.0.1" />
+        <PackageReference Include="Avalonia.Desktop" Version="12.0.1" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.8" />
-        <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.3.0.6" />
-        <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.3.0.6" />
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
         <PackageReference Include="H.InputSimulator" Version="1.5.0" />
-        <PackageReference Include="Irihi.Ursa" Version="1.11.1" />
-        <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="1.11.1" />
+        <PackageReference Include="Irihi.Ursa" Version="2.0.0-rc1" />
+        <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="2.0.0-rc1" />
         <PackageReference Include="LanguageExt.Core" Version="4.4.9" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.6" />
-        <PackageReference Include="Semi.Avalonia" Version="11.2.1.8" />
-        <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.6" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.6" />
+        <PackageReference Include="Semi.Avalonia" Version="12.0.0" />
+        <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+        <PackageReference Include="Xaml.Behaviors.Interactions" Version="12.0.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\SpaceKat.Shared\SpaceKat.Shared.csproj" />
       <ProjectReference Include="..\Win32Helpers\Win32Helpers.csproj" />
+      <ProjectReference Include="..\LinuxHelpers\LinuxHelpers.csproj" />
+      <ProjectReference Include="..\PlatformAbstractions\PlatformAbstractions.csproj" />
     </ItemGroup>
     
     <ItemGroup>
         <DirectPInvoke Include="libHarfBuzzSharp" />
-        <NativeLibrary  Include="E:\codeDir\CSharp\Avalonia\AotLibs\libHarfBuzzSharp.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+        <NativeLibrary Include="E:\codeDir\CSharp\Avalonia\AotLibs\libHarfBuzzSharp.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
         <DirectPInvoke Include="libSkiaSharp" />
-        <NativeLibrary  Include="E:\codeDir\CSharp\Avalonia\AotLibs\libSkiaSharp.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+        <NativeLibrary Include="E:\codeDir\CSharp\Avalonia\AotLibs\libSkiaSharp.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
         <DirectPInvoke Include="av_libglesv2" />
-        <NativeLibrary  Include="E:\codeDir\CSharp\Avalonia\AotLibs\av_libglesv2.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+        <NativeLibrary Include="E:\codeDir\CSharp\Avalonia\AotLibs\av_libglesv2.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
     </ItemGroup>
     
     </Project>

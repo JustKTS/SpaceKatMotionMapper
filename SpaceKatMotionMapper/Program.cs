@@ -1,12 +1,10 @@
 ﻿using Avalonia;
 using System;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Threading;
 using Serilog;
 using SpaceKat.Shared.Functions;
-using SpaceKatMotionMapper.Functions;
-using SpaceKatMotionMapper.Services;
-using SpaceKatMotionMapper.Views;
+#if LINUX
+using LinuxHelpers.Services.Platform;
+#endif
 
 namespace SpaceKatMotionMapper;
 
@@ -18,6 +16,9 @@ sealed class Program
     [STAThread]
     public static void Main(string[] args)
     {
+#if LINUX
+        LinuxScaleDetector.DetectAndApply();
+#endif
         try
         {
             BuildAvaloniaApp()

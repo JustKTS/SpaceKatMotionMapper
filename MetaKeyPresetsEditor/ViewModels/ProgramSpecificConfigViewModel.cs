@@ -45,6 +45,7 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
         IsGeneral = true;
     }
     
+    // ReSharper disable once UnusedParameterInPartialMethod
     partial void OnIsGeneralChanged(bool value)
     {
         ConfigName = string.Empty;
@@ -175,7 +176,7 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
         {
             return await Task.Run(() => _metaKeyPresetFileService.SaveToConfigDir(ToConfigRecord()));
         });
-        _ = ret.Match(s =>
+        _ = ret.Match(_ =>
         {
             DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
                 new PopupNotificationData(

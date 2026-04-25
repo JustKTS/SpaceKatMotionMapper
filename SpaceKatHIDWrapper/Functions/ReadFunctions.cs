@@ -13,6 +13,14 @@ public static class ReadFunctions
     {
         try
         {
+            if (rawData.Length  == 0) return false;
+
+            // if (rawData.Length == 5)
+            // {
+            //     var binaryString = string.Join(" ", rawData.ToArray().Select(b => Convert.ToString(b, 2).PadLeft(8, '0')));
+            //     Console.WriteLine(binaryString);
+            // };
+
             foreach (var (axisName, axisSpecs) in axesMappings)
             {
                 if (rawData[0] != axisSpecs.Channel) continue;

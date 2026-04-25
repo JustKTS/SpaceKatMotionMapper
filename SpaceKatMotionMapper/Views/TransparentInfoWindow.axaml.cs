@@ -87,12 +87,12 @@ public partial class TransparentInfoWindow : UrsaWindow
 
 public class TimeSpanMsConverter:IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return TimeSpan.FromMilliseconds(value is not int timeSpanMs ? 250 : timeSpanMs);
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotSupportedException();
     }

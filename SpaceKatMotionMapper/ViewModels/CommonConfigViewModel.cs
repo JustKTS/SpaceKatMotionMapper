@@ -1,7 +1,6 @@
 ﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using LanguageExt;
-using LanguageExt.Common;
 using SpaceKat.Shared.Services;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Services;
@@ -34,9 +33,9 @@ public partial class CommonConfigViewModel : ViewModelBase
             var ret2 = DefaultKatMotionConfig.LoadFromConfigGroup(cg);
             if (!ret2) return Unit.Default;
             DefaultKatMotionConfig.IsDefault = true;
+            _katMotionConfigVmManageService.RegisterDefaultConfig(DefaultKatMotionConfig);
             if (!_activationStatusService.IsConfigGroupActivated(DefaultKatMotionConfig.Id)) return Unit.Default;
             DefaultKatMotionConfig.ActivateActionsCommand.Execute(null);
-            _katMotionConfigVmManageService.RegisterDefaultConfig(DefaultKatMotionConfig);
             _katMotionTimeConfigService.ApplyDefaultMotionTimeConfig();
             _katDeadZoneConfigService.ApplyDefaultDeadZoneConfig();
             return Unit.Default;

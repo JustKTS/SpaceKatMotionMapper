@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Channels;
+using PlatformAbstractions;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.Accessibility;
 using static Windows.Win32.PInvoke;
@@ -124,10 +125,10 @@ public class CurrentForeProgramHelper : IDisposable
     
 }
 
-public record ForeProgramInfo(string Title, string ProcessName, string ClassName, string ProcessFileAddress)
-{
-    public ForeProgramInfo() : this(Title: string.Empty, ProcessName: string.Empty, ClassName: string.Empty,
-        ProcessFileAddress: string.Empty)
-    {
-    }
-}
+//public record ForeProgramInfo(string Title, string ProcessName, string ClassName, string ProcessFileAddress)
+//{
+//    public ForeProgramInfo() : this(Title: string.Empty, ProcessName: string.Empty, ClassName: string.Empty,
+//        ProcessFileAddress: string.Empty)
+//    {
+//    }
+//}

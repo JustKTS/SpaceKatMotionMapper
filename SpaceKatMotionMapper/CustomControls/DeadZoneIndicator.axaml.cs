@@ -1,13 +1,8 @@
-using System;
-using System.Diagnostics;
-using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
-using Avalonia.Data.Converters;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using CommunityToolkit.Mvvm.ComponentModel;
 using Ursa.Controls;
 
 namespace SpaceKatMotionMapper.CustomControls;

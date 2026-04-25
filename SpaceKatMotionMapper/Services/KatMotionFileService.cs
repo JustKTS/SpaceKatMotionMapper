@@ -1,20 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using LanguageExt;
-using LanguageExt.Common;
-using SpaceKat.Shared.Services.Contract;
 using SpaceKatMotionMapper.Defines;
-using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services.Contract;
 using Exception = System.Exception;
 
 namespace SpaceKatMotionMapper.Services;
 
-public class KatMotionFileService
+public class KatMotionFileService : IKatMotionFileService
 {
     private readonly string _configDirPath =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SpaceKatMotionMapper");
@@ -47,7 +43,7 @@ public class KatMotionFileService
             _fileService.Save(_configDirPath, DefaultConfigFileName, configGroup);
             return true;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return new Exception("保存配置文件失败");
         }
@@ -82,7 +78,9 @@ public class KatMotionFileService
                 {
                     0 => TreatV1ToV2ConfigGroup(configGroup),
                     1 => TreatV1ToV2ConfigGroup(configGroup),
-                    _ => configGroup
+                    2 => TreatV2ToV3ConfigGroup(configGroup),
+                    3 => TreatV3ToV4ConfigGroup(configGroup),
+                    _ => throw new InvalidDataException($"不支持的配置版本: {configGroup.Version}")
                 };
             }
 
@@ -179,6 +177,37 @@ public class KatMotionFileService
     {
         return configGroup with { Version = 2 };
         // return configGroup with { Version = 2, Motions = motionConfigs.ToList() };
+    }
+
+    private static KatMotionConfigGroup TreatV2ToV3ConfigGroup(KatMotionConfigGroup configGroup)
+    {
+        // 将所有V2配置迁移为进阶模式
+        var migratedMotions = configGroup.Motions.Select(
+            motion =>
+                new KatMotionConfig(
+                    motion.Motion,
+                    motion.ActionConfigs,
+                    motion.IsCustomDescription,
+                    motion.KeyActionsDescription,
+                    motion.ModeNum,
+                    motion.ToModeNum))
+                .ToList();
+
+        return configGroup with
+        {
+            Version = 3,
+            Motions = migratedMotions
+        };
+    }
+
+    private static KatMotionConfigGroup TreatV3ToV4ConfigGroup(KatMotionConfigGroup configGroup)
+    {
+        // V3→V4: 添加默认长推触发时间、默认单动作长推触发时间、默认重复触发放大系数
+        configGroup.MotionTimeConfigs.DefaultLongReachTimeoutMs = 300;
+        configGroup.MotionTimeConfigs.DefaultSingleActionLongReachTimeoutMs = 50;
+        configGroup.MotionTimeConfigs.DefaultRepeatScaleFactor = 1.5;
+
+        return configGroup with { Version = 4 };
     }
 
     #endregion

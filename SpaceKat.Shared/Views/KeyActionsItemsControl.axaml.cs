@@ -1,9 +1,7 @@
-﻿using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml;
-using Avalonia.Threading;
 using SpaceKat.Shared.Helpers;
+using SpaceKat.Shared.ViewModels;
 
 namespace SpaceKat.Shared.Views;
 
@@ -13,13 +11,19 @@ public partial class KeyActionsItemsControl : UserControl
     {
         InitializeComponent();
     }
-    private void HotKeyTextBox_OnKeyUp(object? sender, KeyEventArgs e)
+
+    private void KeySelectionCBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (sender is not TextBox textBox) return;
-        
-        Dispatcher.UIThread.InvokeAsync(() =>
-        {
-            textBox.Text = e.Key.ToVirtualKeyCode().GetWrappedName();
-        });
+        if (sender is not Ursa.Controls.AutoCompleteBox autoCompleteBox) return;
+
+        var selectedKey = e.AddedItems.OfType<string>().FirstOrDefault()
+                          ?? autoCompleteBox.SelectedItem as string;
+
+        if (string.IsNullOrWhiteSpace(selectedKey)) return;
+
+        autoCompleteBox.Text = selectedKey;
+        if (autoCompleteBox.DataContext is not KeyActionWithCommandViewModel viewModel) return;
+
+        viewModel.Key = selectedKey;
     }
 }

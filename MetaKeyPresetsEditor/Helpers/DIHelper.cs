@@ -1,14 +1,17 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using Avalonia.Controls;
-using Avalonia.Controls.Notifications;
 using Avalonia.Platform.Storage;
 using MetaKeyPresetsEditor.Services;
 using MetaKeyPresetsEditor.ViewModels;
 using MetaKeyPresetsEditor.Views;
 using Microsoft.Extensions.DependencyInjection;
+using PlatformAbstractions;
 using SpaceKat.Shared.Services;
 using SpaceKat.Shared.Services.Contract;
+
+#if WINDOWS
+using Win32Helpers.Windows;
+#endif
 
 namespace MetaKeyPresetsEditor.Helpers;
 
@@ -36,9 +39,20 @@ public static class DIHelper
 
         services.AddSingleton<IUiInteractService, UiInteractService>();
         services.AddSingleton<IPopUpNotificationSpecService, PopUpNotificationSpecService>();
+
+        // 平台特定服务
+#if WINDOWS
+        services.AddSingleton<IPlatformWindowService, WindowsPlatformWindowService>();
+        services.AddSingleton<IFileExplorerService, Win32Helpers.Windows.WindowsFileExplorerService>();
+#elif LINUX
+        services.AddSingleton<IFileExplorerService, LinuxHelpers.Services.FileExplorer.LinuxFileExplorerService>();
+#else
+        services.AddSingleton<IFileExplorerService, PlatformAbstractions.Unsupported.UnsupportedFileExplorerService>();
+#endif
+        services.AddSingleton<CurrentRunningProcessSelectorViewModel>();
     }
-    
-    
+
+
     public static IServiceProvider? ServiceProvider { get; private set; }
 
     public static IServiceProvider GetServiceProvider()

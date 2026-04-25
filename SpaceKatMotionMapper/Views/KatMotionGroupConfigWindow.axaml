@@ -1,13 +1,13 @@
 ﻿<u:UrsaWindow
     Icon="/Assets/SpaceKatDevice.png"
     IsCloseButtonVisible="False"
-    IsMinimizeButtonVisible="False"
-    IsRestoreButtonVisible="False"
+    CanMinimize="False"
+    CanMaximize="False"
     Margin="50"
     MaxHeight="1200"
     MinHeight="600"
     MinWidth="1100"
-    Width="1100"
+    WindowDecorations="None"
     WindowStartupLocation="CenterScreen"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -27,7 +27,6 @@
     <Design.DataContext>
         <vm:KatMotionConfigViewModel />
     </Design.DataContext>
-
     <u:UrsaWindow.Styles>
         <Style Selector="Border.WrongDefine">
             <Setter Property="Background" Value="{DynamicResource SemiColorDanger}" />
@@ -39,94 +38,25 @@
         <Style Selector="ItemsControl ToggleButton ContentPresenter">
             <Setter Property="CornerRadius" Value="5" />
         </Style>
+        <Style Selector="Button.floating-button">
+            <Setter Property="CornerRadius" Value="28"/>
+            <Setter Property="Opacity" Value="0.95"/>
+        </Style>
+        <Style Selector="Button.floating-button:pointerover">
+            <Setter Property="Opacity" Value="1"/>
+            <Setter Property="Background" Value="#40FFFFFF"/>
+        </Style>
+        <Style Selector="Button.floating-button:pressed">
+            <Setter Property="Background" Value="#60FFFFFF"/>
+        </Style>
 
     </u:UrsaWindow.Styles>
 
     <u:UrsaWindow.Resources>
         <local:ModeNumToBoolConverter x:Key="ModeNumToBoolConverter" />
-        <local:ShortTriggerToBoolConverter x:Key="ShortTriggerToBoolConverter" />
         <helpers:KatMotionConverter x:Key="KatMotionConverter" />
-        <helpers:KatPressModeConverter x:Key="KatPressModeConverter" />
-
-        <DataTemplate x:DataType="vm:KatMotionViewModel" x:Key="KatActionSelector">
-            <Expander>
-                <Expander.Header>
-                    <Border
-                        Classes.WrongDefine="{Binding !IsAvailable}"
-                        CornerRadius="5"
-                        Padding="5">
-                        <StackPanel
-                            HorizontalAlignment="Left"
-                            Orientation="Horizontal"
-                            Spacing="20">
-                            <Button
-                                Classes="Primary"
-                                Command="{Binding RemoveSelfCommand}"
-                                FontSize="20"
-                                FontWeight="Heavy"
-                                HorizontalAlignment="Stretch"
-                                Margin="5"
-                                Theme="{DynamicResource SolidButton}"
-                                VerticalAlignment="Stretch">
-                                <PathIcon
-                                    Data="{StaticResource SemiIconMinus}"
-                                    Height="15"
-                                    Width="15" />
-                            </Button>
-                            <TextBlock
-                                Classes="H5"
-                                Theme="{StaticResource TitleTextBlock}"
-                                VerticalAlignment="Center">
-                                运动方式
-                            </TextBlock>
-                            <ComboBox
-                                HorizontalAlignment="Center"
-                                ItemsSource="{x:Static helpers:KatMotionHelper.KatMotionNames}"
-                                MinWidth="120"
-                                SelectedItem="{Binding KatMotion, Converter={StaticResource KatMotionConverter}, Mode=TwoWay}"
-                                VerticalAlignment="Stretch"
-                                x:Name="KatActionComboBox" />
-                            <TextBlock
-                                Classes="H5"
-                                Theme="{StaticResource TitleTextBlock}"
-                                VerticalAlignment="Center">
-                                触发状态:
-                            </TextBlock>
-                            <Border
-                                HorizontalAlignment="Stretch"
-                                Margin="8,0"
-                                Theme="{StaticResource RadioButtonGroupBorder}"
-                                VerticalAlignment="Stretch">
-                                <ListBox
-                                    HorizontalAlignment="Center"
-                                    ItemsSource="{x:Static helpers:KatMotionHelper.KatPressModeNames}"
-                                    SelectedItem="{Binding KatPressMode, Converter={StaticResource KatPressModeConverter}}"
-                                    Theme="{StaticResource ButtonRadioGroupListBox}"
-                                    VerticalAlignment="Stretch"
-                                    x:Name="KatPressModeSelector" />
-                            </Border>
-                            <StackPanel IsEnabled="{Binding #KatPressModeSelector.SelectedItem, Converter={StaticResource ShortTriggerToBoolConverter}}" Orientation="Horizontal">
-                                <TextBlock
-                                    Classes="H5"
-                                    Theme="{StaticResource TitleTextBlock}"
-                                    VerticalAlignment="Center">
-                                    触发次数：
-                                </TextBlock>
-                                <u:NumericIntUpDown
-                                    EmptyInputValue="1"
-                                    Maximum="5"
-                                    Minimum="1"
-                                    Value="{Binding RepeatCount, Mode=TwoWay}" />
-                            </StackPanel>
-                        </StackPanel>
-                    </Border>
-
-                </Expander.Header>
-                <Grid>
-                    <local:KeyActionConfigView DataContext="{Binding KeyActionConfigGroup}" />
-                </Grid>
-            </Expander>
-        </DataTemplate>
+        <helpers:KatConfigModeConverter x:Key="KatConfigModeConverter" />
+        <helpers:EmptyCollectionToVisibilityConverter x:Key="EmptyCollectionToVisibilityConverter" />
     </u:UrsaWindow.Resources>
 
     <u:UrsaWindow.RightContent>
@@ -137,7 +67,6 @@
             <u:IconButton
                 Classes="Primary"
                 Command="{Binding SaveToSystemConfigCommand}"
-                Height="50"
                 HorizontalAlignment="Stretch"
                 Icon="{StaticResource SemiIconSave}"
                 Theme="{StaticResource SolidIconButton}"
@@ -154,7 +83,7 @@
         </StackPanel>
     </u:UrsaWindow.RightContent>
 
-    <Grid RowDefinitions="Auto, *, Auto">
+    <Grid RowDefinitions="Auto, *">
         <TextBlock
             Classes="H3"
             Grid.Row="0"
@@ -178,7 +107,7 @@
             Grid.Row="1"
             ItemsSource="{Binding KatMotionsWithMode}"
             Margin="50,0,50,50"
-            Theme="{DynamicResource ScrollTabControl}">
+            Theme="{StaticResource CardTabControl}">
             <TabControl.ItemTemplate>
                 <DataTemplate DataType="vm:KatMotionsWithModeViewModel">
                     <Border
@@ -255,30 +184,145 @@
             </TabControl.ItemTemplate>
             <TabControl.ContentTemplate>
                 <DataTemplate DataType="vm:KatMotionsWithModeViewModel">
-                    <Border Theme="{StaticResource CardBorder}">
-                        <Grid RowDefinitions="Auto, *">
+                    <Border Classes="Shadow"  Theme="{StaticResource CardBorder}" Background="{DynamicResource SemiColorBackground1}">
+                        <Grid>
 
-                            <ScrollViewer Grid.Row="1">
-                                <ItemsControl
-                                    ItemTemplate="{StaticResource KatActionSelector}"
-                                    ItemsSource="{Binding KatMotions}"
-                                    Margin="10" />
-                            </ScrollViewer>
+                            <!-- 运动方式组 TabControl -->
+                            <TabControl ItemsSource="{Binding KatMotionGroups}"
+                                        SelectedIndex="{Binding SelectedMotionGroupIndex, Mode=TwoWay}"
+                                        TabStripPlacement="Left" Theme="{StaticResource CardTabControl}">
+                                <TabControl.ItemTemplate>
+                                    <DataTemplate DataType="vm:KatMotionGroupViewModel">
+                                        <Border
+                                            Classes.WrongDefine="{Binding !IsAvailable}"
+                                            CornerRadius="5"
+                                            Padding="8,5">
+                                            <Grid ColumnDefinitions="*, Auto" ColumnSpacing="8">
+                                                <TextBlock
+                                                    Grid.Column="0"
+                                                    Classes="H6"
+                                                    Text="{Binding DisplayName}"
+                                                    Theme="{StaticResource TitleTextBlock}"
+                                                    VerticalAlignment="Center" />
+                                                <!-- Tab头部的删除按钮 -->
+                                                <Button
+                                                    Grid.Column="1"
+                                                    HorizontalAlignment="Right"
+                                                    Classes="Danger Small"
+                                                    Command="{Binding RemoveSelfCommand}"
+                                                    Theme="{DynamicResource SolidButton}"
+                                                    Width="24"
+                                                    Height="24"
+                                                    ToolTip.Tip="删除此运动配置">
+                                                    <PathIcon
+                                                        Data="{StaticResource SemiIconMinus}"
+                                                        Height="12"
+                                                        Width="12" />
+                                                </Button>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </TabControl.ItemTemplate>
+                                <TabControl.ContentTemplate>
+                                    <DataTemplate DataType="vm:KatMotionGroupViewModel">
+                                
+                                
+                                            <ScrollViewer Background="{DynamicResource SemiColorBackground0}">
+                                                <StackPanel Margin="15" Spacing="10">
 
+                                                    <!-- 配置模式选择-->
+                                                    <Border
+                                                        Classes.WrongDefine="{Binding !IsAvailable}"
+                                                        CornerRadius="5"
+                                                        Padding="10">
+                                                        <Grid ColumnSpacing="10" ColumnDefinitions="Auto,Auto" HorizontalAlignment="Center">
+                                                            <TextBlock Grid.Column="0"
+                                                                Classes="H6"
+                                                                Theme="{StaticResource TitleTextBlock}"
+                                                                VerticalAlignment="Center">
+                                                                配置模式:
+                                                            </TextBlock>
+                                                            <Border Grid.Column="1" Theme="{StaticResource RadioButtonGroupBorder}">
+                                                                <ListBox
+                                                                    IsEnabled="{Binding IsFirstConfig}"
+                                                                    ItemsSource="{x:Static helpers:KatMotionHelper.KatConfigModeNames}"
+                                                                    MinWidth="180"
+                                                                    SelectedItem="{Binding FirstConfigMode, Converter={StaticResource KatConfigModeConverter}, Mode=TwoWay}"
+                                                                    Theme="{DynamicResource ButtonRadioGroupListBox}"
+                                                                    VerticalAlignment="Center" />
+                                                            </Border>
+                                                        </Grid>
+                                                    </Border>
+
+                                                    <!-- 配置列表 -->
+                                                    <ItemsControl ItemsSource="{Binding Configs}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate DataType="vm:KatMotionViewModel">
+                                                                <Panel>
+                                                                    <!-- 单动作模式：直接显示按键配置 -->
+                                                                    <local:KeyActionConfigView
+                                                                        IsVisible="{Binding IsSingleActionMode}"
+                                                                        DataContext="{Binding KeyActionConfigGroup}"
+                                                                        IsSingleActionMode="{Binding IsSingleActionMode}" />
+
+                                                                    <!-- 进阶/专家模式：显示 Expander -->
+                                                                    <local:KatMotionConfigItemView
+                                                                        DataContext="{Binding}"
+                                                                        IsVisible="{Binding IsAdvancedOrExpertMode}"
+                                                                        Margin="5" />
+                                                                </Panel>
+                                                                
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+
+                                                    <!-- 添加配置按钮 -->
+                                                    <Button
+                                                        Command="{Binding AddConfigCommand}"
+                                                        HorizontalAlignment="Center"
+                                                        IsVisible="{Binding CanAddMoreConfigs}"
+                                                        Theme="{DynamicResource OutlineButton}">
+                                                        <StackPanel Orientation="Horizontal" Spacing="10">
+                                                            <PathIcon
+                                                                Data="{StaticResource SemiIconPlus}"
+                                                                Height="15"
+                                                                Width="15" />
+                                                            <TextBlock Classes="H6" Text="添加配置" />
+                                                        </StackPanel>
+                                                    </Button>
+                                                </StackPanel>
+                                            </ScrollViewer>
+                                    </DataTemplate>
+                                </TabControl.ContentTemplate>
+                            </TabControl>
+
+                            <!-- 空状态提示 -->
+                            <TextBlock
+                                Classes="H6"
+                                IsVisible="{Binding KatMotionGroups, Converter={StaticResource EmptyCollectionToVisibilityConverter}}"
+                                Margin="20"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Text="暂无运动配置，请点击右上角按钮添加"
+                                Theme="{StaticResource TitleTextBlock}" />
+
+                            <!-- 浮动添加按钮 -->
                             <Button
-                                Classes="Primary"
-                                Command="{Binding AddKatMotionConfigCommand}"
-                                Grid.Row="0"
-                                HorizontalAlignment="Stretch"
-                                Margin="50,0,50,0"
+                                Classes="Primary floating-button"
+                                Command="{Binding ShowAddMotionDialogCommand}"
+                                IsEnabled="{Binding HasAvailableMotions}"
+                                Width="56"
+                                Height="56"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
                                 Theme="{DynamicResource SolidButton}"
-                                VerticalAlignment="Stretch">
+                                ToolTip.Tip="添加旋钮运动项"
+                                CornerRadius="28">
                                 <PathIcon
                                     Data="{StaticResource SemiIconPlus}"
-                                    Height="15"
-                                    Width="15" />
+                                    Height="24"
+                                    Width="24" />
                             </Button>
-
 
                         </Grid>
                     </Border>

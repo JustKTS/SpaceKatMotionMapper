@@ -8,7 +8,7 @@ public record KatTriggerTimesConfig(
     int LongReachRepeatTimeSpanMs,
     double LongReachRepeatScaleFactor)
 {
-    public KatTriggerTimesConfig() : this(200, 800, 100, 1.5)
+    public KatTriggerTimesConfig() : this(150, 600, 100, 1.5)
     {
     }
 }

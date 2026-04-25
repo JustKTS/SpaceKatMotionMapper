@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Avalonia.Threading;
+using Serilog;
 using SpaceKatMotionMapper.Models;
-using Win32Helpers;
+using PlatformAbstractions;
 
 namespace SpaceKatMotionMapper.Services;
 
@@ -12,15 +13,16 @@ public class ModeChangeService
     public bool ConfigIsDefault { get; private set; } = true;
 
     public Guid CurrentActivatedConfig { get; private set; } = Guid.Empty;
+    public bool IsPlatformSupported => _currentForeProgramHelper.IsSupported;
 
-    private readonly CurrentForeProgramHelper _currentForeProgramHelper;
+    private readonly IPlatformForegroundProgramService _currentForeProgramHelper;
     private readonly KatMotionTimeConfigService _katMotionTimeConfigService;
     private readonly KatDeadZoneConfigService _katDeadZoneConfigService;
     private readonly KatMotionConfigVMManageService _katMotionConfigVmManageService;
     public ForeProgramInfo? CurrentForeProgramInfo { get; private set; }
     private Dictionary<string, Guid> BindProcessPathList { get; } = [];
 
-    public ModeChangeService(CurrentForeProgramHelper currentForeProgramHelper,
+    public ModeChangeService(IPlatformForegroundProgramService currentForeProgramHelper,
         KatMotionTimeConfigService katMotionTimeConfigService,
         KatDeadZoneConfigService katDeadZoneConfigService,
         KatMotionConfigVMManageService katMotionConfigVmManageService
@@ -30,6 +32,18 @@ public class ModeChangeService
         _katMotionTimeConfigService = katMotionTimeConfigService;
         _katDeadZoneConfigService = katDeadZoneConfigService;
         _currentForeProgramHelper = currentForeProgramHelper;
+
+        // 添加平台支持日志
+        if (_currentForeProgramHelper.IsSupported)
+        {
+            Log.Information("[{Service}] Platform supports foreground program monitoring", nameof(ModeChangeService));
+        }
+        else
+        {
+            Log.Warning("[{Service}] Platform does NOT support foreground program monitoring", nameof(ModeChangeService));
+            Log.Warning("[{Service}] Window mode switching will be disabled", nameof(ModeChangeService));
+        }
+
         _currentForeProgramHelper.ForeProgramChanged += ForeProgramChangeHandler;
     }
 

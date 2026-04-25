@@ -1,7 +1,6 @@
 ﻿using System;
 using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.ComponentModel;
-using SpaceKatHIDWrapper.DeviceWrappers;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatHIDWrapper.Services;
 using SpaceKatMotionMapper.Services;
@@ -30,8 +29,8 @@ public partial class TimeAndDeadZoneSettingViewModel(
 
     private void ListenKatStatus(object? _, KatMotionWithTimeStamp data)
     {
-        KatMotion = data.Motion.ToStringFast();
-        PressMode = data.KatPressMode.ToStringFast();
+        KatMotion = data.Motion.ToStringFast(useMetadataAttributes:true);
+        PressMode = data.KatPressMode.ToStringFast(useMetadataAttributes:true);
         RepeatCount = data.RepeatCount;
     }
 
@@ -60,7 +59,12 @@ public partial class TimeAndDeadZoneSettingViewModel(
         _ = configRet.Match(configVm =>
             {
                 IsDeadZoneConfigEnable = configVm.IsCustomDeadZone;
-                IsTimeConfigEnable = configVm.IsCustomMotionTimeConfigs;
+                var hasSingleActionMode = configVm.HasSingleActionMode();
+                IsTimeConfigEnable = configVm.IsCustomMotionTimeConfigs || hasSingleActionMode;
+                if (hasSingleActionMode && !configVm.IsCustomMotionTimeConfigs)
+                {
+                    configVm.IsCustomMotionTimeConfigs = true;
+                }
                 return true;
             }
             , _ => false);
@@ -81,7 +85,7 @@ public partial class TimeAndDeadZoneSettingViewModel(
         {
             configVm.IsCustomDeadZone = value;
             return true;
-        }, ex =>
+        }, _ =>
         {
             popUpNotificationService.Pop(NotificationType.Warning, "分应用配置读取失败");
             return false;
@@ -94,9 +98,15 @@ public partial class TimeAndDeadZoneSettingViewModel(
         var configRet = katMotionConfigVmManageService.GetConfig(Id);
         _ = configRet.Match(configVm =>
         {
+            if (!value && configVm.HasSingleActionMode())
+            {
+                IsTimeConfigEnable = true;
+                popUpNotificationService.Pop(NotificationType.Warning, "存在单动作配置时，时间配置必须启用");
+                return false;
+            }
             configVm.IsCustomMotionTimeConfigs = value;
             return true;
-        }, ex =>
+        }, _ =>
         {
             popUpNotificationService.Pop(NotificationType.Warning, "分应用配置读取失败");
             return false;

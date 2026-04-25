@@ -1,16 +1,12 @@
-﻿using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
 using Avalonia.Platform.Storage;
-using Avalonia.Threading;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using MetaKeyPresetsEditor.Helpers;
 using MetaKeyPresetsEditor.Services;
 using MetaKeyPresetsEditor.Views;
 using Microsoft.Extensions.DependencyInjection;
+using PlatformAbstractions;
 using SpaceKat.Shared.Defines;
 using SpaceKat.Shared.Helpers;
 using SpaceKat.Shared.Models;
@@ -24,6 +20,9 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
 {
     private readonly IMetaKeyPresetFileService _metaKeyPresetFileService =
         DIHelper.GetServiceProvider().GetRequiredService<IMetaKeyPresetFileService>();
+
+    private readonly IFileExplorerService _fileExplorerService =
+        DIHelper.GetServiceProvider().GetRequiredService<IFileExplorerService>();
 
 
     private static readonly OverlayDialogOptions OverlayDialogOptions = new()
@@ -41,7 +40,7 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
     [RelayCommand]
     private static async Task OpenExistProgramSelector()
     {
-        await OverlayDialog.ShowModal(DIHelper.GetServiceProvider().GetRequiredService<ExistPresetSelectorView>(),
+        await OverlayDialog.ShowStandardAsync(DIHelper.GetServiceProvider().GetRequiredService<ExistPresetSelectorView>(),
             DIHelper.GetServiceProvider().GetRequiredService<ExistSpecConfigSelectorViewModel>(),
             PresetsEditorMainWindow.LocalHost,
             OverlayDialogOptions);
@@ -81,16 +80,16 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
 
 
     [RelayCommand]
-    private static void OpenConfigFolder()
+    private void OpenConfigFolder()
     {
-        _ = Process.Start("explorer.exe", GlobalPaths.MetaKeysConfigPath);
+        _fileExplorerService.OpenPath(GlobalPaths.MetaKeysConfigPath);
     }
 
     [RelayCommand]
     private async Task GetPresetsFromInternet()
     {
         var ret = await DownloadMetaKeyPresetsHelper.DownloadAndCopyMetaKeyPresetsAsync();
-        _ = ret.Match(s =>
+        _ = ret.Match(_ =>
         {
             DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
                 .ShowPopUpNotificationAsync(
@@ -105,7 +104,7 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
         });
     }
 
-    private static FilePickerOpenOptions FileOpenOptions = new()
+    private static readonly FilePickerOpenOptions FileOpenOptions = new()
     {
         Title = "选择文件",
         AllowMultiple = false,

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
@@ -42,13 +41,13 @@ public partial class KeyActionsDescriptionDisplay : UserControl
 
 public sealed class KeyConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not string str) return string.Empty;
         return str == "None" ? string.Empty : str;
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotSupportedException();
     }
@@ -56,12 +55,12 @@ public sealed class KeyConverter : IValueConverter
 
 public sealed class ActionTypeToIconConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value is ActionType actionType ? ActionTypeHelper.ToPathIconGeometry(actionType) : new StreamGeometry();
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotSupportedException();
     }
@@ -75,7 +74,7 @@ public sealed class ActionTypeNoneToFalseConverter : IValueConverter
         return actionType != ActionType.None;
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotSupportedException();
     }
@@ -89,7 +88,7 @@ public sealed class ActionTypeNoneToTrueConverter : IValueConverter
         return actionType == ActionType.None;
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotSupportedException();
     }
@@ -97,7 +96,7 @@ public sealed class ActionTypeNoneToTrueConverter : IValueConverter
 
 public sealed class DisplayMultiplierConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not KeyActionConfig action) return false;
         if (action.ActionType != ActionType.Mouse) return false;

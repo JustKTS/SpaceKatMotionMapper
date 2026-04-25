@@ -96,15 +96,14 @@
                                 VerticalAlignment="Center"
                                 x:Name="IsInstantCheckBox" />
                             <TextBox
-                                AcceptsTab="False"
                                 Grid.Column="1"
                                 HorizontalAlignment="Stretch"
                                 IsVisible="{Binding #IsInstantCheckBox.IsChecked}"
-                                KeyUp="HotKeyTextBox_OnKeyUp"
+                                helpers:HotKeyTextBox.IsEnabled="True"
                                 Margin="5,0,5,0"
                                 Text="{Binding Key, Converter={StaticResource ActionTypeKeyOrButtonConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                 VerticalAlignment="Stretch"
-                                Watermark="请按下要配置的按键" />
+                                PlaceholderText="请按下要配置的按键" />
                             <u:AutoCompleteBox
                                 FilterMode="Contains"
                                 Grid.Column="1"
@@ -113,9 +112,10 @@
                                 IsVisible="{Binding !#IsInstantCheckBox.IsChecked}"
                                 ItemsSource="{Binding #ActionTypeSelector.SelectedItem, Converter={StaticResource ActionTypeItemNamesConverter}}"
                                 Margin="5,0,5,0"
+                                SelectionChanged="KeySelectionCBox_OnSelectionChanged"
                                 Text="{Binding Key, Converter={StaticResource ActionTypeKeyOrButtonConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                 VerticalAlignment="Stretch"
-                                Watermark="请点击或输入后按自动补全选择按键"
+                                PlaceholderText="请点击或输入后按自动补全选择按键"
                                 x:Name="KeySelectionCBox" />
                         </Grid>
 

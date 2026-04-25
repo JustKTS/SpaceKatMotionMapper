@@ -5,7 +5,7 @@ using NetEscapades.EnumGenerators;
 namespace SpaceKat.Shared.Models;
 
 [JsonConverter(typeof(JsonStringEnumConverter<KatButtonEnum>))]
-[EnumExtensions]
+[EnumExtensions(MetadataSource = MetadataSource.DisplayAttribute)]
 public enum KatButtonEnum
 {
     [Display(Name = "无")]

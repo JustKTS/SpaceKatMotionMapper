@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
@@ -7,19 +6,17 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MetaKeyPresetsEditor.Views;
+using PlatformAbstractions;
 using SpaceKat.Shared.Helpers;
 using SpaceKat.Shared.Models;
 using SpaceKat.Shared.Services.Contract;
 using SpaceKat.Shared.States;
-using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.States;
 using SpaceKatMotionMapper.Views;
-using Ursa.Common;
 using Ursa.Controls;
-using WindowsInput;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
@@ -30,6 +27,8 @@ public partial class SettingsViewModel : ObservableObject
 
     private readonly PopUpNotificationService _popUpNotificationService =
         App.GetRequiredService<PopUpNotificationService>();
+
+    private readonly IFileExplorerService _fileExplorerService = App.GetRequiredService<IFileExplorerService>();
 
     public SettingsViewModel()
     {
@@ -89,7 +88,7 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _useCtrl = true;
     [ObservableProperty] private bool _useAlt = true;
     [ObservableProperty] private bool _useShift;
-    [ObservableProperty] private VirtualKeyCode _hotKey = VirtualKeyCode.VK_D;
+    [ObservableProperty] private KeyCodeWrapper _hotKey = KeyCodeWrapper.D;
 
     [ObservableProperty] private KatButtonEnum _selectedKatButton = KatButtonEnum.None;
 
@@ -139,7 +138,7 @@ public partial class SettingsViewModel : ObservableObject
                 _popUpNotificationService.Pop(NotificationType.Success, "注册热键成功");
                 SaveHotKey();
                 return true;
-            }, ex =>
+            }, _ =>
             {
                 _popUpNotificationService.Pop(NotificationType.Warning, "注册热键失败");
                 return false;
@@ -162,15 +161,15 @@ public partial class SettingsViewModel : ObservableObject
     # region 配置文件夹
 
     [RelayCommand]
-    private static void OpenConfigFolder()
+    private void OpenConfigFolder()
     {
-        _ = Process.Start("explorer.exe", GlobalPaths.AppDataPath);
+        _fileExplorerService.OpenPath(GlobalPaths.AppDataPath);
     }
 
     [RelayCommand]
-    private static void OpenLogFolder()
+    private void OpenLogFolder()
     {
-        _ = Process.Start("explorer.exe", GlobalPaths.AppLogPath);
+        _fileExplorerService.OpenPath(GlobalPaths.AppLogPath);
     }
 
     # endregion
@@ -195,9 +194,9 @@ public partial class SettingsViewModel : ObservableObject
     }   
     
     [RelayCommand]
-    private static void OpenMetaKeysConfigFolder()
+    private void OpenMetaKeysConfigFolder()
     {
-        _ = Process.Start("explorer.exe", GlobalPaths.MetaKeysConfigPath);
+        _fileExplorerService.OpenPath(GlobalPaths.MetaKeysConfigPath);
     }
 
     private static readonly DialogOptions FavEditorDialogOptions = new()
@@ -212,9 +211,9 @@ public partial class SettingsViewModel : ObservableObject
     };
     
     [RelayCommand]
-    private async Task OpenFavPresetsEditor()
+    private static async Task OpenFavPresetsEditor()
     {
-        await Dialog.ShowCustomModal<FavPresetsEditorView, FavPresetsEditorViewModel, object>(
+        await Dialog.ShowCustomAsync<FavPresetsEditorView, FavPresetsEditorViewModel, object>(
             App.GetRequiredService<FavPresetsEditorViewModel>(), App.GetRequiredService<MainWindow>(), FavEditorDialogOptions
             );
     }
@@ -223,7 +222,7 @@ public partial class SettingsViewModel : ObservableObject
     private async Task GetPresetsFromInternet()
     {
         var ret = await DownloadMetaKeyPresetsHelper.DownloadAndCopyMetaKeyPresetsAsync();
-        _ = ret.Match(s =>
+        _ = ret.Match(_ =>
         {
             _popUpNotificationService.Pop(NotificationType.Success, "预设下载成功");
             return true;

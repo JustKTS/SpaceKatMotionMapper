@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
-using Avalonia.Threading;
-using CommunityToolkit.Mvvm.Messaging;
+
 using MetaKeyPresetsEditor.Services;
 using MetaKeyPresetsEditor.ViewModels;
 using Microsoft.Extensions.DependencyInjection;

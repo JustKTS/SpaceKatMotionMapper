@@ -3,7 +3,7 @@ using Windows.Win32.Foundation;
 
 namespace Win32Helpers;
 
-internal static class Helpers
+internal static class Win32UtilityHelpers
 {
     // ReSharper disable once InconsistentNaming
     internal static unsafe string CallWin32ToGetPWSTR(int bufferLength, Func<PWSTR, int, int> getter)

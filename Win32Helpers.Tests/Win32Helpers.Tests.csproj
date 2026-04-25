@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net10.0;</TargetFrameworks>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+        <LangVersion>latestmajor</LangVersion>
+
+        <!-- 平台特定的编译符号 -->
+        <DefineConstants Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(DefineConstants);WINDOWS</DefineConstants>
+        <DefineConstants Condition="$([MSBuild]::IsOSPlatform('Linux'))">$(DefineConstants);LINUX</DefineConstants>
+        <DefineConstants Condition="$([MSBuild]::IsOSPlatform('OSX'))">$(DefineConstants);OSX;MACOS</DefineConstants>
+
+        <!-- 忽略退出代码 8（运行零测试时的退出代码） -->
+        <TestingPlatformCommandLineArguments>$(TestingPlatformCommandLineArguments) --ignore-exit-code 8</TestingPlatformCommandLineArguments>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="TUnit" Version="1.35.2" />
+        <PackageReference Include="TUnit.Assertions" Version="1.35.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Win32Helpers\Win32Helpers.csproj" />
+    </ItemGroup>
+</Project>

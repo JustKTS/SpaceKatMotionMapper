@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Avalonia.Threading;
 using MetaKeyPresetsEditor.Helpers;
 using MetaKeyPresetsEditor.ViewModels;
 using MetaKeyPresetsEditor.Views;

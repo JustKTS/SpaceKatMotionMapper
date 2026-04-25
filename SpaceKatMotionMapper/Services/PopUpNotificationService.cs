@@ -1,12 +1,12 @@
 ﻿using System;
 using Avalonia.Controls.Notifications;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using SpaceKat.Shared.Models;
+using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.Services;
 
-public class PopUpNotificationService
+public class PopUpNotificationService : IPopUpNotificationService
 {
     public void Pop(NotificationType notificationType, string message)
     {

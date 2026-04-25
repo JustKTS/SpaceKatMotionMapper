@@ -12,7 +12,8 @@ namespace SpaceKatMotionMapper.Services;
 public class TimeAndDeadZoneVMService(
     MotionTimeConfigViewModel motionTimeConfigViewModel,
     DeadZoneConfigViewModel deadZoneConfigViewModel,
-    TimeAndDeadZoneSettingViewModel timeAndDeadZoneSettingViewModel)
+    TimeAndDeadZoneSettingViewModel timeAndDeadZoneSettingViewModel,
+    GlobalStates globalStates)
 {
     public void UpdateByDefault()
     {
@@ -44,11 +45,10 @@ public class TimeAndDeadZoneVMService(
 
     public async Task ShowDialogAsync()
     {
-        var globalStates = App.GetRequiredService<GlobalStates>();
         timeAndDeadZoneSettingViewModel.StartKatListening();
         deadZoneConfigViewModel.StartAxesDataDisplay();
         globalStates.IsMapperEnable = false;
-        await Dialog.ShowCustomModal<TimeAndDeadZoneSettingView, TimeAndDeadZoneSettingViewModel, object>(
+        await Dialog.ShowCustomAsync<TimeAndDeadZoneSettingView, TimeAndDeadZoneSettingViewModel, object>(
             timeAndDeadZoneSettingViewModel, options: _options);
         timeAndDeadZoneSettingViewModel.StopKatListening();
         deadZoneConfigViewModel.StopAxesDataDisplay();

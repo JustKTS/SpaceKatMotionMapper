@@ -6,7 +6,6 @@ using SpaceKat.Shared.Models;
 using SpaceKat.Shared.Services.Contract;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Models;
-using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.States;
 using SpaceKatMotionMapper.ViewModels;
 using SpaceKatMotionMapper.Views;
@@ -18,7 +17,6 @@ public class TransparentInfoService
 {
     private const string EnableStr = "IsTransparentInfoEnable";
     private const string ConfigStr = "TransparentInfoWindowConfig";
-    private bool IsTransparentInfoEnable { get; set; } = true;
 
     private TransparentInfoWindow? _window;
     private bool _isWindowShow;
@@ -33,17 +31,21 @@ public class TransparentInfoService
     };
 
     private readonly ILocalSettingsService _localSettingsService;
+    private readonly GlobalStates _globalStates;
 
     public TransparentInfoService(
         ILocalSettingsService localSettingsService)
     {
         _localSettingsService = localSettingsService;
+        _globalStates = App.GetRequiredService<GlobalStates>();
 
-        App.GetRequiredService<GlobalStates>().IsTransparentInfoEnableChanged += (_, value) =>
+        _globalStates.IsTransparentInfoEnableChanged += (_, value) =>
         {
-            IsTransparentInfoEnable = value;
             _localSettingsService.SaveSettingAsync(EnableStr, value);
         };
+
+        // 启动时加载 enable 状态，避免 UI 与 service 不一致
+        _ = LoadEnableStateAsync();
 
         _timer.Elapsed += (_, _) =>
         {
@@ -105,7 +107,7 @@ public class TransparentInfoService
 
     private void UpdateWindowState()
     {
-        if (!IsTransparentInfoEnable) return;
+        if (!_globalStates.IsTransparentInfoEnable) return;
 
         var vm = App.GetRequiredService<TransparentInfoViewModel>();
         if (vm.IsAdjustMode) return;
@@ -181,12 +183,16 @@ public class TransparentInfoService
 
     public async Task<TransparentInfoWindowConfig?> LoadConfigs()
     {
+        return await _localSettingsService.ReadSettingAsync<TransparentInfoWindowConfig>(ConfigStr);
+    }
+
+    private async Task LoadEnableStateAsync()
+    {
         var isEnable = await _localSettingsService.ReadSettingAsync<bool?>(EnableStr);
         Dispatcher.UIThread.Invoke(() =>
         {
-            App.GetRequiredService<GlobalStates>().IsTransparentInfoEnable = isEnable ?? true;
+            _globalStates.IsTransparentInfoEnable = isEnable ?? true;
         });
-        return await _localSettingsService.ReadSettingAsync<TransparentInfoWindowConfig>(ConfigStr);
     }
 
     public async Task UpdateTimeConfigs(int disappearTimeMs, int animationTimeMs)

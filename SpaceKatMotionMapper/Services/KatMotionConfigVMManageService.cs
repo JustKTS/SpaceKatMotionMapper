@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using Avalonia.Automation;
 using LanguageExt;
-using LanguageExt.Common;
+using Serilog;
 using SpaceKatMotionMapper.ViewModels;
+using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.Services;
 
 // ReSharper disable once InconsistentNaming
-public class KatMotionConfigVMManageService
+public class KatMotionConfigVMManageService : IKatMotionConfigVMManageService
 {
     private readonly Dictionary<Guid, KatMotionConfigViewModel> _configs = [];
 
@@ -28,7 +27,7 @@ public class KatMotionConfigVMManageService
         }
         catch (Exception e)
         {
-            Debug.WriteLine(e);
+            Log.Error(e, "[{Service}] Failed to get config by ID: {Id}", nameof(KatMotionConfigVMManageService), id);
             return new Exception("获取配置组失败");
         }
     }

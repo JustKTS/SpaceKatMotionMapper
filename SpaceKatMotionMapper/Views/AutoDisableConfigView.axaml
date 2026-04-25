@@ -25,7 +25,8 @@
         MaxHeight="315"
         MinHeight="200"
         RowDefinitions="Auto, *"
-        VerticalAlignment="Stretch">
+        VerticalAlignment="Stretch"
+        IsEnabled="{Binding IsPlatformSupported}">
         <StackPanel
             Grid.Row="0"
             HorizontalAlignment="Center"

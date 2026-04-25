@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Avalonia.Controls.Notifications;
 using Avalonia.LogicalTree;
 using MetaKeyPresetsEditor.Helpers;
 using MetaKeyPresetsEditor.Views;

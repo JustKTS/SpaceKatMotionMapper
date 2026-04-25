@@ -9,37 +9,40 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
 using LanguageExt;
 using SpaceKat.Shared.Defines;
-using SpaceKat.Shared.Services;
 using SpaceKat.Shared.Services.Contract;
+using SpaceKat.Shared.ViewModels;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;
+using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
-public partial class OtherConfigsViewModel : ViewModelBase
+public partial class OtherConfigsViewModel(
+    IKatMotionFileService katMotionFileService,
+    IPopUpNotificationService popUpNotificationService,
+    IStorageProviderService storageProviderService,
+    IActivationStatusService activationStatusService,
+    IKatMotionConfigVMManageService katMotionConfigVmManageService,
+    IKatMotionActivateService katMotionActivateService,
+    RunningProgramSelectorViewModel runningProgramSelectorVM,
+    TimeAndDeadZoneVMService? timeAndDeadZoneVmService = null)
+    : ViewModelBase
 {
     public ObservableCollection<KatMotionConfigViewModel> KatMotionConfigGroups { get; } = [];
-    private readonly KatMotionFileService _katMotionFileService;
-    private readonly IStorageProviderService _storageProviderService;
-    private readonly PopUpNotificationService _popUpNotificationService;
-    private readonly ActivationStatusService _activationStatusService;
-    private readonly KatMotionConfigVMManageService _katMotionConfigVmManageService;
-
-    public OtherConfigsViewModel()
-    {
-        _katMotionFileService = App.GetRequiredService<KatMotionFileService>();
-        _popUpNotificationService = App.GetRequiredService<PopUpNotificationService>();
-        _storageProviderService = App.GetRequiredService<IStorageProviderService>();
-        _activationStatusService = App.GetRequiredService<ActivationStatusService>();
-        _katMotionConfigVmManageService = App.GetRequiredService<KatMotionConfigVMManageService>();
-        Add();
-    }
 
     [RelayCommand]
     private void Add()
     {
-        var vm = new KatMotionConfigViewModel(this);
-        _katMotionConfigVmManageService.RegisterConfig(vm);
+        var vm = new KatMotionConfigViewModel(
+            katMotionActivateService,
+            katMotionFileService,
+            popUpNotificationService,
+            storageProviderService,
+            runningProgramSelectorVM,
+            timeAndDeadZoneVmService
+        ){Parent = this};
+
+        katMotionConfigVmManageService.RegisterConfig(vm);
         KatMotionConfigGroups.Add(vm);
     }
 
@@ -47,22 +50,32 @@ public partial class OtherConfigsViewModel : ViewModelBase
     private void Remove(int index)
     {
         if (index < 0 || index >= KatMotionConfigGroups.Count) return;
-        _katMotionConfigVmManageService.RemoveConfig(KatMotionConfigGroups[index].Id);
-        _activationStatusService.DeleteActivationStatus(KatMotionConfigGroups[index].Id);
-        _katMotionFileService.DeleteConfigGroupFromSysConf(KatMotionConfigGroups[index].Id);
+        katMotionConfigVmManageService.RemoveConfig(KatMotionConfigGroups[index].Id);
+        activationStatusService.DeleteActivationStatus(KatMotionConfigGroups[index].Id);
+        katMotionFileService.DeleteConfigGroupFromSysConf(KatMotionConfigGroups[index].Id);
         KatMotionConfigGroups.RemoveAt(index);
 
         if (KatMotionConfigGroups.Count != 0) return;
 
-        var vm = new KatMotionConfigViewModel(this);
-        _katMotionConfigVmManageService.RegisterConfig(vm);
+        var vm = new KatMotionConfigViewModel(
+            katMotionActivateService,
+            katMotionFileService,
+            popUpNotificationService,
+            storageProviderService,
+            runningProgramSelectorVM,
+            timeAndDeadZoneVmService
+        ){Parent = this};
+        katMotionConfigVmManageService.RegisterConfig(vm);
         KatMotionConfigGroups.Add(vm);
     }
 
     [RelayCommand]
     private async Task LoadGroupFromFiles()
     {
-        var files = await _storageProviderService.GetStorageProvider().OpenFilePickerAsync(new FilePickerOpenOptions()
+        var storageProvider = storageProviderService.GetStorageProvider();
+        if (storageProvider == null) return; // 在测试环境中可能为 null
+
+        var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions()
         {
             AllowMultiple = true,
             FileTypeFilter = [FilePickerFileTypeDefines.Json],
@@ -71,19 +84,26 @@ public partial class OtherConfigsViewModel : ViewModelBase
 
         foreach (var file in files)
         {
-            var cgRet = _katMotionFileService.LoadConfigGroup(file.Path.LocalPath);
+            var cgRet = katMotionFileService.LoadConfigGroup(file.Path.LocalPath);
             _ = cgRet.Match(cg =>
             {
                 // ReSharper disable once IdentifierTypo
-                var cgvm = new KatMotionConfigViewModel(this);
+                var cgvm = new KatMotionConfigViewModel(
+                    katMotionActivateService,
+                    katMotionFileService,
+                    popUpNotificationService,
+                    storageProviderService,
+                    runningProgramSelectorVM,
+                    timeAndDeadZoneVmService
+                ){Parent = this};
                 cgvm.LoadFromConfigGroup(cg);
                 cgvm.IsDefault = false;
-                _katMotionConfigVmManageService.RegisterConfig(cgvm);
+                katMotionConfigVmManageService.RegisterConfig(cgvm);
                 KatMotionConfigGroups.Add(cgvm);
                 return true;
             }, ex =>
             {
-                _popUpNotificationService.Pop(NotificationType.Error, ex.Message);
+                popUpNotificationService.Pop(NotificationType.Error, ex.Message);
                 return false;
             });
         }
@@ -91,7 +111,7 @@ public partial class OtherConfigsViewModel : ViewModelBase
 
     private void ClearConfigGroups()
     {
-        KatMotionConfigGroups.Iter(e => _katMotionConfigVmManageService.RemoveConfig(e.Id));
+        KatMotionConfigGroups.Iter(e => katMotionConfigVmManageService.RemoveConfig(e.Id));
         KatMotionConfigGroups.Clear();
     }
 
@@ -99,24 +119,32 @@ public partial class OtherConfigsViewModel : ViewModelBase
     private void ReloadConfigGroupsFromSysConf()
     {
         ClearConfigGroups();
-        var rets = _katMotionFileService.LoadConfigGroupsFromSysConf();
+        var rets = katMotionFileService.LoadConfigGroupsFromSysConf();
+
         _ = rets.Match(cgs =>
         {
             foreach (var cg in cgs)
             {
-                var cgVm = new KatMotionConfigViewModel(this);
+                var cgVm = new KatMotionConfigViewModel(
+                    katMotionActivateService,
+                    katMotionFileService,
+                    popUpNotificationService,
+                    storageProviderService,
+                    runningProgramSelectorVM,
+                    timeAndDeadZoneVmService
+                ){Parent = this};
                 cgVm.LoadFromConfigGroup(cg);
                 cgVm.IsDefault = false;
-                _katMotionConfigVmManageService.RegisterConfig(cgVm);
+                katMotionConfigVmManageService.RegisterConfig(cgVm);
                 KatMotionConfigGroups.Add(cgVm);
-                if (!_activationStatusService.IsConfigGroupActivated(cgVm.Id)) continue;
+                if (!activationStatusService.IsConfigGroupActivated(cgVm.Id)) continue;
                 cgVm.ActivateActionsCommand.Execute(null);
             }
 
             return true;
         }, ex =>
         {
-            _popUpNotificationService.Pop(NotificationType.Error, ex.Message);
+            popUpNotificationService.Pop(NotificationType.Error, ex.Message);
             return false;
         });
         if (KatMotionConfigGroups.Count == 0)
@@ -138,17 +166,17 @@ public partial class OtherConfigsViewModel : ViewModelBase
                 return true;
             }, ex =>
             {
-                _popUpNotificationService.Pop(NotificationType.Error, ex.Message);
+                popUpNotificationService.Pop(NotificationType.Error, ex.Message);
                 return false;
             })).Any(flag => !flag) // TODO: 处理部分失败的情况
             ? new Exception("保存部分文件失败！")
-            : _katMotionFileService.SaveConfigGroupsToSysConf(groups));
+            : katMotionFileService.SaveConfigGroupsToSysConf(groups));
     }
 
     [RelayCommand]
     private async Task SaveGroupToDirectory()
     {
-        var folders = await _storageProviderService.GetStorageProvider().OpenFolderPickerAsync(
+        var folders = await storageProviderService.GetStorageProvider().OpenFolderPickerAsync(
             new FolderPickerOpenOptions()
             {
                 AllowMultiple = false,
@@ -165,9 +193,9 @@ public partial class OtherConfigsViewModel : ViewModelBase
                 var filename = cg.Guid + ".json";
                 var dirPath = folders[0].Path.LocalPath;
                 var path = Path.Join(dirPath, filename);
-                return _katMotionFileService.SaveConfigGroup(cg, path);
+                return katMotionFileService.SaveConfigGroup(cg, path);
             }, ex => ex);
-            ret.IfLeft(ex => { _popUpNotificationService.Pop(NotificationType.Error, ex.Message); });
+            ret.IfLeft(ex => { popUpNotificationService.Pop(NotificationType.Error, ex.Message); });
         }
     }
 }

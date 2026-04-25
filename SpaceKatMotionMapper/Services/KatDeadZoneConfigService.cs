@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Diagnostics;
 using LanguageExt;
-using LanguageExt.Common;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatHIDWrapper.Services;
+using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.Services;
 
 public class KatDeadZoneConfigService(
-    KatMotionFileService katMotionFileService,
+    IKatMotionFileService katMotionFileService,
     KatMotionRecognizeService katMotionRecognizeService,
-    KatMotionConfigVMManageService katMotionConfigVmManageService)
+    IKatMotionConfigVMManageService katMotionConfigVmManageService)
 {
     public KatDeadZoneConfig LoadDefaultDeadZoneConfigs()
     {
@@ -31,7 +30,7 @@ public class KatDeadZoneConfigService(
     public KatDeadZoneConfig? LoadDeadZoneConfigs(Guid configGroupId)
     {
         var configRet = katMotionConfigVmManageService.GetConfig(configGroupId);
-        return configRet.Match<KatDeadZoneConfig?>(config => config.DeadZoneConfig with { }, ex => null);
+        return configRet.Match<KatDeadZoneConfig?>(config => config.DeadZoneConfig with { }, _ => null);
     }
 
     public Either<Exception, bool> SaveDefaultDeadZoneConfig(KatDeadZoneConfig deadZoneConfig)

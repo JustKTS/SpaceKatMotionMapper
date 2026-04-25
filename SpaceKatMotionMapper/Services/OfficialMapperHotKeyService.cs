@@ -1,27 +1,30 @@
 ﻿using System;
 using System.Threading.Tasks;
-using LanguageExt.Common;
-using SpaceKatMotionMapper.Models;
 using Avalonia.Controls;
 using LanguageExt;
 using SpaceKat.Shared.Functions;
 using SpaceKat.Shared.Models;
-using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.States;
-using Win32Helpers;
-using WindowsInput;
+using PlatformAbstractions;
 
 namespace SpaceKatMotionMapper.Services;
 
 public class OfficialMapperHotKeyService : IOfficialMapperHotKeyService
 {
+    private readonly IPlatformHotKeyService _hotKeyService;
+
+    public OfficialMapperHotKeyService(IPlatformHotKeyService hotKeyService)
+    {
+        _hotKeyService = hotKeyService;
+    }
+
     # region 热键注册
 
     private const int HotKeyEventId = 9876;
 
-    public async Task<Either<Exception,bool>> RegisterHotKeyWrapper(bool useCtrl, bool useAlt, bool useShift, VirtualKeyCode hotKey,
+    public async Task<Either<Exception,bool>> RegisterHotKeyWrapper(bool useCtrl, bool useAlt, bool useShift, KeyCodeWrapper hotKey,
         KatButtonEnum katButtonEnum)
     {
         await OfficialWareConfigFunctions.UnbindHotKeyToKatButton();
@@ -36,8 +39,13 @@ public class OfficialMapperHotKeyService : IOfficialMapperHotKeyService
         // ReSharper disable once InvertIf
         if (handle.Handle is { } nativeHandle)
         {
-            HotKeyHelpers.UnregisterHotKeyWrapper(nativeHandle, HotKeyEventId);
-            var ret = HotKeyHelpers.RegisterHotKeyWrapper(nativeHandle, HotKeyEventId, modifierKeys, (int)hotKey);
+            if (!_hotKeyService.IsSupported)
+            {
+                return new Exception("热键功能仅支持Windows平台");
+            }
+
+            _hotKeyService.UnregisterHotKeyWrapper(nativeHandle, HotKeyEventId);
+            var ret = _hotKeyService.RegisterHotKeyWrapper(nativeHandle, HotKeyEventId, modifierKeys, (int)hotKey);
             if (!ret) return new Exception("注册热键失败");
             if (katButtonEnum != KatButtonEnum.None)
             {
@@ -46,6 +54,7 @@ public class OfficialMapperHotKeyService : IOfficialMapperHotKeyService
             return true;
         }
 
+        // ReSharper disable once HeuristicUnreachableCode
         return false;
     }
 
@@ -56,10 +65,11 @@ public class OfficialMapperHotKeyService : IOfficialMapperHotKeyService
         // ReSharper disable once InvertIf
         if (handle.Handle is { } nativeHandle)
         {
-            var ret = HotKeyHelpers.UnregisterHotKeyWrapper(nativeHandle, HotKeyEventId);
+            var ret = _hotKeyService.UnregisterHotKeyWrapper(nativeHandle, HotKeyEventId);
             return ret;
         }
 
+        // ReSharper disable once HeuristicUnreachableCode
         return false;
     }
 

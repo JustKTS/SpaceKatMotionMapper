@@ -8,7 +8,6 @@
     x:DataType="vm:KeyActionConfigForPresetsViewModel"
     xmlns="https://github.com/avaloniaui"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:helpers="clr-namespace:SpaceKat.Shared.Helpers;assembly=SpaceKat.Shared"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:u="https://irihi.tech/ursa"
     xmlns:vm="clr-namespace:SpaceKat.Shared.ViewModels"
@@ -33,10 +32,7 @@
         </Style>
     </UserControl.Styles>
 
-    <Border
-        Classes="Shadow"
-        Padding="2"
-        Theme="{StaticResource CardBorder}">
+
         <Expander Padding="2">
             <Expander.Header>
                 <Grid ColumnDefinitions="Auto, Auto, *,Auto">
@@ -59,7 +55,7 @@
                         Margin="20,5,5,5"
                         Text="{Binding Description, Mode=TwoWay}"
                         VerticalAlignment="Stretch"
-                        Watermark="自定义动作描述" />
+                        PlaceholderText="自定义动作描述" />
 
                     <u:IconButton
                         Classes="Primary"
@@ -79,8 +75,4 @@
                 </ScrollViewer>
             </Expander.Content>
         </Expander>
-
-
-    </Border>
-
 </UserControl>

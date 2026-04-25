@@ -32,7 +32,7 @@ public sealed class TransparentInfoActionDisplayService
         {
             return _motionGroup[motionId][displayId];
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return [new KeyActionConfig(ActionType.None, string.Empty, PressModeEnum.None, 0)];
         }

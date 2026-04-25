@@ -1,7 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
+﻿using Avalonia.Interactivity;
 using SpaceKatMotionMapper.ViewModels;
 using Ursa.Controls;
 
@@ -14,6 +11,7 @@ public partial class OtherConfigsView : UrsaView
     public OtherConfigsView()
     {
         _viewModel =  App.GetService<OtherConfigsViewModel>();
+        _viewModel.AddCommand.Execute(null); // 添加一个默认配置
         DataContext = _viewModel;
         InitializeComponent();
     }

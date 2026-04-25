@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace SpaceKatMotionMapper.Functions;
@@ -7,9 +6,9 @@ namespace SpaceKatMotionMapper.Functions;
 public class ModeChangeValidator
 {
     // 邻接矩表
-    private List<List<int>> _adj = [];
+    private readonly List<List<int>> _adj = [];
 
-    private Dictionary<int, int> _nodeNum = [];
+    private readonly Dictionary<int, int> _nodeNum = [];
 
     public void AddNode(int node)
     {
@@ -19,16 +18,21 @@ public class ModeChangeValidator
 
     public void AddEdge(int fromNode, int toNode)
     {
-        var nodeAdj = _adj[_nodeNum[fromNode]];
-        if (!nodeAdj.Contains(toNode))
+        var fromIndex = _nodeNum[fromNode];
+        var toIndex = _nodeNum[toNode];
+        var nodeAdj = _adj[fromIndex];
+        if (!nodeAdj.Contains(toIndex))
         {
-            nodeAdj.Add(toNode);
+            nodeAdj.Add(toIndex);
         }
     }
 
     public (List<int>, List<int>) Validate()
     {
         var n = _adj.Count;
+
+        // 创建反向映射：内部索引 -> 原始节点ID
+        var indexToNode = _nodeNum.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
 
         // Step 1: 找出原图中从0出发可达的所有节点
         var visitedOriginal = new bool[n];
@@ -54,7 +58,9 @@ public class ModeChangeValidator
         }
 
         // Step 2: 找出原图中从0出发不可达的所有节点
-        var cannotToList = _nodeNum.Keys.Where(e => !reachableFromStart.Contains(e)).Select(e => _nodeNum[e]).ToList();
+        var cannotToList = indexToNode.Where(kvp => !reachableFromStart.Contains(kvp.Key))
+                                       .Select(kvp => kvp.Value)
+                                       .ToList();
 
         // Step 3: 构建反向图
         List<List<int>> reverseAdj = [];
@@ -96,9 +102,9 @@ public class ModeChangeValidator
 
 
         // Step 5: 计算原图可达但反向不可达的节点
-        var cannotReturnList = reachableFromStart
-            .Where(node => !reachableFromReverse.Contains(node))
-            .Select(e => _nodeNum[e]).ToList();
+        var cannotReturnList = indexToNode.Where(kvp => reachableFromStart.Contains(kvp.Key) && !reachableFromReverse.Contains(kvp.Key))
+                                          .Select(kvp => kvp.Value)
+                                          .ToList();
         return (cannotToList, cannotReturnList);
     }
 }

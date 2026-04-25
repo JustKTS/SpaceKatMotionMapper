@@ -15,14 +15,13 @@
               ShowInTaskbar="False"
               ShowActivated="False"
               ExtendClientAreaToDecorationsHint="False"
-              ExtendClientAreaChromeHints="NoChrome"
               ExtendClientAreaTitleBarHeightHint="-1"
-              SystemDecorations="None"
+              WindowDecorations="None"
               Topmost="True"
-              IsMinimizeButtonVisible="False"
+              CanMinimize="False"
               IsFullScreenButtonVisible="False"
               IsCloseButtonVisible="False"
-              IsRestoreButtonVisible="False"
+              CanMaximize="False"
               x:DataType="vm:TransparentInfoViewModel">
 
     <Design.DataContext>

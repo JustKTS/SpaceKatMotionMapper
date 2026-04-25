@@ -1,19 +1,7 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Notifications;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
-using Avalonia.Platform;
-using Avalonia.Threading;
-using Serilog;
 using SpaceKatMotionMapper.NavVMs;
-using SpaceKatMotionMapper.Services;
-using SpaceKatMotionMapper.ViewModels;
-using Ursa.Controls;
 
 namespace SpaceKatMotionMapper.Views;
 

@@ -10,6 +10,9 @@
     d:DesignHeight="1000"
     d:DesignWidth="600"
     mc:Ignorable="d"
+    CanMinimize="True"                                                                     
+    CanMaximize="True"                                                                     
+    IsCloseButtonVisible="True"
     x:Class="SpaceKatMotionMapper.Views.MainWindow"
     x:DataType="navVm:NavViewModel"
     xmlns="https://github.com/avaloniaui"
@@ -20,8 +23,7 @@
     xmlns:view="clr-namespace:SpaceKatMotionMapper.Views"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-
-
+    
     <u:UrsaWindow.RightContent>
         <view:TitleBarRightContent />
     </u:UrsaWindow.RightContent>

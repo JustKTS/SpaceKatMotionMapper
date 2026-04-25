@@ -3,7 +3,6 @@ using LanguageExt;
 using LanguageExt.Common;
 using SpaceKat.Shared.Helpers;
 using SpaceKat.Shared.Models;
-using WindowsInput;
 
 namespace SpaceKat.Shared.Functions;
 
@@ -174,7 +173,7 @@ public static class OfficialWareConfigFunctions
         {
             doc.Save(ConfigFilePath);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await Task.Delay(500); // 猜测是官方驱动会自动加载文件，导致文件被占用无法写入，延迟半秒后再操作。
             doc.Save(ConfigFilePath);
@@ -206,7 +205,7 @@ public static class OfficialWareConfigFunctions
         {
             doc.Save(ConfigFilePath);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await Task.Delay(500); // 猜测是官方驱动会自动加载文件，导致文件被占用无法写入，延迟半秒后再操作。
             doc.Save(ConfigFilePath);
@@ -216,7 +215,7 @@ public static class OfficialWareConfigFunctions
     }
 
     public static async Task<Either<Exception,bool>> BindHotKeyToKatButton(
-        KatButtonEnum button, bool useCtrl, bool useAlt, bool useShift, VirtualKeyCode hotKey)
+        KatButtonEnum button, bool useCtrl, bool useAlt, bool useShift, KeyCodeWrapper hotKey)
     {
         var doc = LoadDocument();
         if (doc == null) return new Exception("配置文件读取失败，请检查是否安装有官方驱动！");
@@ -253,7 +252,7 @@ public static class OfficialWareConfigFunctions
         {
             doc.Save(ConfigFilePath);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await Task.Delay(500); // 猜测是官方驱动会自动加载文件，导致文件被占用无法写入，延迟半秒后再操作。
             doc.Save(ConfigFilePath);
@@ -289,14 +288,14 @@ public static class OfficialWareConfigFunctions
             var docButton = new XmlDocument();
             docButton.LoadXml(DisableButtonXml);
             var importNode3 = doc.ImportNode(docButton.SelectSingleNode("ButtonBank")!, true);
-            node3!.AppendChild(importNode3);
+            node3.AppendChild(importNode3);
         }
        
         try
         {
             doc.Save(ConfigFilePath);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await Task.Delay(500); // 猜测是官方驱动会自动加载文件，导致文件被占用无法写入，延迟半秒后再操作。
             doc.Save(ConfigFilePath);
@@ -328,7 +327,7 @@ public static class OfficialWareConfigFunctions
         {
             doc.Save(ConfigFilePath);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await Task.Delay(500); // 猜测是官方驱动会自动加载文件，导致文件被占用无法写入，延迟半秒后再操作。
             doc.Save(ConfigFilePath);
@@ -375,7 +374,7 @@ public static class OfficialWareConfigFunctions
         return d1;
     }
 
-    private static XmlDocument CreateHotKeyMacroXml(bool useCtrl, bool useAlt, bool useShift, VirtualKeyCode hotKey)
+    private static XmlDocument CreateHotKeyMacroXml(bool useCtrl, bool useAlt, bool useShift, KeyCodeWrapper hotKey)
     {
         List<string> modifierKeyStrList = [];
         if (useCtrl)

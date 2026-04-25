@@ -1,30 +1,30 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using MetaKeyPresetsEditor.Helpers;
 using MetaKeyPresetsEditor.Services;
 using Microsoft.Extensions.DependencyInjection;
 using SpaceKat.Shared.Defines;
-using Win32Helpers;
+using PlatformAbstractions;
 
 namespace MetaKeyPresetsEditor.ViewModels;
 
-public partial class CurrentRunningProcessSelectorViewModel : ViewModelBase
+public partial class CurrentRunningProcessSelectorViewModel(IPlatformWindowService platformWindowService)
+    : ViewModelBase
 {
     public ObservableCollection<ForeProgramInfo> ForeProcessInfos { get; } = [];
 
     [ObservableProperty] private ForeProgramInfo? _selectedFpInfo;
+    public bool IsWindowsPlatform => PlatformHelper.IsWindows();
 
     public async Task UpdateForeProcessInfosAsync()
     {
         ForeProcessInfos.Clear();
-        var fpInfos = await Task.Run(CurrentForeProgramHelper.FindAll);
+        var fpInfos = await Task.Run(platformWindowService.FindAllForegroundPrograms);
         Dispatcher.UIThread.Invoke(() => { fpInfos.Iter(ForeProcessInfos.Add); });
     }
 

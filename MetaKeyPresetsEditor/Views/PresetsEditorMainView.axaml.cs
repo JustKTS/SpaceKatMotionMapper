@@ -4,7 +4,6 @@ using Avalonia.Threading;
 using MetaKeyPresetsEditor.Helpers;
 using MetaKeyPresetsEditor.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
-using Ursa.Controls;
 
 namespace MetaKeyPresetsEditor.Views;
 

@@ -4,7 +4,7 @@ using NetEscapades.EnumGenerators;
 
 namespace SpaceKatHIDWrapper.Models;
 
-[EnumExtensions]
+[EnumExtensions(MetadataSource = MetadataSource.DisplayAttribute)]
 public enum KatMotionEnum
 {
     [Display(Name = "无动作")] Stable = 0,
@@ -23,7 +23,7 @@ public enum KatMotionEnum
     [Display(Name = "未定义")] Null = 999
 }
 
-[EnumExtensions]
+[EnumExtensions(MetadataSource = MetadataSource.DisplayAttribute)]
 public enum KatPressModeEnum
 {
     [Display(Name = "短触")] Short = 0,

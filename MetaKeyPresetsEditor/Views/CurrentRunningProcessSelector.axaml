@@ -8,7 +8,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:tempType="clr-namespace:Win32Helpers;assembly=Win32Helpers"
+    xmlns:platformAbstractions="clr-namespace:PlatformAbstractions;assembly=PlatformAbstractions"
     xmlns:u="https://irihi.tech/ursa"
     xmlns:vms="clr-namespace:MetaKeyPresetsEditor.ViewModels;assembly=MetaKeyPresetsEditor"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
@@ -30,48 +30,62 @@
             当前正在运行的程序：
         </TextBlock>
         <u:LoadingContainer Grid.Row="2" Name="LoadingContainerA">
-            <ListBox
-                ItemsSource="{Binding ForeProcessInfos}"
-                MaxHeight="300"
-                MinHeight="200"
-                Name="CurrentProgramListBox"
-                SelectedItem="{Binding SelectedFpInfo}">
-                <ListBox.DataTemplates>
-                    <DataTemplate x:DataType="tempType:ForeProgramInfo">
-                        <Grid ColumnDefinitions="80,100,60,200" HorizontalAlignment="Stretch">
-                            <TextBlock
-                                Classes="H6"
-                                Grid.Column="0"
-                                HorizontalAlignment="Left"
-                                Theme="{StaticResource TitleTextBlock}">
-                                进程名：
-                            </TextBlock>
-                            <TextBlock
-                                Classes="H7"
-                                Grid.Column="1"
-                                HorizontalAlignment="Left"
-                                Text="{Binding ProcessName}"
-                                Theme="{StaticResource TitleTextBlock}"
-                                ToolTip.Tip="{Binding ProcessName}" />
-                            <TextBlock
-                                Classes="H6"
-                                Grid.Column="2"
-                                HorizontalAlignment="Left"
-                                Theme="{StaticResource TitleTextBlock}">
-                                标题：
-                            </TextBlock>
-                            <TextBlock
-                                Classes="H7"
-                                Grid.Column="3"
-                                HorizontalAlignment="Left"
-                                MaxWidth="200"
-                                Text="{Binding Title}"
-                                Theme="{StaticResource TitleTextBlock}"
-                                ToolTip.Tip="{Binding Title}" />
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.DataTemplates>
-            </ListBox>
+            <Grid>
+                <!-- Windows平台显示程序列表 -->
+                <ListBox
+                    ItemsSource="{Binding ForeProcessInfos}"
+                    MaxHeight="300"
+                    MinHeight="200"
+                    Name="CurrentProgramListBox"
+                    SelectedItem="{Binding SelectedFpInfo}"
+                    IsVisible="{Binding IsWindowsPlatform}">
+                    <ListBox.DataTemplates>
+                        <DataTemplate x:DataType="platformAbstractions:ForeProgramInfo">
+                            <Grid ColumnDefinitions="80,100,60,200" HorizontalAlignment="Stretch">
+                                <TextBlock
+                                    Classes="H6"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Left"
+                                    Theme="{StaticResource TitleTextBlock}">
+                                    进程名：
+                                </TextBlock>
+                                <TextBlock
+                                    Classes="H7"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Left"
+                                    Text="{Binding ProcessName}"
+                                    Theme="{StaticResource TitleTextBlock}"
+                                    ToolTip.Tip="{Binding ProcessName}" />
+                                <TextBlock
+                                    Classes="H6"
+                                    Grid.Column="2"
+                                    HorizontalAlignment="Left"
+                                    Theme="{StaticResource TitleTextBlock}">
+                                    标题：
+                                </TextBlock>
+                                <TextBlock
+                                    Classes="H7"
+                                    Grid.Column="3"
+                                    HorizontalAlignment="Left"
+                                    MaxWidth="200"
+                                    Text="{Binding Title}"
+                                    Theme="{StaticResource TitleTextBlock}"
+                                    ToolTip.Tip="{Binding Title}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.DataTemplates>
+                </ListBox>
+
+                <!-- 非Windows平台显示提示信息 -->
+                <TextBlock
+                    Classes="H6"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="程序列表功能仅在 Windows 平台上支持"
+                    Theme="{StaticResource TitleTextBlock}"
+                    IsVisible="{Binding !IsWindowsPlatform}"
+                    Margin="20" />
+            </Grid>
         </u:LoadingContainer>
     </Grid>
 </UserControl>

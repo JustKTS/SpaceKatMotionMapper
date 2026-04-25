@@ -16,7 +16,7 @@ public partial class FirstDownloadPresetsViewModel : ViewModelBase, IDialogConte
     private async Task Download()
     {
         var ret = await DownloadMetaKeyPresetsHelper.DownloadAndCopyMetaKeyPresetsAsync();
-        _ = ret.Match(s =>
+        _ = ret.Match(_ =>
             {
                  _metaKeyPresetService.ReloadConfigs();
                  return true;

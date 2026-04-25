@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
     Background="Transparent"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -29,7 +29,7 @@
     </UserControl.Styles>
 
     <Border Theme="{StaticResource CardBorder}">
-        <Grid RowDefinitions="Auto, *, Auto">
+        <Grid RowDefinitions="Auto, Auto, Auto, *, Auto">
             <StackPanel
                 Grid.Row="0"
                 HorizontalAlignment="Center"
@@ -48,12 +48,80 @@
                     IsVisible="{Binding !IsDefault}" />
             </StackPanel>
 
+            <WrapPanel
+                Grid.Row="1"
+                HorizontalAlignment="Center"
+                Margin="8,4"
+                Orientation="Horizontal"
+                VerticalAlignment="Center">
+                <StackPanel Margin="8,4" Spacing="4" Width="220">
+                    <TextBlock Text="默认长推触发时间（毫秒）" TextWrapping="Wrap" />
+                    <u:NumericIntUpDown
+                        AllowSpin="True"
+                        EmptyInputValue="300"
+                        Maximum="2000"
+                        Minimum="20"
+                        Value="{Binding DefaultLongReachTimeoutMs}"
+                        Width="120" />
+                </StackPanel>
+                <StackPanel Margin="8,4" Spacing="4" Width="220">
+                    <TextBlock Text="默认单动作长推触发时间（毫秒）" TextWrapping="Wrap" />
+                    <u:NumericIntUpDown
+                        AllowSpin="True"
+                        EmptyInputValue="50"
+                        Maximum="100"
+                        Minimum="30"
+                        Value="{Binding DefaultSingleActionLongReachTimeoutMs}"
+                        Width="120" />
+                </StackPanel>
+                <StackPanel Margin="8,4" Spacing="4" Width="220">
+                    <TextBlock Text="默认重复触发放大系数" TextWrapping="Wrap" />
+                    <u:NumericDoubleUpDown
+                        AllowSpin="True"
+                        EmptyInputValue="1.5"
+                        Maximum="10"
+                        Minimum="0.1"
+                        Step="0.1"
+                        Value="{Binding DefaultRepeatScaleFactor}"
+                        Width="120" />
+                </StackPanel>
+            </WrapPanel>
+
+            <Border
+                Grid.Row="2"
+                IsVisible="{Binding ShowSingleActionModeHint}"
+                Background="{DynamicResource SemiColorWarningLight}"
+                BorderBrush="{DynamicResource SemiColorWarning}"
+                BorderThickness="1"
+                CornerRadius="8"
+                HorizontalAlignment="Center"
+                Margin="12,8,12,0"
+                MaxWidth="760"
+                Padding="14,10">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <PathIcon
+                        Data="{StaticResource SemiIconAlertTriangle}"
+                        Foreground="{DynamicResource SemiColorWarning}"
+                        Height="16"
+                        VerticalAlignment="Center"
+                        Width="16" />
+                    <TextBlock
+                        Classes="H6"
+                        Foreground="{DynamicResource SemiColorText0}"
+                        Text="{Binding SingleActionModeHintText}"
+                        TextAlignment="Center"
+                        TextWrapping="Wrap"
+                        Theme="{StaticResource TitleTextBlock}"
+                        VerticalAlignment="Center" />
+                </StackPanel>
+            </Border>
+
 
             <DataGrid
                 CanUserReorderColumns="False"
                 CanUserResizeColumns="True"
                 CanUserSortColumns="False"
-                Grid.Row="1"
+                Grid.Row="3"
                 HeadersVisibility="All"
                 Height="350"
                 ItemsSource="{Binding ConfigViewModels}"
@@ -64,12 +132,27 @@
                         <Setter Property="TextWrapping" Value="WrapWithOverflow" />
                     </Style>
                 </DataGrid.Styles>
+                
                 <DataGrid.Columns>
+                    
+                    <DataGridTemplateColumn Header="覆盖" Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="vms:MotionTimeSingleConfigViewModel">
+                                <ToggleSwitch
+                                    IsChecked="{Binding IsOverridden}"
+                                    IsVisible="{Binding IsSingleActionMotion}"
+                                    Theme="{StaticResource SimpleToggleSwitch}"
+                                    HorizontalAlignment="Center" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    
                     <DataGridTextColumn
                         Binding="{Binding MotionName}"
                         Header="动作名称"
                         Width="1*"
                         x:DataType="vms:MotionTimeSingleConfigViewModel" />
+
 
                     <DataGridTemplateColumn Header="短触多击容差（毫秒）" Width="1*">
                         <DataGridTemplateColumn.CellTemplate>
@@ -77,6 +160,7 @@
                                 <u:NumericIntUpDown
                                     AllowSpin="True"
                                     EmptyInputValue="120"
+                                    IsEnabled="{Binding CanEdit}"
                                     Margin="5"
                                     Maximum="1500"
                                     Minimum="80"
@@ -90,6 +174,7 @@
                                 <u:NumericIntUpDown
                                     AllowSpin="True"
                                     EmptyInputValue="800"
+                                    IsEnabled="{Binding CanEdit}"
                                     Margin="5"
                                     Maximum="2000"
                                     Minimum="20"
@@ -104,6 +189,7 @@
                                 <u:NumericIntUpDown
                                     AllowSpin="True"
                                     EmptyInputValue="120"
+                                    IsEnabled="{Binding CanEdit}"
                                     Margin="5"
                                     Maximum="3000"
                                     Minimum="20"
@@ -111,22 +197,33 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="长推多击触发缩放系数" Width="1.5*">
+                    <DataGridTemplateColumn Width="1.5*">
+                        <DataGridTemplateColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center"
+                                            ToolTip.Tip="放大系数指扭动幅度与重复触发频率的关联系数，数值越越大重复触发频率越高">
+                                    <TextBlock Text="重复触发及放大系数" VerticalAlignment="Center" />
+                                    <TextBlock Text="?" VerticalAlignment="Center"
+                                                />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.HeaderTemplate>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate x:DataType="vms:MotionTimeSingleConfigViewModel">
                                 <Grid ColumnDefinitions="Auto, 3*, *" Margin="5">
-                                    <CheckBox
+                                    <ToggleSwitch
                                         Grid.Column="0"
                                         IsChecked="{Binding UseScaleFactor}"
-                                        Margin="5"
-                                        Name="UseScaleCheckBox"
+                                        IsEnabled="{Binding CanEdit}"
+                                        OffContent="关"
+                                        OnContent="开"
                                         VerticalAlignment="Center" />
                                     <Slider
                                         Grid.Column="1"
-                                        IsEnabled="{Binding #UseScaleCheckBox.IsChecked}"
+                                        IsEnabled="{Binding UseScaleFactor}"
                                         IsSnapToTickEnabled="True"
                                         Maximum="10"
-                                        Minimum="1"
+                                        Minimum="0"
                                         TickFrequency="0.1"
                                         Value="{Binding LongReachRepeatScaleFactor}"
                                         VerticalAlignment="Center" />
@@ -142,7 +239,7 @@
 
             </DataGrid>
 
-            <Grid ColumnDefinitions="*,*,*" Grid.Row="2">
+            <Grid ColumnDefinitions="*,*,*" Grid.Row="4">
                 <Button
                     Command="{Binding ApplyTimeConfigCommand}"
                     Content="测试"

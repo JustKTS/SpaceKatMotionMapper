@@ -9,7 +9,7 @@ public static class MouseButtonHelper
     public static IReadOnlyList<string> ButtonNames { get; } =
         MouseButtonEnumExtensions.GetValues()
             .Where(x => x is not MouseButtonEnum.None)
-            .Select(x => x.ToStringFast())
+            .Select(x => x.ToStringFast(useMetadataAttributes:true))
             .ToList().AsReadOnly();
     
     public static MouseButtonEnum Parse(string key)
@@ -21,9 +21,9 @@ public static class MouseButtonHelper
 
 public class MouseButtonEnumConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        return value is not MouseButtonEnum keyCode ? string.Empty : keyCode.ToStringFast();
+        return value is not MouseButtonEnum keyCode ? string.Empty : keyCode.ToStringFast(useMetadataAttributes:true);
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -34,7 +34,7 @@ public class MouseButtonEnumConverter : IValueConverter
 
 public class ShowBaseOnMouseScrollConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not string keyCodeStr) return false;
         var keyCode = MouseButtonHelper.Parse(keyCodeStr);
@@ -51,7 +51,7 @@ public class ShowBaseOnMouseScrollConverter : IValueConverter
 
 public class HideBaseOnMouseScrollConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not string keyCodeStr) return true;
         var keyCode = MouseButtonHelper.Parse(keyCodeStr);

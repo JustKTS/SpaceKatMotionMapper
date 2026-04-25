@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Globalization;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
-using Avalonia.Markup.Xaml;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Helpers;
 
@@ -31,7 +29,7 @@ public class ModeNumToBoolConverter : IValueConverter
 
 public class ShortTriggerToBoolConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not string katPressModeStr) return false;
         var pressMode = KatMotionHelper.ParsePressModeEnum(katPressModeStr);

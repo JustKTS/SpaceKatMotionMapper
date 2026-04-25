@@ -9,9 +9,11 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:SpaceKat.Shared.Helpers;assembly=SpaceKat.Shared"
+    xmlns:local="clr-namespace:SpaceKatMotionMapper.Views;assembly=SpaceKatMotionMapper"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:u="https://irihi.tech/ursa"
     xmlns:vms="clr-namespace:SpaceKatMotionMapper.ViewModels;assembly=SpaceKatMotionMapper"
+    xmlns:shared="clr-namespace:SpaceKat.Shared.ViewModels;assembly=SpaceKat.Shared"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Design.DataContext>
@@ -42,8 +44,14 @@
         </Style>
     </UserControl.Styles>
 
-    <Border Classes="Shadow" Theme="{StaticResource CardBorder}">
-        <Grid ColumnDefinitions="Auto, Auto, *,*" RowDefinitions="Auto,*">
+    <Border
+        Background="#43444A"
+        Classes="Shadow"
+        Focusable="True"
+        IsTabStop="False"
+        PointerPressed="FocusContainer_OnPointerPressed"
+        Theme="{StaticResource CardBorder}">
+        <Grid ColumnDefinitions="Auto, Auto, *,*" RowDefinitions="Auto,*" RowSpacing="10">
             <Grid ColumnDefinitions="Auto, Auto, Auto" Margin="0,5">
                 <TextBlock
                     Classes="H4"
@@ -105,12 +113,10 @@
                                 </CheckBox>
 
                                 <TextBox
-                                    AcceptsTab="False"
                                     Grid.Column="4"
                                     Grid.Row="0"
-                                    KeyUp="HotKeyTextBox_OnKeyUp"
                                     Name="HotKeyTextBox"
-                                    Watermark="请按下所需的按键" />
+                                    PlaceholderText="请按下所需的按键" />
                                 <u:IconButton
                                     Click="Button_OnClick"
                                     Grid.Column="0"
@@ -152,7 +158,7 @@
                     MinWidth="200"
                     Text="{Binding KeyActionsDescription, Mode=TwoWay}"
                     VerticalAlignment="Center"
-                    Watermark="自定义动作描述" />
+                    PlaceholderText="自定义动作描述" />
                 <u:IconButton
                     Command="{Binding AddToFavPresetCommand}"
                     Grid.Column="2"
@@ -198,11 +204,12 @@
                 Grid.Column="0"
                 Grid.ColumnSpan="4"
                 Grid.Row="1"
+                HorizontalAlignment="Stretch"
                 MaxHeight="500">
                 <ItemsControl ItemsSource="{Binding ActionConfigGroups}" x:Name="ShortKeyConfigLBox">
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vms:KeyActionViewModel">
-                            <Grid ColumnDefinitions="Auto, *, Auto" RowDefinitions="*, Auto">
+                        <DataTemplate x:DataType="shared:KeyActionWithCommandViewModel">
+                            <Grid ColumnDefinitions="Auto, *, Auto" RowDefinitions="*, Auto" HorizontalAlignment="Stretch" ColumnSpacing="8" RowSpacing="8">
                                 <Border
                                     Classes.WrongDefine="{Binding !IsAvailable}"
                                     CornerRadius="5"
@@ -212,7 +219,6 @@
                                 <StackPanel
                                     Grid.Column="0"
                                     Grid.Row="0"
-                                    Margin="5"
                                     Orientation="Horizontal">
                                     <PathIcon
                                         Data="{StaticResource SemiIconTickCircle}"
@@ -225,131 +231,150 @@
                                         IsVisible="{Binding !IsAvailable}"
                                         VerticalAlignment="Stretch" />
                                 </StackPanel>
-                                <Grid
-                                    ColumnDefinitions="Auto, Auto, Auto, 1.5*, Auto, *"
+                                <DockPanel
                                     Grid.Column="1"
                                     Grid.Row="0"
                                     HorizontalAlignment="Stretch"
                                     IsVisible="{Binding !IsDelay}">
-                                    <TextBlock
-                                        Classes="H7"
-                                        Theme="{StaticResource TitleTextBlock}"
-                                        VerticalAlignment="Center">
-                                        类型：
-                                    </TextBlock>
-                                    <Border
-                                        Grid.Column="1"
+
+                                    <!-- 左侧固定区域：类型选择 -->
+                                    <StackPanel
+                                        DockPanel.Dock="Left"
+                                        Orientation="Horizontal"
                                         HorizontalAlignment="Stretch"
-                                        Margin="8,0"
-                                        Theme="{StaticResource RadioButtonGroupBorder}"
-                                        VerticalAlignment="Stretch">
-                                        <u:SelectionList
-                                            HorizontalAlignment="Center"
-                                            ItemsSource="{x:Static helpers:ActionTypeHelper.ActionTypeNames}"
-                                            SelectedItem="{Binding ActionType, Converter={StaticResource ActionTypeConverter}}"
+                                        Spacing="8">
+                                        <TextBlock
+                                            Classes="H7"
+                                            Theme="{StaticResource TitleTextBlock}"
+                                            VerticalAlignment="Center">
+                                            类型：
+                                        </TextBlock>
+                                        <Border
+                                            HorizontalAlignment="Stretch"
+                                            Margin="8,0"
+                                            Theme="{StaticResource RadioButtonGroupBorder}"
+                                            VerticalAlignment="Stretch">
+                                            <u:SelectionList
+                                                HorizontalAlignment="Center"
+                                                ItemsSource="{x:Static helpers:ActionTypeHelper.ActionTypeNames}"
+                                                SelectedItem="{Binding ActionType, Converter={StaticResource ActionTypeConverter}}"
+                                                VerticalAlignment="Stretch"
+                                                x:Name="ActionTypeSelector">
+                                                <u:SelectionList.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" />
+                                                    </ItemsPanelTemplate>
+                                                </u:SelectionList.ItemsPanel>
+                                            </u:SelectionList>
+                                        </Border>
+                                    </StackPanel>
+
+                                    <!-- 右侧可变区域：模式选择或滚动倍率 -->
+                                    <StackPanel
+                                        DockPanel.Dock="Right"
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+
+                                        <!-- 模式选择区域：单动作模式下隐藏 -->
+                                        <Border
+                                            IsVisible="{Binding !$parent[UserControl].(local:KeyActionConfigView.IsSingleActionMode)}"
+                                            x:Name="PressModeSection">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock
+                                                    Classes="H7"
+                                                    IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource HideBaseOnMouseScrollConverter}}"
+                                                    Theme="{StaticResource TitleTextBlock}"
+                                                    VerticalAlignment="Center">
+                                                    模式：
+                                                </TextBlock>
+                                                <Border
+                                                    HorizontalAlignment="Stretch"
+                                                    Margin="8,0"
+                                                    Theme="{StaticResource RadioButtonGroupBorder}"
+                                                    VerticalAlignment="Stretch"
+                                                    x:Name="PressModeBorder">
+                                                    <u:SelectionList
+                                                        HorizontalAlignment="Center"
+                                                        ItemsSource="{Binding ActionType, Converter={StaticResource DoubleClickCheckConverter}}"
+                                                        SelectedItem="{Binding PressMode, Converter={StaticResource PressModeEnumConverter}, Mode=TwoWay}"
+                                                        VerticalAlignment="Stretch">
+                                                        <u:SelectionList.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" />
+                                                            </ItemsPanelTemplate>
+                                                        </u:SelectionList.ItemsPanel>
+                                                    </u:SelectionList>
+                                                </Border>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- 滚动倍率区域 -->
+                                        <TextBlock
+                                            Classes="H7"
+                                            IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource ShowBaseOnMouseScrollConverter}}"
+                                            Theme="{StaticResource TitleTextBlock}"
+                                            VerticalAlignment="Center">
+                                            滚动倍率：
+                                        </TextBlock>
+                                        <u:NumericIntUpDown
+                                            AllowDrag="True"
+                                            Classes="Large"
+                                            HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Right"
+                                            IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource ShowBaseOnMouseScrollConverter}}"
+                                            Margin="10,0,10,0"
+                                            Maximum="100"
+                                            Minimum="-100"
+                                            Value="{Binding Multiplier}"
                                             VerticalAlignment="Stretch"
-                                            x:Name="ActionTypeSelector">
-                                            <u:SelectionList.ItemsPanel>
-                                                <ItemsPanelTemplate>
-                                                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" />
-                                                </ItemsPanelTemplate>
-                                            </u:SelectionList.ItemsPanel>
-                                        </u:SelectionList>
-                                    </Border>
-                                    <TextBlock
-                                        Classes="H7"
-                                        Grid.Column="2"
-                                        Theme="{StaticResource TitleTextBlock}"
-                                        VerticalAlignment="Center">
-                                        按键：
-                                    </TextBlock>
+                                            MinWidth="80" />
+                                    </StackPanel>
+
+                                    <!-- 中间固定区域：按键输入 - 放在最后以填充剩余空间 -->
                                     <Grid
-                                        ColumnDefinitions="Auto, *"
-                                        Grid.Column="3"
-                                        Grid.Row="0">
+                                        Margin="10,0,10,0"
+                                        ColumnDefinitions="Auto, Auto, *"
+                                        HorizontalAlignment="Stretch">
+                                        <TextBlock
+                                            Classes="H7"
+                                            Grid.Column="0"
+                                            Theme="{StaticResource TitleTextBlock}"
+                                            VerticalAlignment="Center">
+                                            按键：
+                                        </TextBlock>
                                         <CheckBox
+                                            Grid.Column="1"
                                             HorizontalAlignment="Center"
                                             IsChecked="{Binding ActionType, Converter={StaticResource ActionTypeMouseToFalseConverter}, Mode=OneWay}"
                                             IsEnabled="{Binding ActionType, Converter={StaticResource ActionTypeMouseToFalseConverter}, Mode=OneWay}"
-                                            Margin="4,0,4,0"
                                             ToolTip.Tip="即时输入模式"
                                             VerticalAlignment="Center"
                                             x:Name="IsInstantCheckBox" />
                                         <TextBox
-                                            AcceptsTab="False"
-                                            Grid.Column="1"
-                                            HorizontalAlignment="Stretch"
+                                            Grid.Column="2"
                                             IsVisible="{Binding #IsInstantCheckBox.IsChecked}"
-                                            KeyUp="HotKeyTextBox_OnKeyUp"
-                                            Margin="5,0,5,0"
-                                            Text="{Binding Key, Converter={StaticResource ActionTypeKeyOrButtonConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                            helpers:HotKeyTextBox.IsEnabled="True"
+                                            Text="{Binding Key, Converter={StaticResource ActionTypeKeyOrButtonConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                             VerticalAlignment="Stretch"
-                                            Watermark="请按下要配置的按键" />
+                                            PlaceholderText="请按下要配置的按键"
+                                            HorizontalAlignment="Stretch"
+                                            Margin="5,0,0,0"
+                                            MinWidth="150" />
                                         <u:AutoCompleteBox
                                             FilterMode="Contains"
-                                            Grid.Column="1"
-                                            Grid.Row="0"
-                                            HorizontalAlignment="Stretch"
+                                            Grid.Column="2"
                                             IsVisible="{Binding !#IsInstantCheckBox.IsChecked}"
                                             ItemsSource="{Binding #ActionTypeSelector.SelectedItem, Converter={StaticResource ActionTypeItemNamesConverter}}"
-                                            Margin="5,0,5,0"
+                                            SelectionChanged="KeySelectionCBox_OnSelectionChanged"
                                             Text="{Binding Key, Converter={StaticResource ActionTypeKeyOrButtonConverter}, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                             VerticalAlignment="Stretch"
-                                            Watermark="请点击或输入后按自动补全选择按键"
-                                            x:Name="KeySelectionCBox" />
+                                            PlaceholderText="请点击或输入后按自动补全选择按键"
+                                            x:Name="KeySelectionCBox"
+                                            HorizontalAlignment="Stretch"
+                                            Margin="5,0,0,0"
+                                            MinWidth="150" />
                                     </Grid>
-
-                                    <TextBlock
-                                        Classes="H7"
-                                        Grid.Column="4"
-                                        IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource HideBaseOnMouseScrollConverter}}"
-                                        Theme="{StaticResource TitleTextBlock}"
-                                        VerticalAlignment="Center">
-                                        模式：
-                                    </TextBlock>
-                                    <Border
-                                        Grid.Column="5"
-                                        HorizontalAlignment="Stretch"
-                                        IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource HideBaseOnMouseScrollConverter}}"
-                                        Margin="8,0"
-                                        Theme="{StaticResource RadioButtonGroupBorder}"
-                                        VerticalAlignment="Stretch">
-                                        <u:SelectionList
-                                            HorizontalAlignment="Center"
-                                            ItemsSource="{Binding ActionType, Converter={StaticResource DoubleClickCheckConverter}}"
-                                            SelectedItem="{Binding PressMode, Converter={StaticResource PressModeEnumConverter}, Mode=TwoWay}"
-                                            VerticalAlignment="Stretch">
-                                            <u:SelectionList.ItemsPanel>
-                                                <ItemsPanelTemplate>
-                                                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" />
-                                                </ItemsPanelTemplate>
-                                            </u:SelectionList.ItemsPanel>
-                                        </u:SelectionList>
-                                    </Border>
-
-                                    <TextBlock
-                                        Classes="H7"
-                                        Grid.Column="4"
-                                        IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource ShowBaseOnMouseScrollConverter}}"
-                                        Theme="{StaticResource TitleTextBlock}"
-                                        VerticalAlignment="Center">
-                                        滚动倍率：
-                                    </TextBlock>
-
-                                    <u:NumericIntUpDown
-                                        AllowDrag="True"
-                                        Classes="Large"
-                                        Grid.Column="5"
-                                        HorizontalAlignment="Stretch"
-                                        HorizontalContentAlignment="Right"
-                                        IsVisible="{Binding #KeySelectionCBox.SelectedItem, Converter={StaticResource ShowBaseOnMouseScrollConverter}}"
-                                        Margin="10,0,10,0"
-                                        Maximum="100"
-                                        Minimum="-100"
-                                        Value="{Binding Multiplier}"
-                                        VerticalAlignment="Stretch" />
-
-                                </Grid>
+                                </DockPanel>
                                 <Grid
                                     ColumnDefinitions="*, 2*, *"
                                     Grid.Column="1"
@@ -386,11 +411,10 @@
                                 </Grid>
                                 <Button
                                     Classes="Secendary"
-                                    Command="{Binding RemoveCommand}"
+                                    Command="{Binding RemoveActionConfigCommand}"
                                     Grid.Column="2"
                                     Grid.Row="0"
                                     HorizontalAlignment="Stretch"
-                                    Margin="0,0,10,0"
                                     Theme="{DynamicResource SolidButton}"
                                     VerticalAlignment="Center">
                                     -
@@ -402,12 +426,12 @@
                                     Grid.Row="1">
                                     <StackPanel Orientation="Horizontal" Spacing="5">
                                         <u:IconButton
-                                            Command="{Binding InsertNextActionCommand}"
+                                            Command="{Binding InsertNextActionConfigCommand}"
                                             Icon="{StaticResource SemiIconPlusCircle}"
                                             Theme="{StaticResource BorderlessIconButton}"
                                             ToolTip.Tip="添加单键" />
                                         <u:IconButton
-                                            Command="{Binding InsertNextDelayCommand}"
+                                            Command="{Binding InsertNextDelayConfigCommand}"
                                             Icon="{StaticResource SemiIconActivity}"
                                             IsVisible="{Binding !IsDelay}"
                                             Theme="{StaticResource BorderlessIconButton}"

@@ -4,10 +4,11 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Irihi.Avalonia.Shared.Contracts;
+using PlatformAbstractions;
+using Serilog;
 using SpaceKat.Shared.Defines;
 using SpaceKat.Shared.Services.Contract;
 using Ursa.Controls;
-using Win32Helpers;
 
 namespace SpaceKat.Shared.ViewModels;
 
@@ -32,23 +33,37 @@ public partial class RunningProgramSelectorViewModel : ObservableObject, IDialog
     }
 
     private readonly IStorageProviderService _storageProviderService;
+    private readonly IPlatformWindowService _platformWindowService;
 
-    public RunningProgramSelectorViewModel(IStorageProviderService storageProviderService)
+    public RunningProgramSelectorViewModel(IStorageProviderService storageProviderService, IPlatformWindowService platformWindowService)
     {
         _storageProviderService = storageProviderService;
-        _ = UpdateForeProcessInfosAsync();
+        _platformWindowService = platformWindowService;
+        Log.Debug("[{ViewModel}] Constructor called, service type: {ServiceType}",
+            nameof(RunningProgramSelectorViewModel), _platformWindowService.GetType().FullName);
+        // 不在构造函数中加载数据，等待对话框显示时再加载
     }
-    
-    private async Task UpdateForeProcessInfosAsync(CancellationToken cancellationToken=default)
+
+    /// <summary>
+    /// 更新前台程序列表（在对话框显示时调用）
+    /// </summary>
+    public async Task UpdateForeProcessInfosAsync(CancellationToken cancellationToken=default)
     {
+        Log.Debug("[{ViewModel}] UpdateForeProcessInfosAsync() started", nameof(RunningProgramSelectorViewModel));
         ForeProcessInfos.Clear();
-        await foreach(var fpInfo in CurrentForeProgramHelper.FindAllAsyncEnumerable(cancellationToken))
+        var count = 0;
+        await foreach(var fpInfo in _platformWindowService.FindAllForegroundProgramsAsync(cancellationToken))
         {
+            count++;
+            Log.Debug("[{ViewModel}] Received window info #{Count}: {Title}",
+                nameof(RunningProgramSelectorViewModel), count, fpInfo.Title);
             Dispatcher.UIThread.Invoke(()=>
             {
                 ForeProcessInfos.Add(fpInfo);
             });
         }
+        Log.Information("[{ViewModel}] UpdateForeProcessInfosAsync() completed, total windows: {Count}",
+            nameof(RunningProgramSelectorViewModel), count);
     }
 
 
@@ -71,9 +86,9 @@ public partial class RunningProgramSelectorViewModel : ObservableObject, IDialog
         });
     }
 
-    public void ReturnFpInfo(ForeProgramInfo info)
+    public async void ReturnFpInfo(ForeProgramInfo info)
     {
-        RequestClose?.Invoke(this, info);
+        await Dispatcher.UIThread.InvokeAsync(() => RequestClose?.Invoke(this, info));
     }
 
     public void Close()

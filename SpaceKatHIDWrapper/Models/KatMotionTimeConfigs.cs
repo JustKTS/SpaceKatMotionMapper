@@ -4,6 +4,11 @@ namespace SpaceKatHIDWrapper.Models;
 
 public record KatMotionTimeConfigs(Dictionary<KatMotionEnum, KatTriggerTimesConfig> Configs)
 {
+    public HashSet<KatMotionEnum> OverriddenMotions { get; set; } = [];
+    public int DefaultLongReachTimeoutMs { get; set; } = 300;
+    public int DefaultSingleActionLongReachTimeoutMs { get; set; } = 50;
+    public double DefaultRepeatScaleFactor { get; set; } = 1.5;
+
     public KatMotionTimeConfigs() : this(new Dictionary<KatMotionEnum, KatTriggerTimesConfig>())
     {
         Configs = MotionTimeConfigInitHelper.GeneDefault();

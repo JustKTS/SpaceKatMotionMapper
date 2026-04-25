@@ -5,7 +5,7 @@ using NetEscapades.EnumGenerators;
 namespace SpaceKat.Shared.Models;
 
 [JsonConverter(typeof(JsonStringEnumConverter<ActionType>))]
-[EnumExtensions]
+[EnumExtensions(MetadataSource = MetadataSource.DisplayAttribute)]
 public enum ActionType
 {
     [Display(Name="键盘")]

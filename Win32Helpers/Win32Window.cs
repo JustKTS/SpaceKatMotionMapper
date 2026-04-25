@@ -25,9 +25,9 @@ public class Win32Window
 
     // public nint Handle => _hWnd;
 
-    public string ClassName => _className ??= Helpers.CallWin32ToGetPWSTR(512, (p, l) => GetClassName(_hWnd, p, l));
+    public string ClassName => _className ??= Win32UtilityHelpers.CallWin32ToGetPWSTR(512, (p, l) => GetClassName(_hWnd, p, l));
 
-    public string Title => _title ??=  Helpers.CallWin32ToGetPWSTR(512, (p, l) => GetWindowText(_hWnd, p, l));
+    public string Title => _title ??=  Win32UtilityHelpers.CallWin32ToGetPWSTR(512, (p, l) => GetWindowText(_hWnd, p, l));
 
     public uint ProcessId => _pid is 0 ? (_pid = GetProcessIdCore()) : _pid;
 

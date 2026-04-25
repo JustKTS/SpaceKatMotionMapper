@@ -1,5 +1,4 @@
 ﻿using LanguageExt;
-using LanguageExt.Common;
 using SpaceKat.Shared.Models;
 
 namespace SpaceKat.Shared.Services.Contract;

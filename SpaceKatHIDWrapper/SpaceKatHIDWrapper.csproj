@@ -1,19 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <EnableEnumGeneratorInterceptor>true</EnableEnumGeneratorInterceptor>
         <PublishAot>true</PublishAot>
         <PublishTrimmed>true</PublishTrimmed>
+        <LangVersion>latestmajor</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-      <PackageReference Include="HidApi.Net" Version="1.1.0" />
+      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+      <PackageReference Include="HidApi.Net" Version="1.2.0" />
       <PackageReference Include="LanguageExt.Core" Version="4.4.9" />
-      <PackageReference Include="NetEscapades.EnumGenerators" Version="1.0.0-beta11" />
+      <PackageReference Include="NetEscapades.EnumGenerators" Version="1.0.0-beta21" />
     </ItemGroup>
     
     <ItemGroup>

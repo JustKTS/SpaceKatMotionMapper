@@ -11,11 +11,11 @@ public partial class MainView : UserControl
     {
         DataContext = App.GetRequiredService<MainViewModel>();
         InitializeComponent();
-        Loaded += (s, e) =>
+        Loaded += (_, _) =>
         {
             if (App.GetRequiredService<MetaKeyPresetService>().IsFirstStart())
             {
-                Dialog.ShowModal<FirstDownloadPresetsView, FirstDownloadPresetsViewModel>(
+                Dialog.ShowStandardAsync<FirstDownloadPresetsView, FirstDownloadPresetsViewModel>(
                     App.GetRequiredService<FirstDownloadPresetsViewModel>(), options: new DialogOptions
                     {
                         StartupLocation = WindowStartupLocation.CenterOwner,

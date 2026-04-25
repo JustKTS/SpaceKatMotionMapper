@@ -9,7 +9,7 @@ public static class PressModeHelper
     public static IReadOnlyList<string> PressModeNames { get; } =
         PressModeEnumExtensions.GetValues()
             .Where(x => x is not PressModeEnum.None)
-            .Select(x => x.ToStringFast()).ToList().AsReadOnly();
+            .Select(x => x.ToStringFast(useMetadataAttributes:true)).ToList().AsReadOnly();
 
 
     public static PressModeEnum Parse(string pressModeName)
@@ -24,7 +24,7 @@ public class PressModeEnumConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        return value is not PressModeEnum keyMode ? PressModeEnum.None.ToStringFast() : keyMode.ToStringFast();
+        return value is not PressModeEnum keyMode ? PressModeEnum.None.ToStringFast(useMetadataAttributes:true) : keyMode.ToStringFast(useMetadataAttributes:true);
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

@@ -1,6 +1,5 @@
 ﻿using SpaceKat.Shared.Helpers;
 using SpaceKat.Shared.Models;
-using WindowsInput;
 
 // ReSharper disable StringLiteralTypo
 

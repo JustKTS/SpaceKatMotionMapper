@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Models;
-using SpaceKatMotionMapper.ViewModels;
 
 namespace SpaceKatMotionMapper.Helpers;
 

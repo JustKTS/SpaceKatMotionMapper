@@ -1,7 +1,4 @@
-﻿using System.Collections.Frozen;
-using System.Collections.ObjectModel;
-using System.Runtime.InteropServices.Swift;
-using HidApi;
+﻿using HidApi;
 using LanguageExt;
 using SpaceKatHIDWrapper.DeviceHIDSpecs;
 using SpaceKatHIDWrapper.Functions;
@@ -11,7 +8,7 @@ namespace SpaceKatHIDWrapper.DeviceWrappers;
 
 public class SpaceDeviceDataWrapper : IDeviceDataWrapper
 {
-    private DeviceHidSpec? _hidSpec = null;
+    private DeviceHidSpec? _hidSpec;
     public event EventHandler<Either<Exception, bool>>? ConnectionChanged;
 
 
@@ -21,7 +18,7 @@ public class SpaceDeviceDataWrapper : IDeviceDataWrapper
 
     public bool IsConnected => _device != null;
 
-    private readonly KatDeviceBuffer _buffer = new();
+    private KatDeviceBuffer? _buffer;
 
     private void RetryConnect(object? obj, Either<Exception, bool> isConnected)
     {
@@ -53,6 +50,7 @@ public class SpaceDeviceDataWrapper : IDeviceDataWrapper
             var (spec, device) = pair;
             _hidSpec = spec;
             _device = device;
+            _buffer = new KatDeviceBuffer(_hidSpec.ButtonMappings.Count);
             _readLength = ReadFunctions.GetReadBytesCount(_hidSpec.AxesMappings);
             ConnectionChanged?.Invoke(this, IsConnected);
             return true;
@@ -74,7 +72,7 @@ public class SpaceDeviceDataWrapper : IDeviceDataWrapper
         try
         {
             var rawData = _device.ReadTimeout(_readLength, 300);
-
+            if  (_buffer == null) return null;
             var ret = ReadFunctions.UpdateDeviceData(rawData, in _buffer, _hidSpec.AxesMappings, _hidSpec.AxisScale,
                 _hidSpec.ButtonMappings);
             return ret ? _buffer.ToKatDeviceData() : null;

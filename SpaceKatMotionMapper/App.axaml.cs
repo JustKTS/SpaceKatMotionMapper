@@ -1,9 +1,7 @@
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
@@ -23,8 +21,16 @@ using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.ViewModels;
 using SpaceKatMotionMapper.Views;
+using PlatformAbstractions;
+using Serilog.Sinks.OpenTelemetry;
+using SpaceKat.Shared.Logging;
+
+#if WINDOWS
 using Win32Helpers;
-using WindowsInput;
+#elif LINUX
+using LinuxHelpers;
+#endif
+
 using ILogger = Serilog.ILogger;
 using Path = System.IO.Path;
 using SpaceKat.Shared.States;
@@ -43,11 +49,11 @@ public class App : Application
     {
         try
         {
-            return (App.Current as App)!.Host.Services.GetRequiredService<T>();
+            return (Current as App)!.Host.Services.GetRequiredService<T>();
         }
         catch (Exception ex)
         {
-            Debug.WriteLine(ex);
+            Log.Error(ex, "[{App}] GetService failed for {ServiceType}", nameof(App), typeof(T).Name);
             throw;
         }
     }
@@ -61,7 +67,7 @@ public class App : Application
         }
         catch (Exception ex)
         {
-            Debug.WriteLine(ex);
+            Log.Error(ex, "[{App}] GetRequiredService failed for {ServiceType}", nameof(App), typeof(T).Name);
             throw;
         }
     }
@@ -93,7 +99,7 @@ public class App : Application
 
                 services.AddTransient<TransparentInfoWindow>();
                 services.AddSingleton<TransparentInfoViewModel>();
-                
+
                 services.AddTransient<FavPresetsEditorView>();
                 services.AddTransient<FavPresetsEditorViewModel>();
                 services.AddTransient<FirstDownloadPresetsView>();
@@ -130,9 +136,32 @@ public class App : Application
                 services.AddSingleton<IStorageProviderService, StorageProviderService>();
                 services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
                 services.AddSingleton<IFileService, FileService>();
-                services.AddSingleton<CurrentForeProgramHelper>();
+
+                // 核心服务接口注册
+                services.AddSingleton<IKatMotionFileService, KatMotionFileService>();
+                services.AddSingleton<IPopUpNotificationService, PopUpNotificationService>();
+                services.AddSingleton<IKatMotionActivateService, KatMotionActivateService>();
+                services.AddSingleton<IActivationStatusService, ActivationStatusService>();
+                services.AddSingleton<IKatMotionConfigVMManageService, KatMotionConfigVMManageService>();
+
+                // 平台特定服务
+#if LINUX
+                services.AddLinuxPlatformServices();
+                services.AddSingleton<IFloatingControlWindowUIFactory>(_ =>
+                    new LinuxHelpers.Services.FloatingWindow.FloatingControlWindowUIFactory(
+                        () => new FloatingControlWindow()));
+                services.AddTransient<FloatingControlWindow>();
+#elif WINDOWS
+                services.AddWindowsPlatformServices();
+#else
+                services.AddSingleton<IPlatformWindowService, PlatformAbstractions.Unsupported.UnsupportedPlatformWindowService>();
+                services.AddSingleton<IPlatformHotKeyService, PlatformAbstractions.Unsupported.UnsupportedPlatformHotKeyService>();
+                services.AddSingleton<IPlatformForegroundProgramService, PlatformAbstractions.Unsupported.UnsupportedPlatformForegroundProgramService>();
+                services.AddSingleton<IPlatformMinimizeService, GenericPlatformMinimizeService>();
+                services.AddSingleton<IFileExplorerService, PlatformAbstractions.Unsupported.UnsupportedFileExplorerService>();
+#endif
                 services.AddSingleton<ActivationStatusService>();
-                services.AddSingleton<InputSimulator>();
+                // 保留具体类注册以向后兼容，同时优先使用接口
                 services.AddSingleton<KatMotionActivateService>();
                 services.AddSingleton<KatMotionFileService>();
                 services.AddSingleton<CommonConfigViewModel>();
@@ -140,7 +169,8 @@ public class App : Application
                 services.AddSingleton<OtherConfigsViewModel>();
                 services.AddSingleton<ModeChangeService>();
                 services.AddSingleton<ConflictKatMotionService>();
-                services.AddSingleton<KatMotionConfigVMManageService>();
+                // Ensure interface and concrete resolve to the same singleton instance.
+                services.AddSingleton(sp => (KatMotionConfigVMManageService)sp.GetRequiredService<IKatMotionConfigVMManageService>());
                 services.AddSingleton<IOfficialMapperHotKeyService, OfficialMapperHotKeyService>();
                 services.AddSingleton<MetaKeyPresetService>();
                 services.AddSingleton<MetaKeyPresetFileService>();
@@ -159,11 +189,21 @@ public class App : Application
                 }
 
                 var logPath = Path.Combine(GlobalPaths.AppLogPath, "Log.log");
+
+                // 生成实例ID并创建enricher
+                var instanceId = Guid.NewGuid().ToString();
+                var instanceIdEnricher = new InstanceIdEnricher(instanceId);
+
                 Log.Logger = new LoggerConfiguration()
                     .MinimumLevel.Debug()
                     .Enrich.FromLogContext()
-                    .WriteTo.File(logPath, rollingInterval: RollingInterval.Day)
-                    .MinimumLevel.Information()
+                    .Enrich.With(instanceIdEnricher)  // 添加实例ID enricher
+#if DEBUG
+                    .WriteTo.OpenTelemetry("http://localhost:9428/insert/opentelemetry/v1/logs", OtlpProtocol.HttpProtobuf)
+#endif
+                    .WriteTo.File(logPath,
+                        rollingInterval: RollingInterval.Day,
+                        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [InstanceId:{InstanceId}] {Message:lj}{NewLine}{Exception}")
                     .CreateLogger();
                 logging.Services.AddSingleton(Log.Logger);
             })
@@ -181,10 +221,6 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // Line below is needed to remove Avalonia data validation.
-        // Without this line you will get duplicate validations from both Avalonia and CT
-        BindingPlugins.DataValidators.RemoveAt(0);
-
         switch (ApplicationLifetime)
         {
             case IClassicDesktopStyleApplicationLifetime desktop:
@@ -220,7 +256,21 @@ public class App : Application
                 ofMs.UnregisterHandle();
                 OfficialWareConfigFunctions.CleanAllChange().GetAwaiter().GetResult();
                 Hid.Exit();
-                GetRequiredService<CurrentForeProgramHelper>().Dispose();
+                var foregroundService = GetRequiredService<IPlatformForegroundProgramService>();
+                if (foregroundService is IDisposable disposableForegroundService)
+                {
+                    disposableForegroundService.Dispose();
+                }
+
+                var minimizeService = GetRequiredService<IPlatformMinimizeService>();
+                minimizeService.Dispose();
+
+                #if WINDOWS
+                if (GetRequiredService<CurrentForeProgramHelper>() is { } helper)
+                {
+                    helper.Dispose();
+                }
+                #endif
                 _mutex?.WaitOne();
                 _mutex?.ReleaseMutex();
                 desktop.Shutdown();
@@ -236,8 +286,8 @@ public class App : Application
     private void ShowWindowMenuItem_OnClick(object? sender, EventArgs e)
     {
         var window = GetService<MainWindow>();
-        window.WindowState = WindowState.Normal;
-        window.ShowInTaskbar = true;
+        var minimizeService = GetRequiredService<IPlatformMinimizeService>();
+        minimizeService.RestoreWindow(window);
     }
 
     private static Mutex? _mutex;

@@ -1,12 +1,9 @@
-using System;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
-using CommunityToolkit.Mvvm.Messaging;
 using MetaKeyPresetsEditor.Helpers;
 using Microsoft.Extensions.DependencyInjection;
-using MetaKeyPresetsEditor.ViewModels;
 using SpaceKat.Shared.Models;
 using Ursa.Controls;
 using Notification = Ursa.Controls.Notification;

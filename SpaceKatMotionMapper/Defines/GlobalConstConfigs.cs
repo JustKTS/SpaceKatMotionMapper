@@ -2,6 +2,7 @@
 
 public static class GlobalConstConfigs
 {
-    public const int ConfigFileVersion = 2;
-    public const string SoftVersion = "0.2.8";
+    public const int ConfigFileVersion = 4;
+    public static string SoftVersion { get; } =
+        typeof(GlobalConstConfigs).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
 }

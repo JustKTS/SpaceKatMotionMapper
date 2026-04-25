@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LanguageExt;
-using Semi.Avalonia.Locale;
+using Serilog;
 using SpaceKat.Shared.Functions;
 using SpaceKatHIDWrapper.DeviceWrappers;
 using SpaceKatHIDWrapper.Functions;
 using SpaceKatHIDWrapper.Services;
-using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.States;
 
@@ -20,41 +17,42 @@ namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class ConnectAndEnableViewModel : ObservableObject
 {
-    public ConnectAndEnableViewModel()
+    private readonly TransparentInfoService _transparentInfoService;
+    private readonly PopUpNotificationService _popUpNotificationService;
+    private readonly KatMotionRecognizeService _katMotionRecognizeService;
+    private readonly IDeviceDataWrapper _deviceDataWrapper;
+    private readonly GlobalStates _globalStates;
+
+    public GlobalStates GlobalStates => _globalStates;
+
+    public ConnectAndEnableViewModel(
+        TransparentInfoService transparentInfoService,
+        PopUpNotificationService popUpNotificationService,
+        KatMotionRecognizeService katMotionRecognizeService,
+        IDeviceDataWrapper deviceDataWrapper,
+        GlobalStates globalStates)
     {
-        GlobalStates.IsConnectionChanged += ConnectionChangeHandle;
-        GlobalStates.IsMapperEnableChanged += SwitchMapperEnable;
+        _transparentInfoService = transparentInfoService;
+        _popUpNotificationService = popUpNotificationService;
+        _katMotionRecognizeService = katMotionRecognizeService;
+        _deviceDataWrapper = deviceDataWrapper;
+        _globalStates = globalStates;
+
+        _globalStates.IsConnectionChanged += ConnectionChangeHandle;
+        _globalStates.IsMapperEnableChanged += SwitchMapperEnable;
         _katMotionRecognizeService.ConnectionChanged += OnDeviceIsConnectedChange;
     }
 
-
-    # region 服务相关
-
-    private readonly TransparentInfoService _transparentInfoService = App.GetRequiredService<TransparentInfoService>();
-
-    private readonly PopUpNotificationService _popUpNotificationService =
-        App.GetRequiredService<PopUpNotificationService>();
-
-    public static GlobalStates GlobalStates => App.GetRequiredService<GlobalStates>();
-
-    # endregion
-
     #region 连接情况
-
-    private readonly KatMotionRecognizeService _katMotionRecognizeService =
-        App.GetRequiredService<KatMotionRecognizeService>();
-
-    private readonly IDeviceDataWrapper _deviceDataWrapper =
-        App.GetRequiredService<IDeviceDataWrapper>();
 
     private Task? _listenTask;
 
     [RelayCommand]
     private async Task ConnectBtn()
     {
-        if (GlobalStates.IsConnected)
+        if (_globalStates.IsConnected)
         {
-            DisconnectDevice();
+            await DisconnectDeviceAsync();
         }
         else
         {
@@ -90,7 +88,7 @@ public partial class ConnectAndEnableViewModel : ObservableObject
                 }
                 catch (Exception e)
                 {
-                    Debug.WriteLine(e);
+                    Log.Error(e, "[{ViewModel}] Error in motion recognition task", nameof(ConnectAndEnableViewModel));
                 }
             }, TaskCreationOptions.LongRunning);
             _listenTask.Start();
@@ -105,16 +103,16 @@ public partial class ConnectAndEnableViewModel : ObservableObject
 
         _isUseConnectButton = true;
         _popUpNotificationService.Pop(NotificationType.Warning, "未搜索到设备，是否已打开设备并配对成功？");
-        GlobalStates.IsConnected = true;
-        GlobalStates.IsConnected = false;
+        _globalStates.IsConnected = true;
+        _globalStates.IsConnected = false;
         _isUseConnectButton = false;
     }
 
-    private static void OnDeviceIsConnectedChange(object? sender, Either<Exception, bool> eitherValue)
+    private void OnDeviceIsConnectedChange(object? sender, Either<Exception, bool> eitherValue)
     {
-        eitherValue.Match(value => Dispatcher.UIThread.InvokeAsync(() => GlobalStates.IsConnected = value), ex =>
+        eitherValue.Match(value => Dispatcher.UIThread.InvokeAsync(() => _globalStates.IsConnected = value), _ =>
         {
-            Dispatcher.UIThread.InvokeAsync(() => GlobalStates.IsConnected = false);
+            Dispatcher.UIThread.InvokeAsync(() => _globalStates.IsConnected = false);
         });
     }
        
@@ -122,7 +120,18 @@ public partial class ConnectAndEnableViewModel : ObservableObject
     private void DisconnectDevice()
     {
         _katMotionRecognizeService.ExitEvent.Set();
-        _listenTask?.Wait();
+        _listenTask?.Wait(TimeSpan.FromSeconds(3));
+        _listenTask = null;
+        KatDeviceFunction.StopDevice();
+    }
+
+    private async Task DisconnectDeviceAsync()
+    {
+        _katMotionRecognizeService.ExitEvent.Set();
+        if (_listenTask is not null)
+        {
+            await Task.WhenAny(_listenTask, Task.Delay(3000));
+        }
         _listenTask = null;
         KatDeviceFunction.StopDevice();
     }
@@ -137,14 +146,20 @@ public partial class ConnectAndEnableViewModel : ObservableObject
         {
             OfficialWareConfigFunctions.CloseOfficialMapper().ContinueWith(t =>
             {
-                _transparentInfoService.DisplayOtherInfo("官方映射已禁用");
+                if (t.IsFaulted)
+                    Log.Error(t.Exception, "[{ViewModel}] Failed to close official mapper", nameof(ConnectAndEnableViewModel));
+                else
+                    _transparentInfoService.DisplayOtherInfo("官方映射已禁用");
             });
         }
         else
         {
             OfficialWareConfigFunctions.OpenOfficialMapper().ContinueWith(t =>
             {
-                _transparentInfoService.DisplayOtherInfo("官方映射已启用");
+                if (t.IsFaulted)
+                    Log.Error(t.Exception, "[{ViewModel}] Failed to open official mapper", nameof(ConnectAndEnableViewModel));
+                else
+                    _transparentInfoService.DisplayOtherInfo("官方映射已启用");
             });
         }
     }

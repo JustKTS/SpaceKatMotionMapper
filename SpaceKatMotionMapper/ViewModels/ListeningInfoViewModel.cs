@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatHIDWrapper.Services;
 using SpaceKatMotionMapper.Services;
-using Win32Helpers;
+using PlatformAbstractions;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
@@ -28,8 +28,8 @@ public partial class ListeningInfoViewModel : ViewModelBase
             if (!_katMotionActivateService.IsActivated) return;
             Dispatcher.UIThread.Invoke(() =>
             {
-                KatMotion = data.Motion.ToStringFast();
-                PressMode = data.KatPressMode.ToStringFast();
+                KatMotion = data.Motion.ToStringFast(useMetadataAttributes:true);
+                PressMode = data.KatPressMode.ToStringFast(useMetadataAttributes:true);
                 RepeatCount = data.RepeatCount;
                 
                 try
@@ -48,7 +48,7 @@ public partial class ListeningInfoViewModel : ViewModelBase
 
     # region 前台状态
 
-    private readonly CurrentForeProgramHelper _currentForeProgramHelper;
+    private readonly IPlatformForegroundProgramService _currentForeProgramHelper;
     [ObservableProperty] private ForeProgramInfo _currentForeProgramInfo = new();
 
     private void ForeProgramChangedCallback(object? sender, ForeProgramInfo data)
@@ -58,24 +58,22 @@ public partial class ListeningInfoViewModel : ViewModelBase
 
     # endregion
     
-    private readonly PopUpNotificationService _popUpNotificationService;
     private readonly TransparentInfoService _transparentInfoService;
 
 #if DEBUG
-    public ListeningInfoViewModel() : this(null!, null!, null!, null!, null!)
+    public ListeningInfoViewModel() : this(null!, null!,  null!, null!)
     {
     }
 #endif
 
 
     public ListeningInfoViewModel(
-        CurrentForeProgramHelper currentForeProgramHelper, PopUpNotificationService popUpNotificationService,
+        IPlatformForegroundProgramService currentForeProgramHelper, 
         KatMotionRecognizeService katMotionRecognizeService,
         KatMotionActivateService katMotionActivateService,
         TransparentInfoService transparentInfoService)
     {
         _katMotionRecognizeService = katMotionRecognizeService;
-        _popUpNotificationService = popUpNotificationService;
         _katMotionActivateService = katMotionActivateService;
         _currentForeProgramHelper = currentForeProgramHelper;
         _transparentInfoService = transparentInfoService;

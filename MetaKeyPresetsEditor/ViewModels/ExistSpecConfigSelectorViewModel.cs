@@ -8,7 +8,6 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Irihi.Avalonia.Shared.Contracts;
-using LanguageExt;
 using MetaKeyPresetsEditor.Helpers;
 using MetaKeyPresetsEditor.Services;
 using Microsoft.Extensions.DependencyInjection;

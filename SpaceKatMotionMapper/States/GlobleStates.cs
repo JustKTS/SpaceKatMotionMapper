@@ -1,8 +1,6 @@
 ﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
-using LanguageExt;
 using SpaceKat.Shared.Services.Contract;
-using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.States;
 
@@ -11,7 +9,7 @@ public partial class GlobalStates : ObservableObject
     # region 全局信息
     [ObservableProperty] private bool _isConnected;
     [ObservableProperty] private bool _isMapperEnable;
-    [ObservableProperty] private bool _isTransparentInfoEnable;
+    [ObservableProperty] private bool _isTransparentInfoEnable = true;
 
     public const string IsMapperEnableKey = "IsMapperEnable";
 

@@ -88,7 +88,7 @@
                             MaxWidth="300"
                             MinWidth="200"
                             Text="{Binding KeyActionFilterStr}"
-                            Watermark="输入需要筛选的名称" />
+                            PlaceholderText="输入需要筛选的名称" />
                     </Grid>
                     <u:IconButton
                         Command="{Binding AddKeyActionConfigCommand}"

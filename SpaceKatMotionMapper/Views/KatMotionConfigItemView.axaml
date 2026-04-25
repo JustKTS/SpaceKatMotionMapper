@@ -1,0 +1,121 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:SpaceKatMotionMapper.Helpers"
+    xmlns:local="clr-namespace:SpaceKatMotionMapper.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:u="https://irihi.tech/ursa"
+    xmlns:vm="clr-namespace:SpaceKatMotionMapper.ViewModels"
+    x:Class="SpaceKatMotionMapper.Views.KatMotionConfigItemView"
+    x:DataType="vm:KatMotionViewModel"
+    d:DesignHeight="80"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+
+    <Design.DataContext>
+        <vm:KatMotionViewModel />
+    </Design.DataContext>
+
+    <UserControl.Resources>
+        <helpers:KatPressModeConverter x:Key="KatPressModeConverter" />
+        <helpers:KatPressModeSimpleConverter x:Key="KatPressModeSimpleConverter" />
+        <local:ShortTriggerToBoolConverter x:Key="ShortTriggerToBoolConverter" />
+    </UserControl.Resources>
+    
+    <Border
+          BorderBrush="{DynamicResource SemiColorBorder}"
+          BorderThickness="1"
+          CornerRadius="5"
+          Padding="5"
+          Background="#35363C">
+
+    <!-- Expander 折叠显示，节省空间 -->
+    <Expander x:Name="ConfigExpander" IsExpanded="False">
+        <Expander.Header>
+                <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="10">
+                    <!-- 删除按钮 -->
+                    <Button
+                        Grid.Column="0"
+                        Classes="Danger"
+                        Command="{Binding RemoveSelfCommand}"
+                        IsEnabled="{Binding CanRemove}"
+                        Theme="{DynamicResource SolidButton}"
+                        Width="28"
+                        Height="28">
+                        <PathIcon
+                            Data="{StaticResource SemiIconMinus}"
+                            Height="12"
+                            Width="12" />
+                    </Button>
+                    
+                    <Border Grid.Column="1"
+                            HorizontalAlignment="Stretch" Theme="{StaticResource RadioButtonGroupBorder}"
+                            Background="{DynamicResource SemiColorBackground1}"/>
+
+                    <!-- 进阶模式触发状态选择器 -->
+                    <ListBox
+                        Grid.Column="1"
+                        IsVisible="{Binding IsAdvancedConfigMode}"
+                        ItemsSource="{x:Static helpers:KatMotionHelper.KatPressModeSimpleNames}"
+                        MinWidth="100"
+                        SelectedItem="{Binding KatPressMode, Converter={StaticResource KatPressModeSimpleConverter}, Mode=TwoWay}"
+                        Theme="{DynamicResource ButtonRadioGroupListBox}"
+                        VerticalAlignment="Center"
+                        x:Name="PressModeSimpleSelector" />
+                 
+                    <!-- 专家模式触发状态选择器 -->
+                    <ListBox
+                        Grid.Column="1"
+                        IsVisible="{Binding IsExpertMode}"
+                        ItemsSource="{x:Static helpers:KatMotionHelper.KatPressModeNames}"
+                        MinWidth="180"
+                        SelectedItem="{Binding KatPressMode, Converter={StaticResource KatPressModeConverter}, Mode=TwoWay}"
+                        Theme="{DynamicResource ButtonRadioGroupListBox}"
+                        VerticalAlignment="Center"
+                        x:Name="PressModeAdvancedSelector" />
+
+                    <!-- 触发次数控件：仅在进阶模式的短触时显示 -->
+                    <StackPanel
+                        Grid.Column="3"
+                        IsEnabled="{Binding #PressModeSimpleSelector.SelectedItem, Converter={StaticResource ShortTriggerToBoolConverter}}"
+                        IsVisible="{Binding IsAdvancedConfigMode}"
+                        Margin="5,0,0,0"
+                        Orientation="Horizontal"
+                        Spacing="3">
+                        <TextBlock
+                            Classes="H6"
+                            Theme="{StaticResource TitleTextBlock}"
+                            VerticalAlignment="Center">
+                            ×
+                        </TextBlock>
+                        <u:NumericIntUpDown
+                            EmptyInputValue="1"
+                            Maximum="5"
+                            Minimum="1"
+                            MinWidth="100"
+                            Value="{Binding RepeatCount, Mode=TwoWay}"
+                            Width="50" />
+                    </StackPanel>
+
+                    <!-- 按键配置简述 -->
+                    <TextBlock
+                        Grid.Column="4"
+                        Classes="H6"
+                        Foreground="{DynamicResource SemiColorInfo}"
+                        Margin="10,0,0,0"
+                        Theme="{StaticResource TitleTextBlock}"
+                        VerticalAlignment="Center">
+                        <Run Text="{Binding KeyActionConfigGroup.KeyActionsDescription}" />
+                    </TextBlock>
+                </Grid>
+        </Expander.Header>
+
+        <!-- 详细配置内容：只包含按键配置 -->
+        <local:KeyActionConfigView
+            DataContext="{Binding KeyActionConfigGroup}"
+            IsSingleActionMode="{Binding IsSingleActionMode}" />
+    </Expander>
+    </Border>
+
+</UserControl>

@@ -12,9 +12,9 @@ public class ConflictKatMotionService
 
     public bool IsConflict(Guid id, KatMotionEnum katMotion, KatPressModeEnum katPressMode, int count)
     {
+        var target = new KatMotion(katMotion, katPressMode, count);
         return OverwriteKatMotions.Any(e =>
-            e.Id == id && e.Motion.Motion == katMotion && e.Motion.KatPressMode == katPressMode &&
-            e.Motion.RepeatCount == count);
+            e.Id == id && e.Motion.MatchesMotion(target));
     }
     public void Register(KatMotionInfo katMotionInfo)
     {

@@ -229,12 +229,11 @@
                                 VerticalAlignment="Center" />
                             <TextBox
                                 Grid.Column="3"
-                                KeyUp="HotKeyTextBox_OnKeyUp"
                                 Margin="5"
                                 Name="HotKeyTextBox"
                                 Text="{Binding HotKey, Mode=TwoWay, Converter={StaticResource VirtualKeyCodeConverter}}"
                                 ToolTip.Tip="请按下所需的按键"
-                                Watermark="请按下所需的按键" />
+                                PlaceholderText="请按下所需的按键" />
                         </Grid>
 
                         <TextBlock
@@ -305,6 +304,7 @@
                                 IsChecked="{Binding AutoDisableViewModel.IsEnable, Mode=TwoWay}"
                                 OffContent="关"
                                 OnContent="开"
+                                IsEnabled="{Binding AutoDisableViewModel.IsPlatformSupported}"
                                 Theme="{StaticResource SimpleToggleSwitch}" />
                         </Grid>
                     </Expander.Header>
