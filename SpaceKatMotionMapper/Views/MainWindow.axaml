@@ -3,8 +3,8 @@
     Icon="/Assets/SpaceKatDevice.png"
     MinHeight="600"
     MinWidth="500"
+    Padding="0,32,0,0"
     Title="SpaceKat动作映射工具"
-    TitleBarMargin="200 0 0 0"
     Width="600"
     WindowStartupLocation="CenterScreen"
     d:DesignHeight="1000"
@@ -12,7 +12,9 @@
     mc:Ignorable="d"
     CanMinimize="True"                                                                     
     CanMaximize="True"                                                                     
-    IsCloseButtonVisible="True"
+    IsCloseButtonVisible="False"
+    IsMinimizeButtonVisible="False"
+    IsRestoreButtonVisible="False"
     x:Class="SpaceKatMotionMapper.Views.MainWindow"
     x:DataType="navVm:NavViewModel"
     xmlns="https://github.com/avaloniaui"
@@ -24,25 +26,23 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     
+    <u:UrsaWindow.LeftContent>
+        <view:ConnectAndEnableView />
+    </u:UrsaWindow.LeftContent>
+
     <u:UrsaWindow.RightContent>
         <view:TitleBarRightContent />
     </u:UrsaWindow.RightContent>
 
-    <Grid RowDefinitions="Auto, *">
-        <view:ConnectAndEnableView
-            Grid.Row="0"
-            HorizontalAlignment="Left"
-            MaxWidth="200" />
-
+    <Grid>
         <TransitioningContentControl
             Content="{Binding Content}"
-            Grid.Row="1"
             Margin="5">
             <TransitioningContentControl.PageTransition>
                 <CrossFade Duration="0:00:00.100" />
             </TransitioningContentControl.PageTransition>
         </TransitioningContentControl>
-        <u:OverlayDialogHost Grid.Row="1" HostId="{x:Static view:MainWindow.LocalHost}" />
+        <u:OverlayDialogHost HostId="{x:Static view:MainWindow.LocalHost}" />
 
     </Grid>
 </u:UrsaWindow>

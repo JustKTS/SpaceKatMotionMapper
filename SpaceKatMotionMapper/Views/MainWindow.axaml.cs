@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Chrome;
 using Avalonia.Controls.Notifications;
 using Avalonia.Interactivity;
+using Avalonia.LogicalTree;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Messaging;
 using PlatformAbstractions;
@@ -148,9 +151,34 @@ public partial class MainWindow : UrsaWindow
     protected override void OnLoaded(RoutedEventArgs e)
     {
         base.OnLoaded(e);
+        HideNativeDecorations();
         OnStartOrCloseFunctions.LoadOnMainWindowLoaded();
         var navVm = App.GetRequiredService<NavViewModel>();
         navVm.OnNavigation(navVm, typeof(MainView).FullName!);
+    }
+
+    private void HideNativeDecorations()
+    {
+        var decorations = this.GetLogicalDescendants()
+            .OfType<WindowDrawnDecorations>()
+            .FirstOrDefault();
+        if (decorations is null) return;
+
+        var overlayPanel = decorations.GetLogicalDescendants()
+            .OfType<StackPanel>()
+            .FirstOrDefault(s => s.Name == "PART_OverlayPanel");
+        if (overlayPanel is not null)
+        {
+            overlayPanel.IsVisible = false;
+        }
+
+        var closeButton = decorations.GetLogicalDescendants()
+            .OfType<Button>()
+            .FirstOrDefault(b => b.Name == "PART_CloseButton");
+        if (closeButton is not null)
+        {
+            closeButton.IsVisible = false;
+        }
     }
 
     protected override void OnClosing(WindowClosingEventArgs e)

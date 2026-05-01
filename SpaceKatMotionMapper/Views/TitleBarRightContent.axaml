@@ -7,35 +7,64 @@
     d:DesignHeight="50"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    
+
     <UserControl.Styles>
         <Style Selector="ToggleButton.Second:unchecked /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource ButtonBorderlessBackground}"></Setter>
+            <Setter Property="Background" Value="{DynamicResource ButtonBorderlessBackground}" />
         </Style>
         <Style Selector="ToggleButton.Second:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}"></Setter>
+            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}" />
         </Style>
         <Style Selector="Button.Second /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource ButtonBorderlessBackground}"></Setter>
+            <Setter Property="Background" Value="{DynamicResource ButtonBorderlessBackground}" />
         </Style>
         <Style Selector="Button.Second:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}"></Setter>
+            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}" />
         </Style>
     </UserControl.Styles>
-    
-    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="5">
-        <ToggleButton Click="Button_OnClick" Classes="Second" VerticalAlignment="Center">
+
+    <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Center"
+                WindowDecorationProperties.ElementRole="User">
+        <ToggleButton
+            x:Name="SettingsBtn"
+            Classes="Second"
+            Click="Button_OnClick"
+            VerticalAlignment="Center"
+            Margin="0,0,5,0">
             <PathIcon Data="{StaticResource SemiIconSetting}" Theme="{DynamicResource InnerPathIcon}" />
         </ToggleButton>
+
         <Button
             x:Name="MinimizeButton"
-            Click="MinimizeButton_OnClick"
             Classes="Second"
-            Height="50"
-            IsVisible="False"
+            Click="MinimizeButton_OnClick"
+            Height="30"
+            Width="30"
             VerticalAlignment="Center"
-            Width="50">
+            ToolTip.Tip="最小化">
             <PathIcon Data="{StaticResource SemiIconMinus}" Theme="{DynamicResource InnerPathIcon}" />
+        </Button>
+
+        <Button
+            x:Name="MaximizeButton"
+            Classes="Second"
+            Click="MaximizeButton_OnClick"
+            Height="30"
+            Width="30"
+            VerticalAlignment="Center"
+            ToolTip.Tip="最大化">
+            <PathIcon x:Name="MaximizeIcon" Data="{StaticResource SemiIconMaximize}" Theme="{DynamicResource InnerPathIcon}" />
+        </Button>
+
+        <Button
+            x:Name="CloseButton"
+            Classes="Second"
+            Click="CloseButton_OnClick"
+            Height="30"
+            Width="30"
+            VerticalAlignment="Center"
+            ToolTip.Tip="关闭">
+            <PathIcon Data="{StaticResource SemiIconClose}" Theme="{DynamicResource InnerPathIcon}" />
         </Button>
     </StackPanel>
 </UserControl>

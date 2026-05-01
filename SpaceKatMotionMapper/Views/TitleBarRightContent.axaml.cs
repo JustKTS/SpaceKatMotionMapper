@@ -1,9 +1,13 @@
+using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
-using PlatformAbstractions;
+using Avalonia.Media;
 using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.NavVMs;
+using SpaceKatMotionMapper.ViewModels;
+using Ursa.Controls;
 
 namespace SpaceKatMotionMapper.Views;
 
@@ -12,31 +16,40 @@ public partial class TitleBarRightContent : UserControl
     public TitleBarRightContent()
     {
         InitializeComponent();
-#if LINUX
-        MinimizeButton.IsVisible = true;
-#endif
+        AttachedToVisualTree += OnAttachedToVisualTree;
     }
-    // private readonly OverlayDialogOptions _options = new()
-    // {
-    //     FullScreen = true,
-    //     HorizontalAnchor = HorizontalPosition.Center,
-    //     VerticalAnchor = VerticalPosition.Center,
-    //     HorizontalOffset = 0.0,
-    //     VerticalOffset = 0.0,
-    //     Mode = DialogMode.None,
-    //     Buttons = DialogButton.None,
-    //     Title = "设置",
-    //     CanLightDismiss = true,
-    //     CanDragMove = true,
-    //     IsCloseButtonVisible = true,
-    //     CanResize = false
-    // };
-    //
-    // private void Button_OnClick(object? sender, RoutedEventArgs e)
-    // {
-    //     OverlayDialog.ShowModal<SettingsView, SettingsViewModel>(
-    //         App.GetRequiredService<SettingsViewModel>(), MainWindow.LocalHost, options: _options);
-    // }
+
+    private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
+    {
+        AttachedToVisualTree -= OnAttachedToVisualTree;
+        if (TopLevelHelper.GetTopLevel() is Window window)
+        {
+            window.PropertyChanged += OnWindowPropertyChanged;
+            UpdateMaximizeIcon(window.WindowState);
+        }
+    }
+
+    private void OnWindowPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == Window.WindowStateProperty && sender is Window window)
+        {
+            UpdateMaximizeIcon(window.WindowState);
+        }
+    }
+
+    private void UpdateMaximizeIcon(WindowState state)
+    {
+        if (MaximizeIcon is null) return;
+
+        var iconKey = state == WindowState.Maximized
+            ? "SemiIconRestore"
+            : "SemiIconMaximize";
+
+        if (Application.Current!.TryFindResource(iconKey, out var resource))
+        {
+            MaximizeIcon.Data = (Geometry)resource!;
+        }
+    }
 
     private void Button_OnClick(object? sender, RoutedEventArgs e)
     {
@@ -59,8 +72,36 @@ public partial class TitleBarRightContent : UserControl
     {
         if (TopLevelHelper.GetTopLevel() is Window window)
         {
-            var minimizeService = App.GetRequiredService<IPlatformMinimizeService>();
-            minimizeService.MinimizeWindow(window);
+            window.Hide();
+        }
+    }
+
+    private void MaximizeButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (TopLevelHelper.GetTopLevel() is Window window)
+        {
+            window.WindowState = window.WindowState == WindowState.Maximized
+                ? WindowState.Normal
+                : WindowState.Maximized;
+        }
+    }
+
+    private async void CloseButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (TopLevelHelper.GetTopLevel() is not Window window) return;
+
+        var viewModel = new CloseConfirmDialogViewModel();
+        var confirmed = await OverlayDialog.ShowCustomAsync<
+            CloseConfirmDialog,
+            CloseConfirmDialogViewModel,
+            bool>(
+            viewModel,
+            MainWindow.LocalHost,
+            CloseConfirmDialogViewModel.OverlayDialogOptions);
+
+        if (confirmed)
+        {
+            window.Close();
         }
     }
 }

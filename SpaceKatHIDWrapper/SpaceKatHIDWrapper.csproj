@@ -29,10 +29,17 @@
       <AdditionalFiles Include="DeviceHIDSpecs\devices_3dconnexion.toml" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\SpaceKatHIDWrapper.SourceGen\SpaceKatHIDWrapper.SourceGen.csproj"
-                        OutputItemType="Analyzer"
-                        ReferenceOutputAssembly="false" />
-    </ItemGroup>
+    <Target Name="BuildSourceGen" BeforeTargets="BeforeBuild">
+        <MSBuild Projects="..\SpaceKatHIDWrapper.SourceGen\SpaceKatHIDWrapper.SourceGen.csproj"
+                 Targets="Build"
+                 Properties="Configuration=$(Configuration)"
+                 RemoveProperties="PublishTrimmed;PublishAot;SelfContained;RuntimeIdentifier" />
+    </Target>
+
+    <Target Name="AddSourceGenAnalyzer" BeforeTargets="CoreCompile">
+        <ItemGroup>
+            <Analyzer Include="..\SpaceKatHIDWrapper.SourceGen\bin\$(Configuration)\netstandard2.0\SpaceKatHIDWrapper.SourceGen.dll" />
+        </ItemGroup>
+    </Target>
 
 </Project>

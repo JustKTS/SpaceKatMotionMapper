@@ -5,6 +5,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <IsRoslynComponent>true</IsRoslynComponent>
+        <IsTrimmable>false</IsTrimmable>
+        <IsPublishable>false</IsPublishable>
+        <PublishTrimmed>false</PublishTrimmed>
         <LangVersion>latestmajor</LangVersion>
     </PropertyGroup>
     <ItemGroup>
