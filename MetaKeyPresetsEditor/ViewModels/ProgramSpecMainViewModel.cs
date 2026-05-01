@@ -90,13 +90,13 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
         var ret = await DownloadMetaKeyPresetsHelper.DownloadAndCopyMetaKeyPresetsAsync();
         if (ret.IsSuccess)
         {
-            DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
+            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
                 .ShowPopUpNotificationAsync(
                     new PopupNotificationData(NotificationType.Success, "预设下载成功"));
         }
         else
         {
-            DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
+            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
                 .ShowPopUpNotificationAsync(
                     new PopupNotificationData(NotificationType.Error, $"预设下载失败：{ret.Error.Message}"));
         }
@@ -123,7 +123,7 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
         }
         else
         {
-            DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
+            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
                 .ShowPopUpNotificationAsync(new PopupNotificationData(NotificationType.Error, $"预设文件读取失败：{loadRet.Error}"));
         }
     }

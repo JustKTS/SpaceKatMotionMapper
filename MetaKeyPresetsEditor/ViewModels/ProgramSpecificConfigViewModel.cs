@@ -175,7 +175,7 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
         var checkResult = CheckAvailable();
         if (checkResult.IsFailure)
         {
-            DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
+            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
                 new PopupNotificationData(
                     NotificationType.Error,
                     $"保存失败，{checkResult.Error.Message}"));
@@ -183,7 +183,7 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
         }
 
         await Task.Run(() => _metaKeyPresetFileService.SaveToConfigDir(ToConfigRecord()));
-        DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
+        await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
             new PopupNotificationData(
                 NotificationType.Success,
                 $"保存成功!"));
@@ -195,7 +195,7 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
         var checkResult = CheckAvailable();
         if (checkResult.IsFailure)
         {
-            DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
+            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
                 new PopupNotificationData(
                     NotificationType.Error,
                     $"保存失败，{checkResult.Error.Message}"));
@@ -220,7 +220,7 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
 
         if (saveResult.IsSuccess && saveResult.Value)
         {
-            DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
+            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
                 .ShowPopUpNotificationAsync(
                     new PopupNotificationData(
                         NotificationType.Success,
@@ -229,7 +229,7 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
         else
         {
             var message = saveResult.IsSuccess ? "保存失败" : saveResult.Error.Message;
-            DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
+            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
                 new PopupNotificationData(
                     NotificationType.Error,
                     $"保存失败，{message}"));

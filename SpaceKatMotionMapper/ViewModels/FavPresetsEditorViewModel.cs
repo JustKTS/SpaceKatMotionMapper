@@ -144,7 +144,7 @@ public partial class FavPresetsEditorViewModel : ViewModelBase, IDialogContext
         var checkResult = CheckAvailable();
         if (checkResult.IsFailure)
         {
-            OverlayMessageBox.ShowAsync($"保存失败，{checkResult.Error.Message}", hostId: FavPresetsEditorView.LocalHost,
+            await OverlayMessageBox.ShowAsync($"保存失败，{checkResult.Error.Message}", hostId: FavPresetsEditorView.LocalHost,
                 icon: MessageBoxIcon.Warning);
             return;
         }

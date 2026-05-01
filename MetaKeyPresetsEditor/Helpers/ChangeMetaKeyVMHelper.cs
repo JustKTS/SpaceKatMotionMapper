@@ -19,7 +19,7 @@ public static class ChangeMetaKeyVMHelper
         var ret = await vm.LoadFromRecord(record);
         if (ret.IsFailure)
         {
-            DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
+            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
                 new PopupNotificationData(NotificationType.Error, $"加载配置文件失败，具体错误信息为：{ret.Error.Message}"));
             Log.Logger.Error(ret.Error, "");
         }
