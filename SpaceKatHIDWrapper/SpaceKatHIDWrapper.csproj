@@ -25,8 +25,14 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="DeviceHIDSpecs\devices.toml" />
-      <EmbeddedResource Include="DeviceHIDSpecs\devices_3dconnexion.toml" />
+      <AdditionalFiles Include="DeviceHIDSpecs\devices.toml" />
+      <AdditionalFiles Include="DeviceHIDSpecs\devices_3dconnexion.toml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SpaceKatHIDWrapper.SourceGen\SpaceKatHIDWrapper.SourceGen.csproj"
+                        OutputItemType="Analyzer"
+                        ReferenceOutputAssembly="false" />
     </ItemGroup>
 
 </Project>

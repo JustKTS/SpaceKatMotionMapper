@@ -1,12 +1,9 @@
 ﻿using System.Collections.Frozen;
-using System.Reflection;
 
 namespace SpaceKatHIDWrapper.DeviceHIDSpecs;
 
 public static class DeviceHidSpecDict
 {
-    private const string EmbeddedResourceName = "SpaceKatHIDWrapper.DeviceHIDSpecs.devices.toml";
-    private const string EmbeddedThreeDConnexionResourceName = "SpaceKatHIDWrapper.DeviceHIDSpecs.devices_3dconnexion.toml";
     private const string DevicesFileName = "devices.toml";
     private const string ThreeDConnexionFileName = "devices_3dconnexion.toml";
 
@@ -23,7 +20,7 @@ public static class DeviceHidSpecDict
 
         var tomlPath = Path.Combine(configDirPath, DevicesFileName);
         if (!File.Exists(tomlPath))
-            ExtractEmbeddedResource(EmbeddedResourceName, tomlPath);
+            WriteDefaultTomlFile(tomlPath, false);
 
         try
         {
@@ -40,11 +37,10 @@ public static class DeviceHidSpecDict
     public static void Reload(string configDirPath, bool includeThreeDConnexion)
     {
         var fileName = includeThreeDConnexion ? ThreeDConnexionFileName : DevicesFileName;
-        var resourceName = includeThreeDConnexion ? EmbeddedThreeDConnexionResourceName : EmbeddedResourceName;
         var filePath = Path.Combine(configDirPath, fileName);
 
         if (!File.Exists(filePath))
-            ExtractEmbeddedResource(resourceName, filePath);
+            WriteDefaultTomlFile(filePath, includeThreeDConnexion);
 
         try
         {
@@ -77,15 +73,11 @@ public static class DeviceHidSpecDict
         }
     }
 
-    private static void ExtractEmbeddedResource(string resourceName, string targetPath)
+    private static void WriteDefaultTomlFile(string filePath, bool includeThreeDConnexion)
     {
-        var assembly = Assembly.GetExecutingAssembly();
-        using var stream = assembly.GetManifestResourceStream(resourceName);
-        if (stream is null)
-            throw new FileNotFoundException(
-                $"Embedded resource '{resourceName}' not found in assembly '{assembly.FullName}'.");
-
-        using var fileStream = File.Create(targetPath);
-        stream.CopyTo(fileStream);
+        var content = includeThreeDConnexion
+            ? EmbeddedTomlDefaults.Devices3DConnexion
+            : EmbeddedTomlDefaults.Devices;
+        File.WriteAllText(filePath, content);
     }
 }
