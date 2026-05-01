@@ -15,8 +15,6 @@ public class FakeKatMotionConfigVMManageService : IKatMotionConfigVMManageServic
 {
     private readonly Dictionary<Guid, KatMotionConfigViewModel> _configs = [];
     private Guid _commonConfigGuid = Guid.Empty;
-    private KatMotionConfigViewModel? _defaultConfig;
-
     /// <inheritdoc />
     public void RegisterConfig(KatMotionConfigViewModel configVm)
     {
@@ -46,11 +44,6 @@ public class FakeKatMotionConfigVMManageService : IKatMotionConfigVMManageServic
     /// <inheritdoc />
     public Either<Exception, KatMotionConfigViewModel> GetDefaultConfig()
     {
-        if (_defaultConfig != null)
-        {
-            return _defaultConfig;
-        }
-
         if (_commonConfigGuid != Guid.Empty)
         {
             return _configs[_commonConfigGuid];

@@ -4,6 +4,7 @@ using LinuxHelpers.Services.ForegroundProgram;
 using LinuxHelpers.Services.Input;
 using LinuxHelpers.Services.Minimize;
 using LinuxHelpers.Services.Notification;
+using LinuxHelpers.Services.SingletonInstance;
 using LinuxHelpers.Services.Window;
 using Microsoft.Extensions.DependencyInjection;
 using PlatformAbstractions;
@@ -27,6 +28,7 @@ public static class LinuxServiceCollectionExtensions
         services.AddSingleton<IFloatingControlWindowService, LinuxFloatingControlWindowService>();
         services.AddSingleton<IPlatformMinimizeService, LinuxPlatformMinimizeService>();
         services.AddSingleton<IFileExplorerService, LinuxFileExplorerService>();
+        services.AddSingleton<ISingletonInstanceService, LinuxSingletonInstanceService>();
         return services;
     }
 }

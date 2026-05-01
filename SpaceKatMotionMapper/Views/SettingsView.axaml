@@ -166,6 +166,36 @@
 
                 </Expander>
             </Border>
+            
+            <Border
+                Classes="Hover"
+                Margin="0"
+                Padding="2"
+                Theme="{StaticResource CardBorder}">
+                    
+                <Grid ColumnDefinitions="Auto, *, Auto" >
+                    <TextBlock Grid.Column="0" 
+                               Margin="16,0,10,0"
+                               VerticalAlignment="Center"
+                               Classes="SettingTitle"
+                               Foreground="{DynamicResource SemiColorPrimary}">3DConnexion 设备支持</TextBlock>
+                        <TextBlock Grid.Column="1"
+                                   Margin="10 0"
+                                   VerticalAlignment="Center" HorizontalAlignment="Left"
+                                   Text="开启后仅支持 3DConnexion 设备的 HID 映射"
+                                   TextWrapping="Wrap" />
+                    <ToggleSwitch
+                        Grid.Column="2"
+                        Margin="10,0,40,0"
+                        HorizontalAlignment="Right"
+                        Classes="Large"
+                        IsChecked="{Binding IsThreeDConnexionEnabled, Mode=TwoWay}"
+                        OffContent="关"
+                        OnContent="开"
+                        Theme="{StaticResource SimpleToggleSwitch}" />
+                </Grid>
+                 
+            </Border>
 
             <Border
                 Classes="Hover"
@@ -392,6 +422,8 @@
                     </StackPanel>
                 </Expander>
             </Border>
+
+           
 
         </StackPanel>
     </ScrollViewer>

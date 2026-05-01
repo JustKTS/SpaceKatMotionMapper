@@ -35,6 +35,5 @@ public static class KatDeviceFunction
 
     public static void StopDevice()
     {
-        Hid.Exit();
     }
 }

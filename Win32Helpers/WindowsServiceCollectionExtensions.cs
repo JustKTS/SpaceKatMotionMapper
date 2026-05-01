@@ -4,6 +4,7 @@ using PlatformAbstractions;
 using SpaceKat.Shared.Services;
 using SpaceKat.Shared.Services.Contract;
 using Win32Helpers.Services.Input;
+using Win32Helpers.Services.SingletonInstance;
 using WindowsInput;
 using Win32Helpers.Windows;
 
@@ -24,6 +25,7 @@ public static class WindowsServiceCollectionExtensions
         services.AddSingleton<IInputSimulator, InputSimulator>();
         services.AddSingleton<CurrentForeProgramHelper>();
         services.AddSingleton<IFileExplorerService, WindowsFileExplorerService>();
+        services.AddSingleton<ISingletonInstanceService, WindowsSingletonInstanceService>();
         return services;
     }
 }

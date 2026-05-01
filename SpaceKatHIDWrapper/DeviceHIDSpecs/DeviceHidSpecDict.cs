@@ -1,88 +1,91 @@
 ﻿using System.Collections.Frozen;
-using SpaceKatHIDWrapper.Models;
+using System.Reflection;
 
 namespace SpaceKatHIDWrapper.DeviceHIDSpecs;
 
 public static class DeviceHidSpecDict
 {
-    public static readonly FrozenDictionary<string, DeviceHidSpec> HidIds = new Dictionary<string, DeviceHidSpec>
+    private const string EmbeddedResourceName = "SpaceKatHIDWrapper.DeviceHIDSpecs.devices.toml";
+    private const string EmbeddedThreeDConnexionResourceName = "SpaceKatHIDWrapper.DeviceHIDSpecs.devices_3dconnexion.toml";
+    private const string DevicesFileName = "devices.toml";
+    private const string ThreeDConnexionFileName = "devices_3dconnexion.toml";
+
+    private static FrozenDictionary<string, DeviceHidSpec>? _hidIds;
+
+    public static FrozenDictionary<string, DeviceHidSpec> HidIds =>
+        _hidIds ?? throw new InvalidOperationException(
+            $"{nameof(DeviceHidSpecDict)} not initialized. Call {nameof(Initialize)} first.");
+
+    public static void Initialize(string configDirPath)
     {
-        ["Mini"] = new("SpaceKat V3 Mini", [0x256F, 0xC635], new Dictionary<MotionAxis, AxisSpecs>()
+        if (!Directory.Exists(configDirPath))
+            Directory.CreateDirectory(configDirPath);
+
+        var tomlPath = Path.Combine(configDirPath, DevicesFileName);
+        if (!File.Exists(tomlPath))
+            ExtractEmbeddedResource(EmbeddedResourceName, tomlPath);
+
+        try
         {
-            [MotionAxis.X] = new(1, 1, 2, 1),
-            [MotionAxis.Y] = new(1, 3, 4, -1),
-            [MotionAxis.Z] = new(1, 5, 6, -1),
-            [MotionAxis.Pitch] = new(1, 7, 8, -1),
-            [MotionAxis.Roll] = new(1, 9, 10, -1),
-            [MotionAxis.Yaw] = new(1, 11, 12, 1),
-        }.ToFrozenDictionary(), new List<ButtonSpecs>
+            _hidIds = DeviceHidSpecTomlReader.ReadFromFile(tomlPath);
+        }
+        catch (Exception ex) when (ex is not InvalidOperationException)
         {
-            new(3, 1, 0), // LEFT
-            new(3, 1, 1)  // RIGHT
-        }.AsReadOnly(), 350.0),
-        ["Mini_V1.3"] = new("SpaceKat V3 Mini", [0x256F, 0xC63A], new Dictionary<MotionAxis, AxisSpecs>()
+            throw new InvalidOperationException(
+                $"设备配置文件格式错误: {tomlPath}\n{ex.Message}\n可以删除此文件让程序从内置资源恢复默认配置",
+                ex);
+        }
+    }
+
+    public static void Reload(string configDirPath, bool includeThreeDConnexion)
+    {
+        var fileName = includeThreeDConnexion ? ThreeDConnexionFileName : DevicesFileName;
+        var resourceName = includeThreeDConnexion ? EmbeddedThreeDConnexionResourceName : EmbeddedResourceName;
+        var filePath = Path.Combine(configDirPath, fileName);
+
+        if (!File.Exists(filePath))
+            ExtractEmbeddedResource(resourceName, filePath);
+
+        try
         {
-            [MotionAxis.X] = new(1, 1, 2, 1),
-            [MotionAxis.Y] = new(1, 3, 4, -1),
-            [MotionAxis.Z] = new(1, 5, 6, -1),
-            [MotionAxis.Pitch] = new(1, 7, 8, -1),
-            [MotionAxis.Roll] = new(1, 9, 10, -1),
-            [MotionAxis.Yaw] = new(1, 11, 12, 1),
-        }.ToFrozenDictionary(), new List<ButtonSpecs>
+            _hidIds = DeviceHidSpecTomlReader.ReadFromFile(filePath);
+        }
+        catch (Exception ex) when (ex is not InvalidOperationException)
         {
-            new(3, 1, 0), // LEFT
-            new(3, 1, 1)  // RIGHT
-        }.AsReadOnly(), 350.0),
-        ["MiniE"] = new("SpaceKat V3 MiniE", [0x256F, 0xC638], new Dictionary<MotionAxis, AxisSpecs>()
+            throw new InvalidOperationException(
+                $"设备配置文件格式错误: {filePath}\n{ex.Message}\n可以删除此文件让程序从内置资源恢复默认配置",
+                ex);
+        }
+    }
+
+    public static void ResetToDefault(string configDirPath, bool includeThreeDConnexion = false)
+    {
+        var fileName = includeThreeDConnexion ? ThreeDConnexionFileName : DevicesFileName;
+        var tomlPath = Path.Combine(configDirPath, DevicesFileName);
+        var connPath = Path.Combine(configDirPath, ThreeDConnexionFileName);
+
+        if (includeThreeDConnexion)
         {
-            [MotionAxis.X] = new(1, 1, 2, 1),
-            [MotionAxis.Y] = new(1, 3, 4, -1),
-            [MotionAxis.Z] = new(1, 5, 6, -1),
-            [MotionAxis.Pitch] = new(1, 7, 8, -1),
-            [MotionAxis.Roll] = new(1, 9, 10, -1),
-            [MotionAxis.Yaw] = new(1, 11, 12, 1),
-        }.ToFrozenDictionary(), new List<ButtonSpecs>
+            if (File.Exists(connPath)) File.Delete(connPath);
+            Reload(configDirPath, true);
+        }
+        else
         {
-            new(3, 4, 1), // LEFT1
-            new(3, 1, 2), // LEFT2
-            new(3, 1, 5), // LEFT3
-            new(3, 1, 1), // RIGHT1
-            new(3, 1, 4), // RIGHT2
-            new(3, 2, 0)  // RIGHT3
-        }.AsReadOnly(), 350.0),// TODO: Pro与MiniE硬件码相同
-        ["MiniEWired"] = new("SpaceKat V3 MiniE Wired", [0x256F, 0xC631], new Dictionary<MotionAxis, AxisSpecs>()
-        {
-            [MotionAxis.X] = new(1, 1, 2, 1),
-            [MotionAxis.Y] = new(1, 3, 4, -1),
-            [MotionAxis.Z] = new(1, 5, 6, -1),
-            [MotionAxis.Pitch] = new(1, 7, 8, -1),
-            [MotionAxis.Roll] = new(1, 9, 10, -1),
-            [MotionAxis.Yaw] = new(1, 11, 12, 1),
-        }.ToFrozenDictionary(), new List<ButtonSpecs>
-        {
-            new(3, 4, 1), // LEFT1
-            new(3, 1, 2), // LEFT2
-            new(3, 1, 5), // LEFT3
-            new(3, 1, 1), // RIGHT1
-            new(3, 1, 4), // RIGHT2
-            new(3, 2, 0)  // RIGHT3
-        }.AsReadOnly(), 350.0),// TODO: Pro与MiniE硬件码相同
-        ["ProDesigner"] = new("SpaceKatV3 Pro Designer", [0x256F, 0xC633], new Dictionary<MotionAxis, AxisSpecs>()
-        {
-            [MotionAxis.X] = new(1, 1, 2, 1),
-            [MotionAxis.Y] = new(1, 3, 4, -1),
-            [MotionAxis.Z] = new(1, 5, 6, -1),
-            [MotionAxis.Pitch] = new(1, 7, 8, -1),
-            [MotionAxis.Roll] = new(1, 9, 10, -1),
-            [MotionAxis.Yaw] = new(1, 11, 12, 1),
-        }.ToFrozenDictionary(), new List<ButtonSpecs>
-        {
-            new(3, 4, 1), // LEFT1
-            new(3, 1, 2), // LEFT2
-            new(3, 1, 5), // LEFT3
-            new(3, 1, 1), // RIGHT1
-            new(3, 4, 2), // RIGHT2
-            new(3, 2, 0)  // RIGHT3
-        }.AsReadOnly(), 350.0), // TODO: 按钮定义没有修改，仅可用使用旋钮部分
-    }.ToFrozenDictionary();
+            if (File.Exists(tomlPath)) File.Delete(tomlPath);
+            if (File.Exists(connPath)) File.Delete(connPath);
+            Initialize(configDirPath);
+        }
+    }
+
+    private static void ExtractEmbeddedResource(string resourceName, string targetPath)
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        using var stream = assembly.GetManifestResourceStream(resourceName);
+        if (stream is null)
+            throw new FileNotFoundException(
+                $"Embedded resource '{resourceName}' not found in assembly '{assembly.FullName}'.");
+
+        using var fileStream = File.Create(targetPath);
+        stream.CopyTo(fileStream);
+    }
 }

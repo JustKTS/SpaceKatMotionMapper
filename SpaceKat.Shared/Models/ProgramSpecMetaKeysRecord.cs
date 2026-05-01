@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SpaceKat.Shared.Models;
 
@@ -9,7 +10,7 @@ public record ProgramSpecMetaKeysRecord(
     Dictionary<string, CombinationKeysRecord> CombinationKeys,
     Dictionary<string, List<KeyActionConfig>> MacroKeys);
 
-[JsonSourceGenerationOptions(WriteIndented = true, UseStringEnumConverter = true)]
+[JsonSourceGenerationOptions(WriteIndented = true, UseStringEnumConverter = true, PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, ReadCommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true)]
 [JsonSerializable(typeof(ProgramSpecMetaKeysRecord))]
 [JsonSerializable(typeof(string))]
 [JsonSerializable(typeof(bool))]

@@ -1,6 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
+using PlatformAbstractions;
+using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.NavVMs;
 
 namespace SpaceKatMotionMapper.Views;
@@ -10,6 +12,9 @@ public partial class TitleBarRightContent : UserControl
     public TitleBarRightContent()
     {
         InitializeComponent();
+#if LINUX
+        MinimizeButton.IsVisible = true;
+#endif
     }
     // private readonly OverlayDialogOptions _options = new()
     // {
@@ -47,6 +52,15 @@ public partial class TitleBarRightContent : UserControl
             case false:
                 navVm.OnNavigation(navVm, typeof(MainView).FullName!);
                 break;
+        }
+    }
+
+    private void MinimizeButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (TopLevelHelper.GetTopLevel() is Window window)
+        {
+            var minimizeService = App.GetRequiredService<IPlatformMinimizeService>();
+            minimizeService.MinimizeWindow(window);
         }
     }
 }

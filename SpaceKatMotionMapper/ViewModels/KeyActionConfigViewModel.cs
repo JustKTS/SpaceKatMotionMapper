@@ -19,7 +19,6 @@ using SpaceKat.Shared.ViewModels.PressModePolicies;
 using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.Functions.Contract;
 using SpaceKatMotionMapper.Models;
-using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.Views;

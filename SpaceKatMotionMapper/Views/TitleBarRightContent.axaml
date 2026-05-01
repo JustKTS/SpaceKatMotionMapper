@@ -15,9 +15,27 @@
         <Style Selector="ToggleButton.Second:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}"></Setter>
         </Style>
+        <Style Selector="Button.Second /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonBorderlessBackground}"></Setter>
+        </Style>
+        <Style Selector="Button.Second:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ButtonDefaultPointeroverBackground}"></Setter>
+        </Style>
     </UserControl.Styles>
     
-    <ToggleButton Click="Button_OnClick" Classes="Second" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <PathIcon Data="{StaticResource SemiIconSetting}" Theme="{DynamicResource InnerPathIcon}"></PathIcon>
-    </ToggleButton>
+    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="5">
+        <ToggleButton Click="Button_OnClick" Classes="Second" VerticalAlignment="Center">
+            <PathIcon Data="{StaticResource SemiIconSetting}" Theme="{DynamicResource InnerPathIcon}" />
+        </ToggleButton>
+        <Button
+            x:Name="MinimizeButton"
+            Click="MinimizeButton_OnClick"
+            Classes="Second"
+            Height="50"
+            IsVisible="False"
+            VerticalAlignment="Center"
+            Width="50">
+            <PathIcon Data="{StaticResource SemiIconMinus}" Theme="{DynamicResource InnerPathIcon}" />
+        </Button>
+    </StackPanel>
 </UserControl>

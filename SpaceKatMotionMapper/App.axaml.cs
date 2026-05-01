@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Threading;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
@@ -14,6 +13,7 @@ using Serilog;
 using SpaceKat.Shared.Functions;
 using SpaceKat.Shared.Services;
 using SpaceKat.Shared.Services.Contract;
+using SpaceKatHIDWrapper.DeviceHIDSpecs;
 using SpaceKatHIDWrapper.DeviceWrappers;
 using SpaceKatHIDWrapper.Services;
 using SpaceKatMotionMapper.Functions;
@@ -159,6 +159,7 @@ public class App : Application
                 services.AddSingleton<IPlatformForegroundProgramService, PlatformAbstractions.Unsupported.UnsupportedPlatformForegroundProgramService>();
                 services.AddSingleton<IPlatformMinimizeService, GenericPlatformMinimizeService>();
                 services.AddSingleton<IFileExplorerService, PlatformAbstractions.Unsupported.UnsupportedFileExplorerService>();
+                services.AddSingleton<ISingletonInstanceService, PlatformAbstractions.Unsupported.UnsupportedSingletonInstanceService>();
 #endif
                 services.AddSingleton<ActivationStatusService>();
                 // 保留具体类注册以向后兼容，同时优先使用接口
@@ -224,8 +225,8 @@ public class App : Application
         switch (ApplicationLifetime)
         {
             case IClassicDesktopStyleApplicationLifetime desktop:
-                var ret = SetSingleton();
-                if (!ret)
+                var singleton = GetRequiredService<ISingletonInstanceService>();
+                if (!singleton.TryAcquire())
                 {
                     var wrongWindow = new SingletonWrongWindow();
                     desktop.MainWindow = wrongWindow;
@@ -233,10 +234,43 @@ public class App : Application
                     return;
                 }
 
-                var mainWindow = GetService<MainWindow>();
-                // var mainWindow = new TestWindow();
-                desktop.MainWindow = mainWindow;
-                mainWindow.Closed += (_, _) => { CloseApp(); };
+                try
+                {
+                    DeviceHidSpecDict.Initialize(GlobalPaths.AppDataPath);
+                }
+                catch (Exception ex)
+                {
+                    var recoveryWindow = new ConfigRecoveryWindow(ex.Message);
+                    desktop.MainWindow = recoveryWindow;
+                    recoveryWindow.Closed += (_, _) =>
+                    {
+                        if (recoveryWindow.ShouldReset)
+                        {
+                            try
+                            {
+                                DeviceHidSpecDict.ResetToDefault(GlobalPaths.AppDataPath);
+                                var mainWindow = GetService<MainWindow>();
+                                desktop.MainWindow = mainWindow;
+                                mainWindow.Show();
+                                mainWindow.Closed += (_, _) => { CloseApp(); };
+                            }
+                            catch
+                            {
+                                desktop.Shutdown();
+                            }
+                        }
+                        else
+                        {
+                            desktop.Shutdown();
+                        }
+                    };
+                    return;
+                }
+
+                var mainWindow2 = GetService<MainWindow>();
+                // var mainWindow2 = new TestWindow();
+                desktop.MainWindow = mainWindow2;
+                mainWindow2.Closed += (_, _) => { CloseApp(); };
                 break;
         }
 
@@ -271,8 +305,6 @@ public class App : Application
                     helper.Dispose();
                 }
                 #endif
-                _mutex?.WaitOne();
-                _mutex?.ReleaseMutex();
                 desktop.Shutdown();
                 break;
         }
@@ -290,11 +322,4 @@ public class App : Application
         minimizeService.RestoreWindow(window);
     }
 
-    private static Mutex? _mutex;
-
-    private static bool SetSingleton()
-    {
-        _mutex = new Mutex(true, "SpaceMotionMapper", out var ret);
-        return ret;
-    }
 }

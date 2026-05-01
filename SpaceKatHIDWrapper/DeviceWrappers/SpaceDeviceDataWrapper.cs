@@ -35,8 +35,6 @@ public class SpaceDeviceDataWrapper : IDeviceDataWrapper
                         ConnectionChanged?.Invoke(this, IsConnected);
                         return;
                     }
-
-                    i++;
                 }
             }
         );
@@ -75,6 +73,7 @@ public class SpaceDeviceDataWrapper : IDeviceDataWrapper
             if  (_buffer == null) return null;
             var ret = ReadFunctions.UpdateDeviceData(rawData, in _buffer, _hidSpec.AxesMappings, _hidSpec.AxisScale,
                 _hidSpec.ButtonMappings);
+            _readFailedCount = 0;
             return ret ? _buffer.ToKatDeviceData() : null;
         }
         catch (Exception e)
@@ -82,7 +81,7 @@ public class SpaceDeviceDataWrapper : IDeviceDataWrapper
             _readFailedCount += 1;
             if (_readFailedCount < 5) return null;
             Console.WriteLine(e);
-            Hid.Exit();
+            _device?.Dispose();
             _device = null;
             ConnectionChanged?.Invoke(this, e);
             _readFailedCount = 0;

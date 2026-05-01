@@ -8,7 +8,6 @@ using LanguageExt;
 using Serilog;
 using SpaceKat.Shared.Functions;
 using SpaceKatHIDWrapper.DeviceWrappers;
-using SpaceKatHIDWrapper.Functions;
 using SpaceKatHIDWrapper.Services;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.States;
@@ -122,7 +121,7 @@ public partial class ConnectAndEnableViewModel : ObservableObject
         _katMotionRecognizeService.ExitEvent.Set();
         _listenTask?.Wait(TimeSpan.FromSeconds(3));
         _listenTask = null;
-        KatDeviceFunction.StopDevice();
+        _deviceDataWrapper.Disconnect();
     }
 
     private async Task DisconnectDeviceAsync()
@@ -133,7 +132,7 @@ public partial class ConnectAndEnableViewModel : ObservableObject
             await Task.WhenAny(_listenTask, Task.Delay(3000));
         }
         _listenTask = null;
-        KatDeviceFunction.StopDevice();
+        _deviceDataWrapper.Disconnect();
     }
 
     #endregion

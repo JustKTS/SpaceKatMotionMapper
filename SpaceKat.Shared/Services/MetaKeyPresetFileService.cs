@@ -46,7 +46,7 @@ public class MetaKeyPresetFileService : IMetaKeyPresetFileService
         try
         {
             var fileContent = JsonSerializer.Serialize(config,
-                ProgramSpecJsOption.Default);
+                ProgramSpecMetaKeysRecordJsonSgContext.Default.ProgramSpecMetaKeysRecord);
             File.WriteAllText(filepath, fileContent, Encoding.UTF8);
             return true;
         }
@@ -84,8 +84,8 @@ public class MetaKeyPresetFileService : IMetaKeyPresetFileService
         try
         {
             var config =
-                JsonSerializer.Deserialize<ProgramSpecMetaKeysRecord>(jsonRaw,
-                    ProgramSpecJsOption.Default);
+                JsonSerializer.Deserialize(jsonRaw,
+                    ProgramSpecMetaKeysRecordJsonSgContext.Default.ProgramSpecMetaKeysRecord);
             if (config != null) return config;
             return new Exception($"程序快捷键配置文件 {filename} 有误, 请重新保存或删除");
         }
