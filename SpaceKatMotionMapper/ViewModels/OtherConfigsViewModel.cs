@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
-using LanguageExt;
+using CSharpFunctionalExtensions;
+using SpaceKat.Shared.Helpers;
 using SpaceKat.Shared.Defines;
 using SpaceKat.Shared.Services.Contract;
 using SpaceKat.Shared.ViewModels;
@@ -85,9 +86,9 @@ public partial class OtherConfigsViewModel(
         foreach (var file in files)
         {
             var cgRet = katMotionFileService.LoadConfigGroup(file.Path.LocalPath);
-            _ = cgRet.Match(cg =>
+            if (cgRet.IsSuccess)
             {
-                // ReSharper disable once IdentifierTypo
+                var cg = cgRet.Value;
                 var cgvm = new KatMotionConfigViewModel(
                     katMotionActivateService,
                     katMotionFileService,
@@ -100,12 +101,11 @@ public partial class OtherConfigsViewModel(
                 cgvm.IsDefault = false;
                 katMotionConfigVmManageService.RegisterConfig(cgvm);
                 KatMotionConfigGroups.Add(cgvm);
-                return true;
-            }, ex =>
+            }
+            else
             {
-                popUpNotificationService.Pop(NotificationType.Error, ex.Message);
-                return false;
-            });
+                popUpNotificationService.Pop(NotificationType.Error, cgRet.Error.Message);
+            }
         }
     }
 
@@ -121,8 +121,9 @@ public partial class OtherConfigsViewModel(
         ClearConfigGroups();
         var rets = katMotionFileService.LoadConfigGroupsFromSysConf();
 
-        _ = rets.Match(cgs =>
+        if (rets.IsSuccess)
         {
+            var cgs = rets.Value;
             foreach (var cg in cgs)
             {
                 var cgVm = new KatMotionConfigViewModel(
@@ -140,13 +141,12 @@ public partial class OtherConfigsViewModel(
                 if (!activationStatusService.IsConfigGroupActivated(cgVm.Id)) continue;
                 cgVm.ActivateActionsCommand.Execute(null);
             }
-
-            return true;
-        }, ex =>
+        }
+        else
         {
-            popUpNotificationService.Pop(NotificationType.Error, ex.Message);
-            return false;
-        });
+            popUpNotificationService.Pop(NotificationType.Error, rets.Error.Message);
+        }
+
         if (KatMotionConfigGroups.Count == 0)
         {
             Add();
@@ -154,23 +154,27 @@ public partial class OtherConfigsViewModel(
     }
 
     [RelayCommand]
-    private Task<Either<Exception, bool>> SaveGroupsToConfigDir()
+    private Task<Result<bool, Exception>> SaveGroupsToConfigDir()
     {
         List<KatMotionConfigGroup> groups = [];
-        // ReSharper disable once IdentifierTypo
+        var anyFailed = false;
+        foreach (var ret in KatMotionConfigGroups.Select(cgvm => cgvm.ToKatMotionConfigGroups()))
+        {
+            if (ret.IsSuccess)
+            {
+                groups.Add(ret.Value);
+            }
+            else
+            {
+                popUpNotificationService.Pop(NotificationType.Error, ret.Error.Message);
+                anyFailed = true;
+            }
+        }
+
         return Task.FromResult(
-            KatMotionConfigGroups.Select(cgvm => cgvm.ToKatMotionConfigGroups()).Select(ret =>
-            ret.Match(cg =>
-            {
-                groups.Add(cg);
-                return true;
-            }, ex =>
-            {
-                popUpNotificationService.Pop(NotificationType.Error, ex.Message);
-                return false;
-            })).Any(flag => !flag) // TODO: 处理部分失败的情况
-            ? new Exception("保存部分文件失败！")
-            : katMotionFileService.SaveConfigGroupsToSysConf(groups));
+            anyFailed
+                ? new Exception("保存部分文件失败！")
+                : katMotionFileService.SaveConfigGroupsToSysConf(groups));
     }
 
     [RelayCommand]
@@ -184,18 +188,25 @@ public partial class OtherConfigsViewModel(
             });
         if (folders.Count == 0) return;
 
-        // ReSharper disable once IdentifierTypo
         foreach (var cgvm in KatMotionConfigGroups)
         {
             var cgRet = cgvm.ToKatMotionConfigGroups();
-            var ret = cgRet.Match(cg =>
+            if (cgRet.IsSuccess)
             {
+                var cg = cgRet.Value;
                 var filename = cg.Guid + ".json";
                 var dirPath = folders[0].Path.LocalPath;
                 var path = Path.Join(dirPath, filename);
-                return katMotionFileService.SaveConfigGroup(cg, path);
-            }, ex => ex);
-            ret.IfLeft(ex => { popUpNotificationService.Pop(NotificationType.Error, ex.Message); });
+                var saveRet = katMotionFileService.SaveConfigGroup(cg, path);
+                if (saveRet.IsFailure)
+                {
+                    popUpNotificationService.Pop(NotificationType.Error, saveRet.Error.Message);
+                }
+            }
+            else
+            {
+                popUpNotificationService.Pop(NotificationType.Error, cgRet.Error.Message);
+            }
         }
     }
 }

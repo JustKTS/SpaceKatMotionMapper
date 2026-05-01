@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatHIDWrapper.Services;
 using SpaceKatMotionMapper.Models;
@@ -16,20 +16,17 @@ public class KatMotionTimeConfigService(
 {
     public KatMotionTimeConfigs LoadDefaultTimeConfigs()
     {
-        return katMotionConfigVmManageService
-            .GetDefaultConfig()
-            .Match<KatMotionTimeConfigs>(
-                config => GetEffectiveMotionTimeConfigs(config),
-                _ => new KatMotionTimeConfigs());
+        var result = katMotionConfigVmManageService.GetDefaultConfig();
+        return result.IsSuccess ? GetEffectiveMotionTimeConfigs(result.Value) : new KatMotionTimeConfigs();
     }
 
     public KatMotionTimeConfigs? LoadMotionTimeConfigs(Guid configGroupId)
     {
-        var configRet = katMotionConfigVmManageService.GetConfig(configGroupId);
-        return configRet.Match<KatMotionTimeConfigs?>(config => GetEffectiveMotionTimeConfigs(config), _ => null);
+        var result = katMotionConfigVmManageService.GetConfig(configGroupId);
+        return result.IsSuccess ? GetEffectiveMotionTimeConfigs(result.Value) : null;
     }
 
-    public Either<Exception, bool> SaveDefaultTimeConfig(KatMotionTimeConfigs timeConfig)
+    public Result<bool, Exception> SaveDefaultTimeConfig(KatMotionTimeConfigs timeConfig)
     {
         return katMotionConfigVmManageService.GetDefaultConfig().Bind(configVm =>
         {
@@ -45,7 +42,7 @@ public class KatMotionTimeConfigService(
         });
     }
 
-    public Either<Exception,bool> SaveTimeConfig(KatMotionTimeConfigs timeConfig, Guid configGroupId)
+    public Result<bool, Exception> SaveTimeConfig(KatMotionTimeConfigs timeConfig, Guid configGroupId)
     {
         return katMotionConfigVmManageService.GetConfig(configGroupId).Bind(
             configVm =>
@@ -62,23 +59,27 @@ public class KatMotionTimeConfigService(
             }
         });
     }
-    
+
     public bool ApplyMotionTimeConfigById(Guid id)
     {
-        return katMotionConfigVmManageService.GetConfig(id).Match(vm =>
+        var result = katMotionConfigVmManageService.GetConfig(id);
+        if (result.IsSuccess)
         {
-            katMotionRecognizeService.UpdateMotionTimeConfigs(GetEffectiveMotionTimeConfigs(vm));
+            katMotionRecognizeService.UpdateMotionTimeConfigs(GetEffectiveMotionTimeConfigs(result.Value));
             return true;
-        }, _ => false);
+        }
+        return false;
     }
-    
+
     public bool ApplyDefaultMotionTimeConfig()
     {
-        return katMotionConfigVmManageService.GetDefaultConfig().Match(vm =>
+        var result = katMotionConfigVmManageService.GetDefaultConfig();
+        if (result.IsSuccess)
         {
-            katMotionRecognizeService.UpdateMotionTimeConfigs(GetEffectiveMotionTimeConfigs(vm));
+            katMotionRecognizeService.UpdateMotionTimeConfigs(GetEffectiveMotionTimeConfigs(result.Value));
             return true;
-        }, _ => false);
+        }
+        return false;
     }
 
     private static KatMotionTimeConfigs GetEffectiveMotionTimeConfigs(ViewModels.KatMotionConfigViewModel vm)
@@ -95,16 +96,14 @@ public class KatMotionTimeConfigService(
 
     public System.Collections.Generic.HashSet<KatMotionEnum> GetSingleActionMotionsFromDefaultConfig()
     {
-        return katMotionConfigVmManageService.GetDefaultConfig().Match(
-            GetSingleActionMotions,
-            _ => new System.Collections.Generic.HashSet<KatMotionEnum>());
+        var result = katMotionConfigVmManageService.GetDefaultConfig();
+        return result.IsSuccess ? GetSingleActionMotions(result.Value) : new System.Collections.Generic.HashSet<KatMotionEnum>();
     }
 
     public System.Collections.Generic.HashSet<KatMotionEnum> GetSingleActionMotionsById(Guid configGroupId)
     {
-        return katMotionConfigVmManageService.GetConfig(configGroupId).Match(
-            GetSingleActionMotions,
-            _ => new System.Collections.Generic.HashSet<KatMotionEnum>());
+        var result = katMotionConfigVmManageService.GetConfig(configGroupId);
+        return result.IsSuccess ? GetSingleActionMotions(result.Value) : new System.Collections.Generic.HashSet<KatMotionEnum>();
     }
 
     private static System.Collections.Generic.HashSet<KatMotionEnum> GetSingleActionMotions(ViewModels.KatMotionConfigViewModel vm)

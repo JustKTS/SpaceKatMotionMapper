@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using CSharpFunctionalExtensions;
 using SpaceKat.Shared.Models;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Functions;
@@ -19,7 +20,7 @@ public class KatMotionConfigSemanticRulePipelineTests
 
         var result = sut.Validate(context);
 
-        await Assert.That(result.IsRight).IsTrue();
+        await Assert.That(result.IsSuccess).IsTrue();
     }
 
     [Test]
@@ -34,9 +35,9 @@ public class KatMotionConfigSemanticRulePipelineTests
 
         var result = sut.Validate(context);
         var errorMessage = string.Empty;
-        result.IfLeft(ex => errorMessage = ex.Message);
+        if (result.IsFailure) errorMessage = result.Error.Message;
 
-        await Assert.That(result.IsLeft).IsTrue();
+        await Assert.That(result.IsFailure).IsTrue();
         await Assert.That(errorMessage.Contains("按下但没有被释放")).IsTrue();
     }
 
@@ -52,7 +53,7 @@ public class KatMotionConfigSemanticRulePipelineTests
 
         var result = sut.Validate(context);
 
-        await Assert.That(result.IsRight).IsTrue();
+        await Assert.That(result.IsSuccess).IsTrue();
     }
 
     [Test]
@@ -69,9 +70,9 @@ public class KatMotionConfigSemanticRulePipelineTests
 
         var result = sut.Validate(context);
         var errorMessage = string.Empty;
-        result.IfLeft(ex => errorMessage = ex.Message);
+        if (result.IsFailure) errorMessage = result.Error.Message;
 
-        await Assert.That(result.IsLeft).IsTrue();
+        await Assert.That(result.IsFailure).IsTrue();
         await Assert.That(errorMessage.Contains("配置模式不一致")).IsTrue();
     }
 
@@ -93,8 +94,8 @@ public class KatMotionConfigSemanticRulePipelineTests
                 new KeyActionConfig(ActionType.KeyBoard, "A", PressModeEnum.Click, 1))
         }));
 
-        await Assert.That(preResult.IsLeft).IsTrue();
-        await Assert.That(postResult.IsLeft).IsTrue();
+        await Assert.That(preResult.IsFailure).IsTrue();
+        await Assert.That(postResult.IsFailure).IsTrue();
     }
 
     private static KatMotionSemanticItem CreateItem(

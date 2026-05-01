@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSharpFunctionalExtensions;
+using System;
 using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.Input;
@@ -16,17 +17,15 @@ public partial class FirstDownloadPresetsViewModel : ViewModelBase, IDialogConte
     private async Task Download()
     {
         var ret = await DownloadMetaKeyPresetsHelper.DownloadAndCopyMetaKeyPresetsAsync();
-        _ = ret.Match(_ =>
-            {
-                 _metaKeyPresetService.ReloadConfigs();
-                 return true;
-            },
-            ex =>
-            {
-                App.GetRequiredService<PopUpNotificationService>()
-                    .Pop(NotificationType.Error, $"预设下载失败：{ex.Message}");
-                return false;
-            });
+        if (ret.IsSuccess)
+        {
+            _metaKeyPresetService.ReloadConfigs();
+        }
+        else
+        {
+            App.GetRequiredService<PopUpNotificationService>()
+                .Pop(NotificationType.Error, $"预设下载失败：{ret.Error.Message}");
+        }
         Close();
     }
     

@@ -1,6 +1,5 @@
 ﻿using System.Xml;
-using LanguageExt;
-using LanguageExt.Common;
+using CSharpFunctionalExtensions;
 using SpaceKat.Shared.Helpers;
 using SpaceKat.Shared.Models;
 
@@ -151,13 +150,13 @@ public static class OfficialWareConfigFunctions
         }
     }
 
-    public static async Task<Result<bool>> OpenOfficialMapper(bool clearButtons = false)
+    public static async Task<Result<bool, Exception>> OpenOfficialMapper(bool clearButtons = false)
     {
         var doc = LoadDocument();
-        if (doc == null) return new Result<bool>(new Exception("配置文件读取失败，请检查是否安装有官方驱动！"));
+        if (doc == null) return new Exception("配置文件读取失败，请检查是否安装有官方驱动！");
 
         var node1 = doc.SelectSingleNode("Global");
-        if (node1 == null) return new Result<bool>(new Exception("配置文件解析失败，请检查配置文件是否有被不正确的修改！"));
+        if (node1 == null) return new Exception("配置文件解析失败，请检查配置文件是否有被不正确的修改！");
         var node2 = node1.SelectSingleNode("Devices")?.SelectSingleNode("Device")?.SelectSingleNode("AxisBank");
         if (node2 == null) return true;
         node1.SelectSingleNode("Devices")?.SelectSingleNode("Device")?.RemoveChild(node2);
@@ -182,13 +181,13 @@ public static class OfficialWareConfigFunctions
         return true;
     }
 
-    public static async Task<Result<bool>> UnbindHotKeyToKatButton()
+    public static async Task<Result<bool, Exception>> UnbindHotKeyToKatButton()
     {
         var doc = LoadDocument();
-        if (doc == null) return new Result<bool>(new Exception("配置文件读取失败，请检查是否安装有官方驱动！"));
+        if (doc == null) return new Exception("配置文件读取失败，请检查是否安装有官方驱动！");
 
         var node1 = doc.SelectSingleNode("Global");
-        if (node1 == null) return new Result<bool>(new Exception("配置文件解析失败，请检查配置文件是否有被不正确的修改！"));
+        if (node1 == null) return new Exception("配置文件解析失败，请检查配置文件是否有被不正确的修改！");
         var node2 = node1.SelectSingleNode("Devices")?.SelectSingleNode("Device")?.SelectSingleNode("ButtonBank");
         if (node2 != null)
         {
@@ -214,7 +213,7 @@ public static class OfficialWareConfigFunctions
         return true;
     }
 
-    public static async Task<Either<Exception,bool>> BindHotKeyToKatButton(
+    public static async Task<Result<bool, Exception>> BindHotKeyToKatButton(
         KatButtonEnum button, bool useCtrl, bool useAlt, bool useShift, KeyCodeWrapper hotKey)
     {
         var doc = LoadDocument();
@@ -261,13 +260,13 @@ public static class OfficialWareConfigFunctions
         return true;
     }
 
-    public static async Task<Result<bool>> CloseOfficialMapper(bool disableButton = false)
+    public static async Task<Result<bool, Exception>> CloseOfficialMapper(bool disableButton = false)
     {
         var doc = LoadDocument();
-        if (doc == null) return new Result<bool>(new Exception("配置文件读取失败，请检查是否安装有官方驱动！"));
+        if (doc == null) return new Exception("配置文件读取失败，请检查是否安装有官方驱动！");
 
         var node1 = doc.SelectSingleNode("Global");
-        if (node1 == null) return new Result<bool>(new Exception("配置文件解析失败，请检查配置文件是否有被不正确的修改！"));
+        if (node1 == null) return new Exception("配置文件解析失败，请检查配置文件是否有被不正确的修改！");
         var node2 = node1.SelectSingleNode("Devices");
         if (node2 == null)
         {
@@ -304,13 +303,13 @@ public static class OfficialWareConfigFunctions
         return true;
     }
 
-    public static async Task<Result<bool>> CleanAllChange()
+    public static async Task<Result<bool, Exception>> CleanAllChange()
     {
         var doc = LoadDocument();
-        if (doc == null) return new Result<bool>(new Exception("配置文件读取失败，请检查是否安装有官方驱动！"));
+        if (doc == null) return new Exception("配置文件读取失败，请检查是否安装有官方驱动！");
 
         var node1 = doc.SelectSingleNode("Global");
-        if (node1 == null) return new Result<bool>(new Exception("配置文件解析失败，请检查配置文件是否有被不正确的修改！"));
+        if (node1 == null) return new Exception("配置文件解析失败，请检查配置文件是否有被不正确的修改！");
         var node2 = node1.SelectSingleNode("Devices");
         if (node2 != null)
         {

@@ -1,3 +1,4 @@
+using CSharpFunctionalExtensions;
 using Moq;
 using TUnit.Assertions;
 using TUnit.Core;
@@ -164,7 +165,7 @@ public class OtherConfigsViewModelTest
         var mockFileService = new Mock<IKatMotionFileService>();
         mockFileService
             .Setup(x => x.SaveConfigGroupsToSysConf(It.IsAny<List<SpaceKatMotionMapper.Models.KatMotionConfigGroup>>()))
-            .Returns(LanguageExt.Either<Exception, bool>.Right(true));
+            .Returns(true);
 
         var vm = ViewModelTestHelpers.CreateOtherConfigsViewModel(
             fileService: mockFileService.Object
@@ -190,7 +191,7 @@ public class OtherConfigsViewModelTest
         var mockFileService = new Mock<IKatMotionFileService>();
         mockFileService
             .Setup(x => x.LoadConfigGroupsFromSysConf())
-            .Returns(LanguageExt.Either<Exception, List<SpaceKatMotionMapper.Models.KatMotionConfigGroup>>.Right([]));
+            .Returns(new List<SpaceKatMotionMapper.Models.KatMotionConfigGroup>());
 
         var vm = ViewModelTestHelpers.CreateOtherConfigsViewModel(
             fileService: mockFileService.Object
@@ -214,7 +215,7 @@ public class OtherConfigsViewModelTest
         var mockFileService = new Mock<IKatMotionFileService>();
         mockFileService
             .Setup(x => x.LoadConfigGroupsFromSysConf())
-            .Returns(LanguageExt.Either<Exception, List<SpaceKatMotionMapper.Models.KatMotionConfigGroup>>.Right([]));
+            .Returns(new List<SpaceKatMotionMapper.Models.KatMotionConfigGroup>());
 
         var vm = ViewModelTestHelpers.CreateOtherConfigsViewModel(
             fileService: mockFileService.Object

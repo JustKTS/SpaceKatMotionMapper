@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SpaceKatHIDWrapper.Models;
+using SpaceKat.Shared.Helpers;
 using SpaceKatMotionMapper.Models;
 
 namespace SpaceKatMotionMapper.Services;

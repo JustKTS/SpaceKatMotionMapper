@@ -5,6 +5,7 @@ using SpaceKat.Shared.Services;
 using SpaceKat.Shared.Services.Contract;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatHIDWrapper.Services;
+using SpaceKat.Shared.Helpers;
 using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services.Contract;

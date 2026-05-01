@@ -7,7 +7,8 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Irihi.Avalonia.Shared.Contracts;
-using LanguageExt.Common;
+using CSharpFunctionalExtensions;
+using SpaceKat.Shared.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using MetaKeyPresetsEditor.Helpers;
 using Serilog;
@@ -110,13 +111,13 @@ public partial class FavPresetsEditorViewModel : ViewModelBase, IDialogContext
         KeyActionConfigs.Add(new KeyActionConfigForPresetsViewModel { Parent = KeyActionConfigs });
     }
 
-    private Result<bool> CheckAvailable()
+    private Result<bool, Exception> CheckAvailable()
     {
         var ret = CombinationKeysConfigs.Any(vm =>
             string.IsNullOrEmpty(vm.Description) || string.IsNullOrEmpty(vm.HotKey));
-        if (ret) return new Result<bool>(new Exception("组合式快捷键配置出现错误，请检查。"));
+        if (ret) return new Exception("组合式快捷键配置出现错误，请检查。");
         ret = KeyActionConfigs.Any(vm => string.IsNullOrEmpty(vm.Description) || vm.IsAvailable is false);
-        return ret ? new Result<bool>(new Exception("宏配置出现错误，请检查。")) : true;
+        return ret ? new Exception("宏配置出现错误，请检查。") : true;
     }
 
     private ProgramSpecMetaKeysRecord ToConfigRecord()
@@ -140,87 +141,76 @@ public partial class FavPresetsEditorViewModel : ViewModelBase, IDialogContext
     [RelayCommand]
     private async Task SaveToConfigDir()
     {
-        var ret = await CheckAvailable().MapAsync(async _ =>
+        var checkResult = CheckAvailable();
+        if (checkResult.IsFailure)
         {
-            return await Task.Run(() => _metaKeyPresetFileService.SaveToConfigDir(ToConfigRecord()));
-        });
-        _ = ret.Match(_ =>
-        {
-            Close();
-            return true;
-        }, ex =>
-        {
-            OverlayMessageBox.ShowAsync($"保存失败，{ex.Message}", hostId: FavPresetsEditorView.LocalHost,
+            OverlayMessageBox.ShowAsync($"保存失败，{checkResult.Error.Message}", hostId: FavPresetsEditorView.LocalHost,
                 icon: MessageBoxIcon.Warning);
-            // App.GetRequiredService<PopUpNotificationService>().Pop(
-            //         NotificationType.Error,
-            //         $"保存失败，{ex.Message}");
-            return false;
-        });
+            return;
+        }
+
+        await Task.Run(() => _metaKeyPresetFileService.SaveToConfigDir(ToConfigRecord()));
+        Close();
     }
 
-    private Result<bool> LoadFromRecord()
+    private Result<bool, Exception> LoadFromRecord()
     {
-        var eitherRecords = _metaKeyPresetFileService.LoadConfigs();
-        var ret = eitherRecords.Map(records =>
+        var loadResult = _metaKeyPresetFileService.LoadConfigs();
+        if (loadResult.IsFailure)
+            return loadResult.Error;
+
+        var records = loadResult.Value;
+        var record = records.GetValueOrDefault("我的收藏");
+        if (record == null) return new Exception("我的收藏未创建！");
+        IsCombinationKeyFilter = false;
+        IsKeyActionFilter = false;
+
+        try
         {
-            var record = records.GetValueOrDefault("我的收藏");
-            if (record == null) return new Result<bool>(new Exception("我的收藏未创建！"));
-            IsCombinationKeyFilter = false;
-            IsKeyActionFilter = false;
+            CombinationKeysConfigs.Clear();
+            KeyActionConfigs.Clear();
+            CombinationKeysConfigsFiltered.Clear();
+            KeyActionConfigsFiltered.Clear();
 
-            try
+            foreach (var (k, v) in record.CombinationKeys)
             {
-                CombinationKeysConfigs.Clear();
-                KeyActionConfigs.Clear();
-                CombinationKeysConfigsFiltered.Clear();
-                KeyActionConfigsFiltered.Clear();
-
-                foreach (var (k, v) in record.CombinationKeys)
+                var vm = new CombinationKeysConfigViewModel
                 {
-                    var vm = new CombinationKeysConfigViewModel
-                    {
-                        Parent = CombinationKeysConfigs,
-                        Description = k,
-                    };
-                    vm.FromRecord(v);
-                    Dispatcher.UIThread.Invoke(() =>
-                    {
-                        CombinationKeysConfigs.Add(vm);
-                        CombinationKeysConfigsFiltered.Add(vm);
-                    });
-                }
-
-                foreach (var (k, v) in record.MacroKeys)
+                    Parent = CombinationKeysConfigs,
+                    Description = k,
+                };
+                vm.FromRecord(v);
+                Dispatcher.UIThread.Invoke(() =>
                 {
-                    var vm = new KeyActionConfigForPresetsViewModel
-                    {
-                        Parent = KeyActionConfigs,
-                        Description = k,
-                        IsCustomDescription = true
-                    };
-
-                    vm.FromKeyActionConfig(v);
-
-                    Dispatcher.UIThread.Invoke(() => KeyActionConfigs.Add(vm));
-                }
-
-
-                return true;
+                    CombinationKeysConfigs.Add(vm);
+                    CombinationKeysConfigsFiltered.Add(vm);
+                });
             }
-            catch (Exception e)
+
+            foreach (var (k, v) in record.MacroKeys)
             {
-                _logger.Error(e, "");
-                OverlayMessageBox.ShowAsync(string.Empty, $"读取配置文件失败，具体错误信息为：{e.Message}",
-                    hostId: FavPresetsEditorView.LocalHost, icon: MessageBoxIcon.Error);
-                // App.GetRequiredService<PopUpNotificationService>()
-                //     .Pop(
-                //         NotificationType.Error,
-                //         $"读取配置文件失败，具体错误信息为：{e.Message}");
-                return new Result<bool>(e);
+                var vm = new KeyActionConfigForPresetsViewModel
+                {
+                    Parent = KeyActionConfigs,
+                    Description = k,
+                    IsCustomDescription = true
+                };
+
+                vm.FromKeyActionConfig(v);
+
+                Dispatcher.UIThread.Invoke(() => KeyActionConfigs.Add(vm));
             }
-        });
-        return ret.Match(s => s, ex => new Result<bool>(ex));
+
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "");
+            OverlayMessageBox.ShowAsync(string.Empty, $"读取配置文件失败，具体错误信息为：{e.Message}",
+                hostId: FavPresetsEditorView.LocalHost, icon: MessageBoxIcon.Error);
+            return e;
+        }
     }
 
     #endregion

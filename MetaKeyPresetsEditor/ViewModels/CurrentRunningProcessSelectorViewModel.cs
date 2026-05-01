@@ -6,6 +6,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MetaKeyPresetsEditor.Helpers;
+using SpaceKat.Shared.Helpers;
 using MetaKeyPresetsEditor.Services;
 using Microsoft.Extensions.DependencyInjection;
 using SpaceKat.Shared.Defines;

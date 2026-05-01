@@ -11,7 +11,8 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using LanguageExt;
+using CSharpFunctionalExtensions;
+using SpaceKat.Shared.Helpers;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
@@ -174,19 +175,21 @@ public partial class KatMotionConfigViewModel : ViewModelBase
         if (!IsActivated)
         {
             var ret = ToKatMotionConfigGroups();
-            var ret2 = ret.Match(configGroup =>
+            bool success;
+            if (ret.IsSuccess)
             {
-                _katMotionActivateService.ActivateKatMotions(configGroup);
-                return true;
-            }, ex =>
+                _katMotionActivateService.ActivateKatMotions(ret.Value);
+                success = true;
+            }
+            else
             {
-                Log.Error(ex, "[配置激活] 配置激活失败. ViewModel Id: {ViewModelId}, 错误: {ErrorMessage}", Id, ex.Message);
-                _popUpNotificationService.Pop(NotificationType.Error, ex.Message);
-                return false;
-            });
+                Log.Error(ret.Error, "[配置激活] 配置激活失败. ViewModel Id: {ViewModelId}, 错误: {ErrorMessage}", Id, ret.Error.Message);
+                _popUpNotificationService.Pop(NotificationType.Error, ret.Error.Message);
+                success = false;
+            }
 
             IsActivated = true;
-            if (!ret2)
+            if (!success)
             {
                 IsActivated = false;
             }
@@ -194,20 +197,22 @@ public partial class KatMotionConfigViewModel : ViewModelBase
         else
         {
             var ret = ToKatMotionConfigGroups();
-            var ret2 = ret.Match(configGroup =>
+            bool success;
+            if (ret.IsSuccess)
             {
-                _katMotionActivateService.DeactivateKatMotions(configGroup);
-                _katMotionActivateService.ActivateKatMotions(configGroup);
-                return true;
-            }, ex =>
+                _katMotionActivateService.DeactivateKatMotions(ret.Value);
+                _katMotionActivateService.ActivateKatMotions(ret.Value);
+                success = true;
+            }
+            else
             {
-                Log.Error(ex, "[配置激活] 重新激活失败. ViewModel Id: {ViewModelId}, 错误: {ErrorMessage}", Id, ex.Message);
-                _popUpNotificationService.Pop(NotificationType.Error, ex.Message);
-                return false;
-            });
+                Log.Error(ret.Error, "[配置激活] 重新激活失败. ViewModel Id: {ViewModelId}, 错误: {ErrorMessage}", Id, ret.Error.Message);
+                _popUpNotificationService.Pop(NotificationType.Error, ret.Error.Message);
+                success = false;
+            }
 
             // 只有在激活失败时才设置为 false，成功时保持激活状态
-            if (!ret2)
+            if (!success)
             {
                 IsActivated = false;
             }
@@ -216,12 +221,12 @@ public partial class KatMotionConfigViewModel : ViewModelBase
         return Task.CompletedTask;
     }
 
-    private Either<Exception, bool> ValidateKatMotionConfig()
+    private Result<bool, Exception> ValidateKatMotionConfig()
     {
         return _katMotionSemanticProfile.ValidatePreModeGraph(CreateKatMotionSemanticValidationContext());
     }
 
-    private Either<Exception, bool> ValidateCrossModeConfigConsistency()
+    private Result<bool, Exception> ValidateCrossModeConfigConsistency()
     {
         return _katMotionSemanticProfile.ValidatePostModeGraph(CreateKatMotionSemanticValidationContext());
     }
@@ -239,50 +244,47 @@ public partial class KatMotionConfigViewModel : ViewModelBase
         return new KatMotionConfigSemanticValidationContext(items);
     }
 
-    public Either<Exception, KatMotionConfigGroup> ToKatMotionConfigGroups()
+    public Result<KatMotionConfigGroup, Exception> ToKatMotionConfigGroups()
     {
-        return ValidateKatMotionConfig()
-            .Bind(_ => ValidateKatMotionModeGraph())
-            .Bind(_ => ValidateCrossModeConfigConsistency())
-            .Bind<KatMotionConfigGroup>(s1 =>
+        var validationResult = ValidateKatMotionConfig();
+        if (validationResult.IsFailure) return validationResult.Error;
+        if (!validationResult.Value) return new Exception("转换失败");
+
+        var modeGraphResult = ValidateKatMotionModeGraph();
+        if (modeGraphResult.IsFailure) return modeGraphResult.Error;
+        if (!modeGraphResult.Value) return new Exception("模式图验证失败");
+
+        var crossModeResult = ValidateCrossModeConfigConsistency();
+        if (crossModeResult.IsFailure) return crossModeResult.Error;
+        if (!crossModeResult.Value) return new Exception("跨模式一致性验证失败");
+
+        var katActions = KatMotionsWithMode.SelectMany(e => e.KatMotionGroups.SelectMany(g => g.Configs)).ToList();
+        var configList = new List<KatMotionConfig>();
+        foreach (var katMotion in katActions)
+        {
+            var config = katMotion.ToKatMotionConfig();
+            configList.Add(config);
+            var longDownConfig = katMotion.ToLongDownConfig();
+            if (longDownConfig != null)
             {
-                if (!s1)
-                {
-                    return new Exception("转换失败");
-                }
+                configList.Add(longDownConfig);
+            }
+        }
 
-                var katActions = KatMotionsWithMode.SelectMany(e => e.KatMotionGroups.SelectMany(g => g.Configs)).ToList();
-                var configList = new List<KatMotionConfig>();
-                foreach (var katMotion in katActions)
-                {
-                    var config = katMotion.ToKatMotionConfig();
-                    configList.Add(config);
-                    // 简单/单动作模式下自动生成长推结束配置
-                    var longDownConfig = katMotion.ToLongDownConfig();
-                    if (longDownConfig != null)
-                    {
-                        configList.Add(longDownConfig);
-                    }
-                }
+        var hasSingleActionMode = KatMotionsWithMode
+            .SelectMany(e => e.KatMotionGroups.SelectMany(g => g.Configs))
+            .Any(km => km.ConfigMode == KatConfigModeEnum.SingleAction && km.KatMotion != KatMotionEnum.Null);
 
-                // 保存原始时间配置（运行时再根据模式调整）
-                // 检查是否有单动作模式的配置
-                var hasSingleActionMode = KatMotionsWithMode
-                    .SelectMany(e => e.KatMotionGroups.SelectMany(g => g.Configs))
-                    .Any(km => km.ConfigMode == KatConfigModeEnum.SingleAction && km.KatMotion != KatMotionEnum.Null);
+        var finalIsCustomMotionTimeConfigs = IsCustomMotionTimeConfigs || hasSingleActionMode;
 
-                // 如果有单动作模式，强制使用自定义时间配置
-                var finalIsCustomMotionTimeConfigs = IsCustomMotionTimeConfigs || hasSingleActionMode;
+        var configGroups = new KatMotionConfigGroup(
+            Id.ToString(), IsDefault, ProcessPath,
+            configList,
+            IsCustomDeadZone, DeadZoneConfig, finalIsCustomMotionTimeConfigs, MotionTimeConfigs); // Version 4
 
-                var configGroups = new KatMotionConfigGroup(
-                    Id.ToString(), IsDefault, ProcessPath,
-                    configList,
-                    IsCustomDeadZone, DeadZoneConfig, finalIsCustomMotionTimeConfigs, MotionTimeConfigs); // Version 4
+        return configGroups;
 
-                return configGroups;
-            });
-
-        Either<Exception, bool> ValidateKatMotionModeGraph()
+        Result<bool, Exception> ValidateKatMotionModeGraph()
         {
             var modeChangeValidator = new ModeChangeValidator();
             foreach (var configWithMode in KatMotionsWithMode)
@@ -342,17 +344,19 @@ public partial class KatMotionConfigViewModel : ViewModelBase
         try
         {
             var configGroupRet = ToKatMotionConfigGroups();
-            return configGroupRet.Match(
-                configGroup =>
-                {
-                    _katMotionActivateService.ActivateKatMotions(configGroup);
-                    return true;
-                },
-                ex =>
-                {
-                    _popUpNotificationService.Pop(NotificationType.Error, ex.Message);
-                    return false;
-                })
+            bool success;
+            if (configGroupRet.IsSuccess)
+            {
+                _katMotionActivateService.ActivateKatMotions(configGroupRet.Value);
+                success = true;
+            }
+            else
+            {
+                _popUpNotificationService.Pop(NotificationType.Error, configGroupRet.Error.Message);
+                success = false;
+            }
+
+            return success
                 ? Task.CompletedTask
                 : Task.FromException(new Exception("启用失败"));
         }
@@ -375,8 +379,9 @@ public partial class KatMotionConfigViewModel : ViewModelBase
         }
 
         var ret = SaveConfigGroupToSystemConfig();
-        _ = ret.Match(flag =>
+        if (ret.IsSuccess)
         {
+            var flag = ret.Value;
             if (flag)
             {
                 WeakReferenceMessenger.Default.Send(
@@ -384,23 +389,22 @@ public partial class KatMotionConfigViewModel : ViewModelBase
 
                 if (IsActivated)
                 {
-                    ActivateActions(); // 重新激活配置（会先停用旧配置，再激活新配置）
+                    ActivateActions();
                 }
 
-                return true;
+                return;
             }
 
             Log.Error("[配置保存] 配置保存失败. ViewModel Id: {ViewModelId}", Id);
             WeakReferenceMessenger.Default.Send(
                 new PopupNotificationData(NotificationType.Error, "保存失败"), Id);
-            return false;
-        }, ex =>
+        }
+        else
         {
-            Log.Error(ex, "[配置保存] 保存配置时发生异常. ViewModel Id: {ViewModelId}, 错误: {ErrorMessage}", Id, ex.Message);
+            Log.Error(ret.Error, "[配置保存] 保存配置时发生异常. ViewModel Id: {ViewModelId}, 错误: {ErrorMessage}", Id, ret.Error.Message);
             WeakReferenceMessenger.Default.Send(
-                new PopupNotificationData(NotificationType.Error, ex.Message), Id);
-            return false;
-        });
+                new PopupNotificationData(NotificationType.Error, ret.Error.Message), Id);
+        }
     }
 
     /// <summary>
@@ -484,22 +488,25 @@ public partial class KatMotionConfigViewModel : ViewModelBase
         return $"以下配置存在问题，请修复后再保存：\n\n{string.Join("\n\n", errorList)}";
     }
 
-    private Either<Exception, bool> SaveConfigGroupToSystemConfig()
+    private Result<bool, Exception> SaveConfigGroupToSystemConfig()
     {
         try
         {
             var configGroupRet = ToKatMotionConfigGroups();
 
-            return configGroupRet.Match(
-                configGroup =>
-                {
-                    var saveResult = IsDefault
-                        ? _katMotionFileService.SaveDefaultConfigGroup(configGroup)
-                        : _katMotionFileService.SaveConfigGroupToSysConf(configGroup);
+            if (configGroupRet.IsSuccess)
+            {
+                var configGroup = configGroupRet.Value;
+                var saveResult = IsDefault
+                    ? _katMotionFileService.SaveDefaultConfigGroup(configGroup)
+                    : _katMotionFileService.SaveConfigGroupToSysConf(configGroup);
 
-                    return saveResult;
-                },
-                ex => ex);
+                return saveResult;
+            }
+            else
+            {
+                return configGroupRet.Error;
+            }
         }
         catch (Exception e)
         {
@@ -512,14 +519,19 @@ public partial class KatMotionConfigViewModel : ViewModelBase
     private async Task SaveToFile()
     {
         var ret = await SaveConfigGroupToFileAsync();
-        ret.IfLeft(ex => { _popUpNotificationService.Pop(NotificationType.Error, ex.Message); });
+        if (ret.IsFailure)
+        {
+            _popUpNotificationService.Pop(NotificationType.Error, ret.Error.Message);
+        }
     }
 
-    private async Task<Either<Exception,bool>> SaveConfigGroupToFileAsync()
+    private async Task<Result<bool, Exception>> SaveConfigGroupToFileAsync()
     {
         try
         {
-            return await ToKatMotionConfigGroups().BindAsync(async configGroup => await SaveConfigGroupToFileAsync(configGroup));
+            var configGroupResult = ToKatMotionConfigGroups();
+            if (configGroupResult.IsFailure) return configGroupResult.Error;
+            return await SaveConfigGroupToFileAsync(configGroupResult.Value);
         }
         catch (Exception e)
         {
@@ -527,7 +539,7 @@ public partial class KatMotionConfigViewModel : ViewModelBase
         }
     }
 
-    private async Task<Either<Exception,bool>> SaveConfigGroupToFileAsync(KatMotionConfigGroup configGroup)
+    private async Task<Result<bool, Exception>> SaveConfigGroupToFileAsync(KatMotionConfigGroup configGroup)
     {
         var storageProvider = _storageProviderService.GetStorageProvider();
 
@@ -558,12 +570,17 @@ public partial class KatMotionConfigViewModel : ViewModelBase
 
         var file = files[0];
         var configGroup = _katMotionFileService.LoadConfigGroup(file.Path.LocalPath);
-        var ret = configGroup.Match(LoadFromConfigGroup, exception =>
-            {
-                _popUpNotificationService.Pop(NotificationType.Error, exception.Message);
-                return false;
-            }
-        );
+        bool ret;
+        if (configGroup.IsSuccess)
+        {
+            ret = LoadFromConfigGroup(configGroup.Value);
+        }
+        else
+        {
+            _popUpNotificationService.Pop(NotificationType.Error, configGroup.Error.Message);
+            ret = false;
+        }
+
         return ret;
     }
 

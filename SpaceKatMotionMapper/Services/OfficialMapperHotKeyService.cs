@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using SpaceKat.Shared.Functions;
 using SpaceKat.Shared.Models;
 using SpaceKatMotionMapper.Helpers;
@@ -24,7 +24,7 @@ public class OfficialMapperHotKeyService : IOfficialMapperHotKeyService
 
     private const int HotKeyEventId = 9876;
 
-    public async Task<Either<Exception,bool>> RegisterHotKeyWrapper(bool useCtrl, bool useAlt, bool useShift, KeyCodeWrapper hotKey,
+    public async Task<Result<bool, Exception>> RegisterHotKeyWrapper(bool useCtrl, bool useAlt, bool useShift, KeyCodeWrapper hotKey,
         KatButtonEnum katButtonEnum)
     {
         await OfficialWareConfigFunctions.UnbindHotKeyToKatButton();
@@ -58,7 +58,7 @@ public class OfficialMapperHotKeyService : IOfficialMapperHotKeyService
         return false;
     }
 
-    public Either<Exception,bool> UnregisterHotKeyWrapper()
+    public Result<bool, Exception> UnregisterHotKeyWrapper()
     {
         var handle = TopLevelHelper.GetTopLevel().TryGetPlatformHandle();
         if (handle is null) return new Exception("获取窗口句柄失败");

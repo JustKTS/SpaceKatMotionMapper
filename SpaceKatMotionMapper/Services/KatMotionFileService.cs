@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using SpaceKatMotionMapper.Defines;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services.Contract;
@@ -36,7 +36,7 @@ public class KatMotionFileService : IKatMotionFileService
         }
     }
 
-    public Either<Exception, bool> SaveDefaultConfigGroup(KatMotionConfigGroup configGroup)
+    public Result<bool, Exception> SaveDefaultConfigGroup(KatMotionConfigGroup configGroup)
     {
         try
         {
@@ -49,7 +49,7 @@ public class KatMotionFileService : IKatMotionFileService
         }
     }
 
-    public Either<Exception, KatMotionConfigGroup> LoadDefaultConfigGroup()
+    public Result<KatMotionConfigGroup, Exception> LoadDefaultConfigGroup()
     {
         try
         {
@@ -61,7 +61,7 @@ public class KatMotionFileService : IKatMotionFileService
         }
     }
 
-    public Either<Exception, KatMotionConfigGroup> LoadConfigGroup(string configFilePath)
+    public Result<KatMotionConfigGroup, Exception> LoadConfigGroup(string configFilePath)
     {
         try
         {
@@ -92,7 +92,7 @@ public class KatMotionFileService : IKatMotionFileService
         }
     }
 
-    public Either<Exception, List<KatMotionConfigGroup>> LoadConfigGroupsFromSysConf()
+    public Result<List<KatMotionConfigGroup>, Exception> LoadConfigGroupsFromSysConf()
     {
         try
         {
@@ -101,9 +101,9 @@ public class KatMotionFileService : IKatMotionFileService
             List<KatMotionConfigGroup> configGroups = [];
             foreach (var configFile in configFiles)
             {
-                // TODO: 处理部分文件读取失败的情况
-                LoadConfigGroup(Path.Combine(_customConfigDirPath, configFile))
-                    .Iter(configGroups.Add);
+                var result = LoadConfigGroup(Path.Combine(_customConfigDirPath, configFile));
+                if (result.IsSuccess)
+                    configGroups.Add(result.Value);
             }
 
             return configGroups;
@@ -114,14 +114,14 @@ public class KatMotionFileService : IKatMotionFileService
         }
     }
 
-    public Either<Exception, bool> SaveConfigGroupToSysConf(KatMotionConfigGroup configGroup)
+    public Result<bool, Exception> SaveConfigGroupToSysConf(KatMotionConfigGroup configGroup)
     {
         var fileName = configGroup.Guid + ".json";
         var path = Path.Combine(_customConfigDirPath, fileName);
         return SaveConfigGroup(configGroup, path);
     }
 
-    public Either<Exception, bool> SaveConfigGroup(KatMotionConfigGroup configGroup, string configFilePath)
+    public Result<bool, Exception> SaveConfigGroup(KatMotionConfigGroup configGroup, string configFilePath)
     {
         try
         {
@@ -141,22 +141,21 @@ public class KatMotionFileService : IKatMotionFileService
         }
     }
 
-    public Either<Exception, bool> SaveConfigGroupsToSysConf(IEnumerable<KatMotionConfigGroup> configGroups)
+    public Result<bool, Exception> SaveConfigGroupsToSysConf(IEnumerable<KatMotionConfigGroup> configGroups)
     {
         foreach (var configGroup in configGroups)
         {
-            var ret = SaveConfigGroupToSysConf(configGroup)
-                .Match<Either<Exception, bool>>(flag => flag, exception => exception);
-            if (ret.IsLeft)
+            var ret = SaveConfigGroupToSysConf(configGroup);
+            if (ret.IsFailure)
             {
-                return ret;
+                return ret.Error;
             }
         }
 
         return true;
     }
 
-    public Either<Exception, bool> DeleteConfigGroupFromSysConf(Guid id)
+    public Result<bool, Exception> DeleteConfigGroupFromSysConf(Guid id)
     {
         try
         {

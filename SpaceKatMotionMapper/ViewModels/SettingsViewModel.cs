@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSharpFunctionalExtensions;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -133,21 +134,20 @@ public partial class SettingsViewModel : ObservableObject
         {
             var ret = await _officialMapperHotKeyService.RegisterHotKeyWrapper(UseCtrl, UseAlt, UseShift, HotKey,
                 SelectedKatButton);
-            _ = ret.Match(s =>
+            if (ret.IsSuccess)
             {
-                if (!s)
+                if (!ret.Value)
                 {
                     _popUpNotificationService.Pop(NotificationType.Warning, "注册热键失败");
                 }
 
                 _popUpNotificationService.Pop(NotificationType.Success, "注册热键成功");
                 SaveHotKey();
-                return true;
-            }, _ =>
+            }
+            else
             {
                 _popUpNotificationService.Pop(NotificationType.Warning, "注册热键失败");
-                return false;
-            });
+            }
         }
         else
         {
@@ -294,15 +294,14 @@ public partial class SettingsViewModel : ObservableObject
     private async Task GetPresetsFromInternet()
     {
         var ret = await DownloadMetaKeyPresetsHelper.DownloadAndCopyMetaKeyPresetsAsync();
-        _ = ret.Match(_ =>
+        if (ret.IsSuccess)
         {
             _popUpNotificationService.Pop(NotificationType.Success, "预设下载成功");
-            return true;
-        }, ex =>
+        }
+        else
         {
-            _popUpNotificationService.Pop(NotificationType.Error, $"预设下载失败：{ex.Message}");
-            return false;
-        });
+            _popUpNotificationService.Pop(NotificationType.Error, $"预设下载失败：{ret.Error.Message}");
+        }
     }
     
     #endregion

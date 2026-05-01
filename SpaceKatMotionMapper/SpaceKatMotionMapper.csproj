@@ -11,7 +11,7 @@
         <NeutralLanguage>zh-Hans-CN</NeutralLanguage>
         <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
         <IsPackable>false</IsPackable>
-        <Version>0.3.0</Version>
+        <Version>0.3.1</Version>
         <Authors>JustKTS</Authors>
         <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
 		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
@@ -39,7 +39,7 @@
         <PackageReference Include="H.InputSimulator" Version="1.5.0" />
         <PackageReference Include="Irihi.Ursa" Version="2.0.0-rc1" />
         <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="2.0.0-rc1" />
-        <PackageReference Include="LanguageExt.Core" Version="4.4.9" />
+        <PackageReference Include="CSharpFunctionalExtensions" Version="3.7.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.6" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.6" />
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.6" />

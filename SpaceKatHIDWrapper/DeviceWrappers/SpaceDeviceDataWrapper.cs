@@ -1,5 +1,5 @@
 ﻿using HidApi;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using SpaceKatHIDWrapper.DeviceHIDSpecs;
 using SpaceKatHIDWrapper.Functions;
 using SpaceKatHIDWrapper.Models;
@@ -9,20 +9,16 @@ namespace SpaceKatHIDWrapper.DeviceWrappers;
 public class SpaceDeviceDataWrapper : IDeviceDataWrapper
 {
     private DeviceHidSpec? _hidSpec;
-    public event EventHandler<Either<Exception, bool>>? ConnectionChanged;
-
+    public event EventHandler<Result<bool, Exception>>? ConnectionChanged;
 
     private Device? _device;
-
     private int _readFailedCount;
-
     public bool IsConnected => _device != null;
-
     private KatDeviceBuffer? _buffer;
 
-    private void RetryConnect(object? obj, Either<Exception, bool> isConnected)
+    private void RetryConnect(object? obj, Result<bool, Exception> isConnected)
     {
-        if (isConnected.IsRight) return;
+        if (isConnected.IsSuccess) return;
         const int maxRetry = 5;
         Task.Run(async () =>
             {
@@ -43,16 +39,17 @@ public class SpaceDeviceDataWrapper : IDeviceDataWrapper
     public async Task<bool> Connect()
     {
         var devicePack = await KatDeviceFunction.FindKatDevice();
-        return devicePack.Match((pair) =>
+        if (devicePack.IsSuccess)
         {
-            var (spec, device) = pair;
+            var (spec, device) = devicePack.Value;
             _hidSpec = spec;
             _device = device;
             _buffer = new KatDeviceBuffer(_hidSpec.ButtonMappings.Count);
             _readLength = ReadFunctions.GetReadBytesCount(_hidSpec.AxesMappings);
             ConnectionChanged?.Invoke(this, IsConnected);
             return true;
-        }, _ => false);
+        }
+        return false;
     }
 
     private int _readLength;

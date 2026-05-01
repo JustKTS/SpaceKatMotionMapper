@@ -1,5 +1,5 @@
 ﻿using System;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatHIDWrapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
@@ -14,26 +14,26 @@ public class KatDeadZoneConfigService(
     public KatDeadZoneConfig LoadDefaultDeadZoneConfigs()
     {
         var configRet = katMotionConfigVmManageService.GetDefaultConfig().Map(config => config.DeadZoneConfig);
-        return configRet.Match(config =>
+        if (configRet.IsSuccess)
         {
-            // 为保证兼容性添加
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+            var config = configRet.Value;
             if (config.AxesInverse is null)
             {
                 config = config with { AxesInverse = [false, false, false, false, false, false] };
             }
 
             return config;
-        }, _ =>new KatDeadZoneConfig());
+        }
+        return new KatDeadZoneConfig();
     }
 
     public KatDeadZoneConfig? LoadDeadZoneConfigs(Guid configGroupId)
     {
         var configRet = katMotionConfigVmManageService.GetConfig(configGroupId);
-        return configRet.Match<KatDeadZoneConfig?>(config => config.DeadZoneConfig with { }, _ => null);
+        return configRet.IsSuccess ? configRet.Value.DeadZoneConfig with { } : null;
     }
 
-    public Either<Exception, bool> SaveDefaultDeadZoneConfig(KatDeadZoneConfig deadZoneConfig)
+    public Result<bool, Exception> SaveDefaultDeadZoneConfig(KatDeadZoneConfig deadZoneConfig)
     {
         return katMotionConfigVmManageService.GetDefaultConfig().Bind(configVm =>
         {
@@ -49,7 +49,7 @@ public class KatDeadZoneConfigService(
         });
     }
 
-    public Either<Exception, bool> SaveDeadZoneConfig(KatDeadZoneConfig deadZoneConfig, Guid configGroupId)
+    public Result<bool, Exception> SaveDeadZoneConfig(KatDeadZoneConfig deadZoneConfig, Guid configGroupId)
     {
         return katMotionConfigVmManageService.GetConfig(configGroupId).Bind(configVm =>
         {
@@ -68,21 +68,27 @@ public class KatDeadZoneConfigService(
 
     public bool ApplyDeadZoneConfigById(Guid id)
     {
-        return katMotionConfigVmManageService.GetConfig(id).Match(vm =>
+        var result = katMotionConfigVmManageService.GetConfig(id);
+        if (result.IsSuccess)
         {
+            var vm = result.Value;
             katMotionRecognizeService.SetDeadZone(vm.DeadZoneConfig.Upper, vm.DeadZoneConfig.Lower,
                 vm.DeadZoneConfig.AxesInverse);
             return true;
-        }, _ => false);
+        }
+        return false;
     }
 
     public bool ApplyDefaultDeadZoneConfig()
     {
-        return katMotionConfigVmManageService.GetDefaultConfig().Match(vm =>
+        var result = katMotionConfigVmManageService.GetDefaultConfig();
+        if (result.IsSuccess)
         {
+            var vm = result.Value;
             katMotionRecognizeService.SetDeadZone(vm.DeadZoneConfig.Upper, vm.DeadZoneConfig.Lower,
                 vm.DeadZoneConfig.AxesInverse);
             return true;
-        }, _ => false);
+        }
+        return false;
     }
 }

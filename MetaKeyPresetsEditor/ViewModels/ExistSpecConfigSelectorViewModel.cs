@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Irihi.Avalonia.Shared.Contracts;
 using MetaKeyPresetsEditor.Helpers;
+using SpaceKat.Shared.Helpers;
 using MetaKeyPresetsEditor.Services;
 using Microsoft.Extensions.DependencyInjection;
 using SpaceKat.Shared.Models;
@@ -37,17 +38,18 @@ public partial class ExistSpecConfigSelectorViewModel : ObservableRecipient, IDi
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
             var ret = _metaKeyPresetFileService.LoadConfigs();
-            ret.Match(dict =>
-                {
-                    dict.Remove("默认配置");
-                    ProgramSpecificConfigs = dict;
-                    OnFilterStrChanged(string.Empty);
-                }, ex =>
-                {
-                    DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
-                        .ShowPopUpNotificationAsync(new PopupNotificationData(NotificationType.Error, ex.Message));
-                }
-            );
+            if (ret.IsSuccess)
+            {
+                var dict = ret.Value;
+                dict.Remove("默认配置");
+                ProgramSpecificConfigs = dict;
+                OnFilterStrChanged(string.Empty);
+            }
+            else
+            {
+                DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
+                    .ShowPopUpNotificationAsync(new PopupNotificationData(NotificationType.Error, ret.Error.Message));
+            }
         });
     }
 

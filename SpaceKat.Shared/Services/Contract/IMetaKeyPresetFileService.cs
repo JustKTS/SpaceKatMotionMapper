@@ -1,13 +1,13 @@
-﻿using LanguageExt;
+﻿using CSharpFunctionalExtensions;
 using SpaceKat.Shared.Models;
 
 namespace SpaceKat.Shared.Services.Contract;
 
 public interface IMetaKeyPresetFileService
 {
-    public Either<Exception, bool> SaveToConfigDir(ProgramSpecMetaKeysRecord config);
-    public Either<Exception, Dictionary<string, ProgramSpecMetaKeysRecord>> LoadConfigs();
+    public Result<bool, Exception> SaveToConfigDir(ProgramSpecMetaKeysRecord config);
+    public Result<Dictionary<string, ProgramSpecMetaKeysRecord>, Exception> LoadConfigs();
 
-    public Either<Exception, bool> SaveToFile(ProgramSpecMetaKeysRecord config, string filepath);
-    public Either<Exception, ProgramSpecMetaKeysRecord> LoadFromFile(string filepath);
+    public Result<bool, Exception> SaveToFile(ProgramSpecMetaKeysRecord config, string filepath);
+    public Result<ProgramSpecMetaKeysRecord, Exception> LoadFromFile(string filepath);
 }

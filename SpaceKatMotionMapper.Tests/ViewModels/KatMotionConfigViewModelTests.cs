@@ -16,7 +16,7 @@ using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.Tests.TestDoubles;
 using SpaceKatHIDWrapper.Models;
 using CommunityToolkit.Mvvm.Messaging;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using SpaceKatMotionMapper.Functions.Contract;
 
 namespace SpaceKatMotionMapper.Tests.ViewModels;
@@ -90,7 +90,7 @@ public class KatMotionConfigViewModelTests : ViewModelTestBase
         SetupValidConfig(viewModel);
         MockFileService
             .Setup(x => x.SaveConfigGroupToSysConf(It.IsAny<KatMotionConfigGroup>()))
-            .Returns(LanguageExt.Either<Exception, bool>.Right(true));
+            .Returns(Result.Success<bool, Exception>(true));
 
         // Act
         viewModel.SaveToSystemConfigCommand.Execute(null);
@@ -128,7 +128,7 @@ public class KatMotionConfigViewModelTests : ViewModelTestBase
 
         MockFileService
             .Setup(x => x.SaveConfigGroupToSysConf(It.IsAny<KatMotionConfigGroup>()))
-            .Returns(LanguageExt.Either<Exception, bool>.Left(new Exception("保存失败")));
+            .Returns(Result.Failure<bool, Exception>(new Exception("保存失败")));
 
         // 确保配置是可用的
         await Assert.That(viewModel.IsAvailable).IsTrue();
@@ -229,7 +229,7 @@ public class KatMotionConfigViewModelTests : ViewModelTestBase
 
         MockFileService
             .Setup(x => x.LoadConfigGroup(It.IsAny<string>()))
-            .Returns(LanguageExt.Either<Exception, KatMotionConfigGroup>.Left(new Exception("文件不存在")));
+            .Returns(Result.Failure<KatMotionConfigGroup, Exception>(new Exception("文件不存在")));
 
         // Act & Assert - 应该不抛出异常
         await viewModel.LoadFromFileCommand.ExecuteAsync(null);
@@ -455,9 +455,9 @@ public class KatMotionConfigViewModelTests : ViewModelTestBase
 
         var result = viewModel.ToKatMotionConfigGroups();
         var errorMessage = string.Empty;
-        result.IfLeft(ex => errorMessage = ex.Message);
+        if (result.IsFailure) errorMessage = result.Error.Message;
 
-        await Assert.That(result.IsLeft).IsTrue();
+        await Assert.That(result.IsFailure).IsTrue();
         await Assert.That(errorMessage.Contains("配置模式不一致")).IsTrue();
     }
 
@@ -472,9 +472,9 @@ public class KatMotionConfigViewModelTests : ViewModelTestBase
 
         var result = viewModel.ToKatMotionConfigGroups();
         var errorMessage = string.Empty;
-        result.IfLeft(ex => errorMessage = ex.Message);
+        if (result.IsFailure) errorMessage = result.Error.Message;
 
-        await Assert.That(result.IsLeft).IsTrue();
+        await Assert.That(result.IsFailure).IsTrue();
         await Assert.That(errorMessage).IsEqualTo("semantic profile rejected config");
     }
 
@@ -538,12 +538,12 @@ public class KatMotionConfigViewModelTests : ViewModelTestBase
 
     private sealed class AlwaysFailKatMotionSemanticProfile : IKatMotionSemanticProfile
     {
-        public Either<Exception, bool> ValidatePreModeGraph(in KatMotionConfigSemanticValidationContext context)
+        public Result<bool, Exception> ValidatePreModeGraph(in KatMotionConfigSemanticValidationContext context)
         {
             return new Exception("semantic profile rejected config");
         }
 
-        public Either<Exception, bool> ValidatePostModeGraph(in KatMotionConfigSemanticValidationContext context)
+        public Result<bool, Exception> ValidatePostModeGraph(in KatMotionConfigSemanticValidationContext context)
         {
             return true;
         }

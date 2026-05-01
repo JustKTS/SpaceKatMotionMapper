@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSharpFunctionalExtensions;
+using System;
 using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SpaceKatHIDWrapper.Models;
@@ -56,18 +57,17 @@ public partial class TimeAndDeadZoneSettingViewModel(
         IsDefault = false;
         Id = id;
         var configRet = katMotionConfigVmManageService.GetConfig(id);
-        _ = configRet.Match(configVm =>
+        if (configRet.IsSuccess)
+        {
+            var configVm = configRet.Value;
+            IsDeadZoneConfigEnable = configVm.IsCustomDeadZone;
+            var hasSingleActionMode = configVm.HasSingleActionMode();
+            IsTimeConfigEnable = configVm.IsCustomMotionTimeConfigs || hasSingleActionMode;
+            if (hasSingleActionMode && !configVm.IsCustomMotionTimeConfigs)
             {
-                IsDeadZoneConfigEnable = configVm.IsCustomDeadZone;
-                var hasSingleActionMode = configVm.HasSingleActionMode();
-                IsTimeConfigEnable = configVm.IsCustomMotionTimeConfigs || hasSingleActionMode;
-                if (hasSingleActionMode && !configVm.IsCustomMotionTimeConfigs)
-                {
-                    configVm.IsCustomMotionTimeConfigs = true;
-                }
-                return true;
+                configVm.IsCustomMotionTimeConfigs = true;
             }
-            , _ => false);
+        }
     }
 
     # endregion
@@ -81,36 +81,35 @@ public partial class TimeAndDeadZoneSettingViewModel(
     {
         if (IsDefault || Id == Guid.Empty) return;
         var configRet = katMotionConfigVmManageService.GetConfig(Id);
-        _ = configRet.Match(configVm =>
+        if (configRet.IsSuccess)
         {
-            configVm.IsCustomDeadZone = value;
-            return true;
-        }, _ =>
+            configRet.Value.IsCustomDeadZone = value;
+        }
+        else
         {
             popUpNotificationService.Pop(NotificationType.Warning, "分应用配置读取失败");
-            return false;
-        });
+        }
     }
 
     partial void OnIsTimeConfigEnableChanged(bool value)
     {
         if (IsDefault || Id == Guid.Empty) return;
         var configRet = katMotionConfigVmManageService.GetConfig(Id);
-        _ = configRet.Match(configVm =>
+        if (configRet.IsSuccess)
         {
+            var configVm = configRet.Value;
             if (!value && configVm.HasSingleActionMode())
             {
                 IsTimeConfigEnable = true;
                 popUpNotificationService.Pop(NotificationType.Warning, "存在单动作配置时，时间配置必须启用");
-                return false;
+                return;
             }
             configVm.IsCustomMotionTimeConfigs = value;
-            return true;
-        }, _ =>
+        }
+        else
         {
             popUpNotificationService.Pop(NotificationType.Warning, "分应用配置读取失败");
-            return false;
-        });
+        }
     }
 
     #endregion

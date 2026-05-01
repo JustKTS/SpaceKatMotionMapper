@@ -5,6 +5,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
+using SpaceKat.Shared.Helpers;
 using SpaceKat.Shared.Services;
 using SpaceKat.Shared.ViewModels;
 using SpaceKat.Shared.Views;

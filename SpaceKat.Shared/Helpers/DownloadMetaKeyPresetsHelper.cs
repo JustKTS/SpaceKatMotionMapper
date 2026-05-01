@@ -1,5 +1,4 @@
-﻿using LanguageExt;
-using LanguageExt.Common;
+﻿using CSharpFunctionalExtensions;
 using SpaceKat.Shared.States;
 
 namespace SpaceKat.Shared.Helpers;
@@ -13,14 +12,13 @@ public static class DownloadMetaKeyPresetsHelper
     private static readonly string LocalFileName = Path.Combine(GlobalPaths.DownloadTempDir, "presets.zip");
     private static readonly HttpClient Httpclient = new();
 
-    public static async Task<Either<Exception, string>> DownloadMetaKeyPresetsAsync(Uri url, string localFileName)
+    public static async Task<Result<string, Exception>> DownloadMetaKeyPresetsAsync(Uri url, string localFileName)
     {
         if (!Path.Exists(GlobalPaths.DownloadTempDir))
         {
             Directory.CreateDirectory(GlobalPaths.DownloadTempDir);
         }
 
-        //发起请求并异步等待结果
         var cts = new CancellationTokenSource();
         cts.CancelAfter(TimeSpan.FromSeconds(20));
 
@@ -45,52 +43,48 @@ public static class DownloadMetaKeyPresetsHelper
         }
     }
 
-    public static async Task<Either<Exception, string>> UnZipMetaKeyPresetsAsync(
+    public static Result<string, Exception> UnZipMetaKeyPresets(
         string localFileName)
     {
         var tempUnZipDir = Path.Combine(GlobalPaths.DownloadTempDir, "tempUnzip");
         Directory.CreateDirectory(tempUnZipDir);
-        var ret = await Task.Run<Either<Exception, bool>>(() =>
+        try
         {
-            try
-            {
-                System.IO.Compression.ZipFile.ExtractToDirectory(localFileName, tempUnZipDir);
-                return true;
-            }
-            catch (Exception e)
-            {
-                return e;
-            }
-        });
-        File.Delete(localFileName);
-        return ret.Match<Either<Exception, string>>(_ => tempUnZipDir, ex => ex);
+            System.IO.Compression.ZipFile.ExtractToDirectory(localFileName, tempUnZipDir);
+            File.Delete(localFileName);
+            return tempUnZipDir;
+        }
+        catch (Exception e)
+        {
+            File.Delete(localFileName);
+            return e;
+        }
     }
 
-    public static Either<Exception, bool> CopyToConfigDir(string tempUnzipDir)
+    public static Result<bool, Exception> CopyToConfigDir(string tempUnzipDir)
     {
         var filePaths = Directory.GetFiles(tempUnzipDir, "*.json");
 
-        filePaths.Iter(filePath =>
+        foreach (var filePath in filePaths)
         {
             var fileName = Path.GetFileName(filePath);
             File.Copy(filePath, Path.Combine(GlobalPaths.MetaKeysConfigPath, fileName), true);
-        });
+        }
 
         Directory.Delete(tempUnzipDir, true);
 
         return true;
     }
 
-    public static async Task<Result<bool>> DownloadAndCopyMetaKeyPresetsAsync(Uri? url = null,
+    public static async Task<Result<bool, Exception>> DownloadAndCopyMetaKeyPresetsAsync(Uri? url = null,
         string? localFilename = null)
     {
         url ??= DownloadUrl;
         localFilename ??= LocalFileName;
-        var result = await
-            DownloadMetaKeyPresetsAsync(url, localFilename)
-                .BindAsync(UnZipMetaKeyPresetsAsync)
-                .BindAsync(CopyToConfigDir);
-
-        return result.Match(r => r, ex => new Result<bool>(ex));
+        var downloadResult = await DownloadMetaKeyPresetsAsync(url, localFilename);
+        if (downloadResult.IsFailure) return downloadResult.Error;
+        var unzipResult = UnZipMetaKeyPresets(downloadResult.Value);
+        if (unzipResult.IsFailure) return unzipResult.Error;
+        return CopyToConfigDir(unzipResult.Value);
     }
 }

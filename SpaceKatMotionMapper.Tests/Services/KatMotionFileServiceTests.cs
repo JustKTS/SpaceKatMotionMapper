@@ -1,4 +1,5 @@
 using System.Text.Json;
+using CSharpFunctionalExtensions;
 using FluentAssertions;
 using Moq;
 using SpaceKat.Shared.Helpers;
@@ -26,10 +27,11 @@ public class KatMotionFileServiceTests
         Exception? error = null;
         KatMotionConfigGroup? loadedConfig = null;
 
-        sut.LoadConfigGroup(@"C:\Temp\legacy-config.json")
-            .Match(
-                Right: config => loadedConfig = config,
-                Left: ex => error = ex);
+        var result = sut.LoadConfigGroup(@"C:\Temp\legacy-config.json");
+        if (result.IsSuccess)
+            loadedConfig = result.Value;
+        else
+            error = result.Error;
 
         error.Should().BeNull();
         loadedConfig.Should().NotBeNull();
@@ -51,10 +53,11 @@ public class KatMotionFileServiceTests
         Exception? error = null;
         KatMotionConfigGroup? loadedConfig = null;
 
-        sut.LoadConfigGroup(@"C:\Temp\unsupported-config.json")
-            .Match(
-                Right: config => loadedConfig = config,
-                Left: ex => error = ex);
+        var result = sut.LoadConfigGroup(@"C:\Temp\unsupported-config.json");
+        if (result.IsSuccess)
+            loadedConfig = result.Value;
+        else
+            error = result.Error;
 
         loadedConfig.Should().BeNull();
         error.Should().NotBeNull();
@@ -87,10 +90,11 @@ public class KatMotionFileServiceTests
         Exception? error = null;
         KatMotionConfigGroup? loadedConfig = null;
 
-        sut.LoadConfigGroup(@"C:\Temp\legacy-config.json")
-            .Match(
-                Right: config => loadedConfig = config,
-                Left: ex => error = ex);
+        var result = sut.LoadConfigGroup(@"C:\Temp\legacy-config.json");
+        if (result.IsSuccess)
+            loadedConfig = result.Value;
+        else
+            error = result.Error;
 
         error.Should().BeNull();
         loadedConfig.Should().NotBeNull();

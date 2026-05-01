@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using SpaceKat.Shared.Models;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Models;
@@ -17,7 +17,6 @@ public readonly record struct KatMotionConfigSemanticValidationContext(
 
 public interface IKatMotionConfigSemanticRule
 {
-    Either<Exception, bool> Validate(in KatMotionConfigSemanticValidationContext context);
+    Result<bool, Exception> Validate(in KatMotionConfigSemanticValidationContext context);
 }
-
 

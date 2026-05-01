@@ -345,3 +345,4 @@ healthchecksdb
 docs/bugs/
 docs/superpowers/
 .superpowers/
+.tmp_reflect/

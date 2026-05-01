@@ -64,15 +64,16 @@ public class ModeChangeService
             else
             {
                 CurrentActivatedConfig = id;
-                _katMotionConfigVmManageService.GetConfig(id)
-                    .Iter(configVm =>
-                    {
-                        if (configVm.IsCustomMotionTimeConfigs)
-                            _katMotionTimeConfigService.ApplyMotionTimeConfigById(id);
-                        else _katMotionTimeConfigService.ApplyDefaultMotionTimeConfig();
-                        if (configVm.IsCustomDeadZone) _katDeadZoneConfigService.ApplyDeadZoneConfigById(id);
-                        else _katDeadZoneConfigService.ApplyDefaultDeadZoneConfig();
-                    });
+                var configVmResult = _katMotionConfigVmManageService.GetConfig(id);
+                if (configVmResult.IsSuccess)
+                {
+                    var configVm = configVmResult.Value;
+                    if (configVm.IsCustomMotionTimeConfigs)
+                        _katMotionTimeConfigService.ApplyMotionTimeConfigById(id);
+                    else _katMotionTimeConfigService.ApplyDefaultMotionTimeConfig();
+                    if (configVm.IsCustomDeadZone) _katDeadZoneConfigService.ApplyDeadZoneConfigById(id);
+                    else _katDeadZoneConfigService.ApplyDefaultDeadZoneConfig();
+                }
             }
         });
     }

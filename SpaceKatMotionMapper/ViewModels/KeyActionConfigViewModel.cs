@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSharpFunctionalExtensions;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -338,17 +339,16 @@ public partial class KeyActionConfigViewModel : ViewModelBase
         if (_metaKeyPresetService == null) return; // 在测试环境中可能为 null
 
         var ret = _metaKeyPresetService.AddToFavPreset(KeyActionsDescription, ToKeyActionConfigList());
-        _ = ret.Match(s =>
+        if (ret.IsSuccess)
         {
-            if (!s) return s;
-            _popUpNotificationService?.PopInKatMotionConfigWindow(Parent.Parent.Parent.Parent.Id, NotificationType.Success,
-                    $"收藏\"{KeyActionsDescription}\"成功");
-            return s;
-        }, ex =>
+            if (ret.Value)
+                _popUpNotificationService?.PopInKatMotionConfigWindow(Parent.Parent.Parent.Parent.Id, NotificationType.Success,
+                        $"收藏\"{KeyActionsDescription}\"成功");
+        }
+        else
         {
-            _popUpNotificationService?.PopInKatMotionConfigWindow(Parent.Parent.Parent.Parent.Id, NotificationType.Error, ex.Message);
-            return false;
-        });
+            _popUpNotificationService?.PopInKatMotionConfigWindow(Parent.Parent.Parent.Parent.Id, NotificationType.Error, ret.Error.Message);
+        }
     }
 
     #endregion

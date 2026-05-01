@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using SpaceKat.Shared.Models;
 
 namespace SpaceKatMotionMapper.Services.Contract;
 
 public interface IOfficialMapperHotKeyService
 {
-    Task<Either<Exception, bool>> RegisterHotKeyWrapper(bool useCtrl, bool useAlt, bool useShift, KeyCodeWrapper hotKey,
+    Task<Result<bool, Exception>> RegisterHotKeyWrapper(bool useCtrl, bool useAlt, bool useShift, KeyCodeWrapper hotKey,
         KatButtonEnum katButtonEnum);
-
-    Either<Exception, bool> UnregisterHotKeyWrapper();
+    Result<bool, Exception> UnregisterHotKeyWrapper();
     void RegisterHandle();
     void UnregisterHandle();
 }

@@ -17,6 +17,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="CSharpFunctionalExtensions" Version="3.7.0" />
         <PackageReference Include="TUnit" Version="1.35.2" />
         <PackageReference Include="TUnit.Assertions" Version="1.35.2" />
     </ItemGroup>

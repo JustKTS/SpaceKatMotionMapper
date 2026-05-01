@@ -1,4 +1,4 @@
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using Moq;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services.Contract;
@@ -19,8 +19,6 @@ public abstract class ViewModelTestBase
         MockNotificationService = new Mock<IPopUpNotificationService>();
         MockActivateService = new Mock<IKatMotionActivateService>();
         MockStorageProviderService = new Mock<IStorageProviderService>();
-
-        // 设置默认行为
         SetupDefaultBehaviors();
     }
 
@@ -28,13 +26,12 @@ public abstract class ViewModelTestBase
     {
         MockFileService
             .Setup(x => x.SaveConfigGroupToSysConf(It.IsAny<KatMotionConfigGroup>()))
-            .Returns(Either<Exception, bool>.Right(true));
+            .Returns(Result.Success<bool, Exception>(true));
 
         MockActivateService
             .Setup(x => x.ActivateKatMotions(It.IsAny<KatMotionConfigGroup>()))
             .Callback(() => { });
 
-        // 设置 Mock 存储服务 - 简化版本
         var mockStorageProvider = new Moq.Mock<Avalonia.Platform.Storage.IStorageProvider>();
         MockStorageProviderService
             .Setup(x => x.GetStorageProvider())

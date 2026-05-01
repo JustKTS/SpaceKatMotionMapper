@@ -1,4 +1,4 @@
-﻿using LanguageExt;
+﻿using CSharpFunctionalExtensions;
 using SpaceKatHIDWrapper.Models;
 
 namespace SpaceKatHIDWrapper.DeviceWrappers;
@@ -10,6 +10,5 @@ public interface IDeviceDataWrapper
     public void Disconnect();
     public KatDeviceData? Read();
 
-    public event EventHandler<Either<Exception, bool>>? ConnectionChanged;
-
+    public event EventHandler<Result<bool, Exception>>? ConnectionChanged;
 }

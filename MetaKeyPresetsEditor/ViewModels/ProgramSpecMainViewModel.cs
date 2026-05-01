@@ -50,8 +50,9 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
     private void ModifyDefaultConfig()
     {
         var recordsRet = _metaKeyPresetFileService.LoadConfigs();
-        var ret = recordsRet.Map(records =>
+        if (recordsRet.IsSuccess)
         {
+            var records = recordsRet.Value;
             var vm = DIHelper.GetServiceProvider().GetRequiredService<ProgramSpecificConfigViewModel>();
             vm.IsDefault = true;
 
@@ -59,15 +60,13 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
             {
                 _ = vm.LoadFromRecord(record);
             }
-
-            return true;
-        });
-        ret.IfLeft(ex =>
+        }
+        else
         {
             DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
                 .ShowPopUpNotificationAsync(
-                    new PopupNotificationData(NotificationType.Error, $"加载配置文件失败，{ex.Message}"));
-        });
+                    new PopupNotificationData(NotificationType.Error, $"加载配置文件失败，{recordsRet.Error.Message}"));
+        }
     }
 
 
@@ -89,19 +88,18 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
     private async Task GetPresetsFromInternet()
     {
         var ret = await DownloadMetaKeyPresetsHelper.DownloadAndCopyMetaKeyPresetsAsync();
-        _ = ret.Match(_ =>
+        if (ret.IsSuccess)
         {
             DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
                 .ShowPopUpNotificationAsync(
                     new PopupNotificationData(NotificationType.Success, "预设下载成功"));
-            return true;
-        }, ex =>
+        }
+        else
         {
             DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
                 .ShowPopUpNotificationAsync(
-                    new PopupNotificationData(NotificationType.Error, $"预设下载失败：{ex.Message}"));
-            return false;
-        });
+                    new PopupNotificationData(NotificationType.Error, $"预设下载失败：{ret.Error.Message}"));
+        }
     }
 
     private static readonly FilePickerOpenOptions FileOpenOptions = new()
@@ -117,17 +115,16 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
         var filePaths = await DIHelper.GetServiceProvider()
             .GetRequiredService<IStorageProvider>().OpenFilePickerAsync(FileOpenOptions);
 
-        var ret = await DIHelper.GetServiceProvider()
-            .GetRequiredService<IMetaKeyPresetFileService>().LoadFromFile(filePaths[0].Path.LocalPath).MapAsync(
-                async record =>
-                {
-                    await ChangeMetaKeyVMHelper.LoadVMFromConfig(record);
-                    return true;
-                });
-        ret.IfLeft(ex =>
+        var loadRet = DIHelper.GetServiceProvider()
+            .GetRequiredService<IMetaKeyPresetFileService>().LoadFromFile(filePaths[0].Path.LocalPath);
+        if (loadRet.IsSuccess)
+        {
+            await ChangeMetaKeyVMHelper.LoadVMFromConfig(loadRet.Value);
+        }
+        else
         {
             DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
-                .ShowPopUpNotificationAsync(new PopupNotificationData(NotificationType.Error, $"预设文件读取失败：{ex}"));
-        });
+                .ShowPopUpNotificationAsync(new PopupNotificationData(NotificationType.Error, $"预设文件读取失败：{loadRet.Error}"));
+        }
     }
 }

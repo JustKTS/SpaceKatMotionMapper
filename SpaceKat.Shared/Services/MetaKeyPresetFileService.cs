@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using Serilog;
 using SpaceKat.Shared.Helpers;
 using SpaceKat.Shared.Models;
@@ -28,7 +28,7 @@ public class MetaKeyPresetFileService : IMetaKeyPresetFileService
         SaveToConfigDir(favConfig);
     }
 
-    public Either<Exception, bool> SaveToConfigDir(ProgramSpecMetaKeysRecord config)
+    public Result<bool, Exception> SaveToConfigDir(ProgramSpecMetaKeysRecord config)
     {
         try
         {
@@ -41,7 +41,7 @@ public class MetaKeyPresetFileService : IMetaKeyPresetFileService
         }
     }
 
-    public Either<Exception, bool> SaveToFile(ProgramSpecMetaKeysRecord config, string filepath)
+    public Result<bool, Exception> SaveToFile(ProgramSpecMetaKeysRecord config, string filepath)
     {
         try
         {
@@ -56,7 +56,7 @@ public class MetaKeyPresetFileService : IMetaKeyPresetFileService
         }
     }
 
-    public Either<Exception, Dictionary<string, ProgramSpecMetaKeysRecord>> LoadConfigs()
+    public Result<Dictionary<string, ProgramSpecMetaKeysRecord>, Exception> LoadConfigs()
     {
         var configFiles = Directory.GetFiles(GlobalPaths.MetaKeysConfigPath, "*.json");
         Dictionary<string, ProgramSpecMetaKeysRecord> configs = [];
@@ -65,7 +65,10 @@ public class MetaKeyPresetFileService : IMetaKeyPresetFileService
             foreach (var configFilename in configFiles)
             {
                 var configOption = LoadFromFile(configFilename);
-                configOption.Iter(config => { configs.Add(config.ConfigName, config); });
+                if (configOption.IsSuccess)
+                {
+                    configs.Add(configOption.Value.ConfigName, configOption.Value);
+                }
             }
         }
         catch (Exception e)
@@ -76,8 +79,7 @@ public class MetaKeyPresetFileService : IMetaKeyPresetFileService
         return configs.Count == 0 ? new Exception("未找到任何配置文件") : configs;
     }
 
-
-    public Either<Exception, ProgramSpecMetaKeysRecord> LoadFromFile(string filepath)
+    public Result<ProgramSpecMetaKeysRecord, Exception> LoadFromFile(string filepath)
     {
         var filename = Path.GetFileName(filepath);
         var jsonRaw = File.ReadAllText(filepath);

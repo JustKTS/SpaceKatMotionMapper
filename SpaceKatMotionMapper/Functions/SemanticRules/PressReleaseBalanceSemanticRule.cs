@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using SpaceKat.Shared.Models;
 using SpaceKatMotionMapper.Functions.Contract;
 using SpaceKatMotionMapper.Models;
@@ -10,7 +10,7 @@ namespace SpaceKatMotionMapper.Functions.SemanticRules;
 
 public class PressReleaseBalanceSemanticRule : IKatMotionConfigSemanticRule
 {
-    public Either<Exception, bool> Validate(in KatMotionConfigSemanticValidationContext context)
+    public Result<bool, Exception> Validate(in KatMotionConfigSemanticValidationContext context)
     {
         if (context.Items.Any(item => item.ConfigMode == KatConfigModeEnum.SingleAction))
         {

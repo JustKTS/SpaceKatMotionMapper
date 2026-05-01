@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using LanguageExt.Common;
+using CSharpFunctionalExtensions;
 using Serilog;
 using SpaceKat.Shared.Models;
 using SpaceKat.Shared.Services;
@@ -21,23 +21,20 @@ public class MetaKeyPresetService
     }
     public void ReloadConfigs()
     {
-        var either = _metaKeyPresetFileService.LoadConfigs();
-        _ = either.Match(config =>
-        {
-            Configs = config;
-        }, ex =>
-        {
-            _logger.Error(ex, "");
-        });
+        var result = _metaKeyPresetFileService.LoadConfigs();
+        if (result.IsSuccess)
+            Configs = result.Value;
+        else
+            _logger.Error(result.Error, "");
     }
 
-    public Result<bool> AddToFavPreset(string description, List<KeyActionConfig> keyActionConfigs)
+    public Result<bool, Exception> AddToFavPreset(string description, List<KeyActionConfig> keyActionConfigs)
     {
         var config = Configs["我的收藏"];
         var macroKeys = config.MacroKeys;
         if (!macroKeys.TryAdd(description, keyActionConfigs))
         {
-            return new Result<bool>(new Exception($"已存在名为 \"{description}\" 的配置，无法重复添加"));
+            return new Exception($"已存在名为 \"{description}\" 的配置，无法重复添加");
         }
 
         var configNew = config with { MacroKeys = macroKeys };

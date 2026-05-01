@@ -1,5 +1,5 @@
 ﻿using HidApi;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using SpaceKatHIDWrapper.DeviceHIDSpecs;
 
 namespace SpaceKatHIDWrapper.Functions;
@@ -20,7 +20,7 @@ public static class KatDeviceFunction
         }
     }
 
-    public static async Task<Either<Exception, (DeviceHidSpec, Device)>> FindKatDevice()
+    public static async Task<Result<(DeviceHidSpec, Device), Exception>> FindKatDevice()
     {
         foreach (var spec in DeviceHidSpecDict.HidIds.Values)
         {

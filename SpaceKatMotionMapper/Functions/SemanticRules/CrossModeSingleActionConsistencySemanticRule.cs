@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Functions.Contract;
 using SpaceKatMotionMapper.Models;
@@ -10,7 +10,7 @@ namespace SpaceKatMotionMapper.Functions.SemanticRules;
 
 public class CrossModeSingleActionConsistencySemanticRule : IKatMotionConfigSemanticRule
 {
-    public Either<Exception, bool> Validate(in KatMotionConfigSemanticValidationContext context)
+    public Result<bool, Exception> Validate(in KatMotionConfigSemanticValidationContext context)
     {
         var motionConfigModes = new Dictionary<KatMotionEnum, List<KatConfigModeEnum>>();
 

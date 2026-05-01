@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Functions.Contract;
 
@@ -14,12 +14,12 @@ public class MainProjectKatMotionSemanticProfile(
     private readonly MainProjectKatMotionSemanticRuleAssembler _ruleAssembler = ruleAssembler ?? new MainProjectKatMotionSemanticRuleAssembler();
     private readonly IKatMotionTimeConfigAdjustmentPolicy _timeConfigAdjustmentPolicy = timeConfigAdjustmentPolicy ?? new MainProjectSingleActionMotionTimeAdjustmentPolicy();
 
-    public Either<Exception, bool> ValidatePreModeGraph(in KatMotionConfigSemanticValidationContext context)
+    public Result<bool, Exception> ValidatePreModeGraph(in KatMotionConfigSemanticValidationContext context)
     {
         return MainProjectKatMotionSemanticRuleAssembler.CreatePreModeGraphValidator().Validate(context);
     }
 
-    public Either<Exception, bool> ValidatePostModeGraph(in KatMotionConfigSemanticValidationContext context)
+    public Result<bool, Exception> ValidatePostModeGraph(in KatMotionConfigSemanticValidationContext context)
     {
         return MainProjectKatMotionSemanticRuleAssembler.CreatePostModeGraphValidator().Validate(context);
     }

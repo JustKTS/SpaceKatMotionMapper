@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using Serilog;
 using SpaceKatMotionMapper.ViewModels;
 using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.Services;
 
-// ReSharper disable once InconsistentNaming
 public class KatMotionConfigVMManageService : IKatMotionConfigVMManageService
 {
     private readonly Dictionary<Guid, KatMotionConfigViewModel> _configs = [];
@@ -17,9 +16,8 @@ public class KatMotionConfigVMManageService : IKatMotionConfigVMManageService
     {
         _configs[configVm.Id] = configVm;
     }
-    
 
-    public Either<Exception, KatMotionConfigViewModel> GetConfig(Guid id)
+    public Result<KatMotionConfigViewModel, Exception> GetConfig(Guid id)
     {
         try
         {
@@ -31,20 +29,19 @@ public class KatMotionConfigVMManageService : IKatMotionConfigVMManageService
             return new Exception("获取配置组失败");
         }
     }
-    
+
     public void RegisterDefaultConfig(KatMotionConfigViewModel configVm)
     {
         _commonConfigGuid = configVm.Id;
         _configs[configVm.Id] = configVm;
     }
-    
-    public  Either<Exception,KatMotionConfigViewModel> GetDefaultConfig()
+
+    public Result<KatMotionConfigViewModel, Exception> GetDefaultConfig()
     {
-        return _commonConfigGuid == Guid.Empty 
-            ? new Exception("全局配置未设置") 
+        return _commonConfigGuid == Guid.Empty
+            ? new Exception("全局配置未设置")
             : _configs[_commonConfigGuid];
     }
-
 
     public bool RemoveConfig(Guid id)
     {

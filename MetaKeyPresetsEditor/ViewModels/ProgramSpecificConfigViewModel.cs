@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSharpFunctionalExtensions;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -9,9 +10,8 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using LanguageExt;
-using LanguageExt.Common;
 using MetaKeyPresetsEditor.Helpers;
+using SpaceKat.Shared.Helpers;
 using MetaKeyPresetsEditor.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -141,7 +141,7 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
         KeyActionConfigs.Add(new KeyActionConfigForPresetsViewModel() { Parent = KeyActionConfigs });
     }
 
-    private Either<Exception,bool> CheckAvailable()
+    private Result<bool, Exception> CheckAvailable()
     {
         if (!IsGeneral && string.IsNullOrEmpty(ConfigName)) return new Exception("未指定关联程序，请选择。");
         var ret = CombinationKeysConfigs.Any(vm =>
@@ -172,73 +172,75 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
     [RelayCommand]
     private async Task SaveToConfigDir()
     {
-        var ret = await CheckAvailable().MapAsync(async _ =>
-        {
-            return await Task.Run(() => _metaKeyPresetFileService.SaveToConfigDir(ToConfigRecord()));
-        });
-        _ = ret.Match(_ =>
-        {
-            DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
-                new PopupNotificationData(
-                    NotificationType.Success,
-                    $"保存成功!"));
-            return true;
-        }, ex =>
+        var checkResult = CheckAvailable();
+        if (checkResult.IsFailure)
         {
             DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
                 new PopupNotificationData(
                     NotificationType.Error,
-                    $"保存失败，{ex.Message}"));
-            return false;
-        });
+                    $"保存失败，{checkResult.Error.Message}"));
+            return;
+        }
+
+        await Task.Run(() => _metaKeyPresetFileService.SaveToConfigDir(ToConfigRecord()));
+        DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
+            new PopupNotificationData(
+                NotificationType.Success,
+                $"保存成功!"));
     }
 
     [RelayCommand]
     private async Task SaveToFile()
     {
-        var ret = await CheckAvailable()
-            .BindAsync(async _ =>
-            {
-                FilePickerSaveOptions options = new()
-                {
-                    Title = "保存配置文件",
-                    FileTypeChoices = [new FilePickerFileType("json") { Patterns = ["*.json"] }],
-                    SuggestedFileName = $"{Path.GetFileNameWithoutExtension(ConfigName)}.json",
-                    DefaultExtension = "json", ShowOverwritePrompt = true
-                };
-
-                var sp = DIHelper.GetServiceProvider().GetRequiredService<IStorageProvider>();
-
-                var retFilepath = await sp.SaveFilePickerAsync(options);
-                if (retFilepath is null) return false;
-                return await Task.Run(() =>
-                    _metaKeyPresetFileService.SaveToFile(ToConfigRecord(), retFilepath.Path.LocalPath));
-            });
-
-        _ = ret.Match(s =>
+        var checkResult = CheckAvailable();
+        if (checkResult.IsFailure)
         {
-            if (!s) return false;
+            DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
+                new PopupNotificationData(
+                    NotificationType.Error,
+                    $"保存失败，{checkResult.Error.Message}"));
+            return;
+        }
+
+        FilePickerSaveOptions options = new()
+        {
+            Title = "保存配置文件",
+            FileTypeChoices = [new FilePickerFileType("json") { Patterns = ["*.json"] }],
+            SuggestedFileName = $"{Path.GetFileNameWithoutExtension(ConfigName)}.json",
+            DefaultExtension = "json", ShowOverwritePrompt = true
+        };
+
+        var sp = DIHelper.GetServiceProvider().GetRequiredService<IStorageProvider>();
+
+        var retFilepath = await sp.SaveFilePickerAsync(options);
+        if (retFilepath is null) return;
+
+        var saveResult = await Task.Run(() =>
+            _metaKeyPresetFileService.SaveToFile(ToConfigRecord(), retFilepath.Path.LocalPath));
+
+        if (saveResult.IsSuccess && saveResult.Value)
+        {
             DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
                 .ShowPopUpNotificationAsync(
                     new PopupNotificationData(
                         NotificationType.Success,
                         $"保存成功!"));
-            return true;
-        }, ex =>
+        }
+        else
         {
+            var message = saveResult.IsSuccess ? "保存失败" : saveResult.Error.Message;
             DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
                 new PopupNotificationData(
                     NotificationType.Error,
-                    $"保存失败，{ex.Message}"));
-            return false;
-        });
+                    $"保存失败，{message}"));
+        }
     }
 
     #endregion
 
     # region 从Record中读取
 
-    public async Task<Result<bool>> LoadFromRecord(ProgramSpecMetaKeysRecord record)
+    public async Task<Result<bool, Exception>> LoadFromRecord(ProgramSpecMetaKeysRecord record)
     {
         IsCombinationKeyFilter = false;
         IsKeyActionFilter = false;
@@ -297,7 +299,7 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
                 .ShowPopUpNotificationAsync(
                     new PopupNotificationData(NotificationType.Error,
                         $"读取配置文件失败，具体错误信息为：{e.Message}"));
-            return new Result<bool>(e);
+            return e;
         }
     }
 
