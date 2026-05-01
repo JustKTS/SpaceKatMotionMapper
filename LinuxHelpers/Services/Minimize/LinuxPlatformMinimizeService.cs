@@ -11,7 +11,6 @@ public class LinuxPlatformMinimizeService : IPlatformMinimizeService
 {
     private Avalonia.Controls.Window? _currentWindow;
     private WindowState _previousState;
-    private bool _isHidden;
     private readonly IFloatingControlWindowService _floatingWindowService;
 
     public bool IsSupported => true;
@@ -84,18 +83,11 @@ public class LinuxPlatformMinimizeService : IPlatformMinimizeService
     public void RestoreWindow(object window)
     {
         if (window is not Avalonia.Controls.Window avaloniaWindow) return;
-        if (_isHidden)
-        {
-            avaloniaWindow.Show();
-            avaloniaWindow.WindowState = WindowState.Normal;
-            avaloniaWindow.ShowInTaskbar = true;
-            _isHidden = false;
-        }
-        else
-        {
-            avaloniaWindow.WindowState = WindowState.Normal;
-            avaloniaWindow.ShowInTaskbar = true;
-        }
+
+        avaloniaWindow.ShowInTaskbar = true;
+        avaloniaWindow.WindowState = WindowState.Normal;
+        avaloniaWindow.Show();
+        avaloniaWindow.Activate();
 
         // 隐藏浮动窗口
         HideFloatingWindowIfNeeded();
@@ -117,7 +109,6 @@ public class LinuxPlatformMinimizeService : IPlatformMinimizeService
         if (window is not Avalonia.Controls.Window avaloniaWindow) return;
         _currentWindow = avaloniaWindow;
         _previousState = avaloniaWindow.WindowState;
-        _isHidden = true;
 
         // 对于Niri或其他不兼容ShowInTaskbar的窗口管理器
         // 直接隐藏窗口
