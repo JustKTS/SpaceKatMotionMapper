@@ -44,6 +44,18 @@ public class App : Application
 {
     private IHost Host { get; }
 
+    private static readonly object _startupLogLock = new();
+    private static void StartupLog(string msg)
+    {
+        var line = $"{DateTime.Now:HH:mm:ss.fff} [THREAD:{Environment.CurrentManagedThreadId}] {msg}\n";
+        lock (_startupLogLock)
+        {
+            using var fs = new System.IO.FileStream(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "startup_debug.log"), System.IO.FileMode.Append, System.IO.FileAccess.Write, System.IO.FileShare.ReadWrite);
+            fs.Write(System.Text.Encoding.UTF8.GetBytes(line));
+            fs.Flush(false);
+        }
+    }
+
     public static T GetService<T>()
         where T : class
     {
@@ -87,6 +99,7 @@ public class App : Application
 
     public App()
     {
+        StartupLog("App.ctor: START (before Host.Build)");
         Host = Microsoft
             .Extensions.Hosting.Host.CreateDefaultBuilder()
             .ConfigureServices(services =>
@@ -141,7 +154,7 @@ public class App : Application
                 services.AddSingleton<IKatMotionFileService, KatMotionFileService>();
                 services.AddSingleton<IPopUpNotificationService, PopUpNotificationService>();
                 services.AddSingleton<IKatMotionActivateService, KatMotionActivateService>();
-                services.AddSingleton<IActivationStatusService, ActivationStatusService>();
+                services.AddSingleton<IActivationStatusService>(sp => sp.GetRequiredService<ActivationStatusService>());
                 services.AddSingleton<IKatMotionConfigVMManageService, KatMotionConfigVMManageService>();
 
                 // 平台特定服务
@@ -210,30 +223,38 @@ public class App : Application
             })
             .Build();
         DIHelper.SetServiceProvider(Host.Services);
+        StartupLog("App.ctor: END (Host.Build complete)");
     }
 
     // [AvaloniaHotReload]
     public override void Initialize()
     {
+        StartupLog("App.Initialize: START");
         OnStartOrCloseFunctions.LoadOnStart();
+        StartupLog("App.Initialize: AFTER LoadOnStart, BEFORE XamlLoader");
         DataContext = this;
         AvaloniaXamlLoader.Load(this);
+        StartupLog("App.Initialize: END (XamlLoader complete)");
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
+        StartupLog("OnFrameworkInitializationCompleted: START");
         switch (ApplicationLifetime)
         {
             case IClassicDesktopStyleApplicationLifetime desktop:
+                StartupLog("OnFrameworkInitializationCompleted: BEFORE singleton.TryAcquire");
                 var singleton = GetRequiredService<ISingletonInstanceService>();
                 if (!singleton.TryAcquire())
                 {
+                    StartupLog("OnFrameworkInitializationCompleted: Singleton blocked, aborting");
                     var wrongWindow = new SingletonWrongWindow();
                     desktop.MainWindow = wrongWindow;
                     desktop.MainWindow.Closed += (_, _) => { desktop.Shutdown(); };
                     return;
                 }
 
+                StartupLog("OnFrameworkInitializationCompleted: BEFORE DeviceHidSpecDict.Initialize");
                 try
                 {
                     DeviceHidSpecDict.Initialize(GlobalPaths.AppDataPath);
@@ -267,10 +288,14 @@ public class App : Application
                     return;
                 }
 
+                StartupLog("OnFrameworkInitializationCompleted: AFTER DeviceHidSpecDict.Initialize, BEFORE MainWindow");
                 var mainWindow2 = GetService<MainWindow>();
+                StartupLog("OnFrameworkInitializationCompleted: MainWindow created, BEFORE setting desktop.MainWindow");
                 // var mainWindow2 = new TestWindow();
                 desktop.MainWindow = mainWindow2;
+                StartupLog("OnFrameworkInitializationCompleted: desktop.MainWindow set, registering Closed handler");
                 mainWindow2.Closed += (_, _) => { CloseApp(); };
+                StartupLog("OnFrameworkInitializationCompleted: DONE");
                 break;
         }
 

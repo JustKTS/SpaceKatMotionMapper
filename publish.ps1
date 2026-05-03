@@ -7,7 +7,11 @@ param(
 
     [string]$TargetFramework = "net10.0",
 
-    [string]$OutputDir = ""
+    [string]$OutputDir = "",
+
+    [switch]$Aot,
+
+    [switch]$NoSingleFile
 )
 
 $ErrorActionPreference = "Stop"
@@ -20,45 +24,90 @@ $publishArgs = @(
     "-c", $Configuration,
     "-f", $TargetFramework,
     "-r", $Runtime,
-    "-p:SelfContained=true",
-    "-p:PublishSingleFile=true",
-    "-p:EnableCompressionInSingleFile=true",
-    "-p:IncludeNativeLibrariesForSelfExtract=true",
-    "-p:PublishTrimmed=true",
-    "-p:TrimMode=full"
+    "-p:SelfContained=true"
 )
 
-if ($OutputDir) {
-    $publishArgs += "-o", $OutputDir
+if (-not $NoSingleFile) {
+    $publishArgs += @(
+        "-p:PublishSingleFile=true",
+        "-p:PublishTrimmed=true",
+        "-p:TrimMode=full",
+        "-p:EnableCompressionInSingleFile=true",
+        "-p:IncludeNativeLibrariesForSelfExtract=true"
+    )
 }
 
+if ($Aot) {
+    $publishArgs += @(
+        "-p:PublishAot=true",
+        "-p:OptimizationPreference=Size",
+        "-p:IlcFoldIdenticalMethodBodies=true",
+        "-p:StackTraceSupport=false",
+        "-p:IlcGenerateMapFile=true",
+        "-p:IlcGenerateMstatFile=true"
+    )
+}
+
+if (-not $OutputDir) {
+    $suffix = if ($Aot) { "publish_aot" } else { "publish" }
+    $OutputDir = Join-Path $slnDir "SpaceKatMotionMapper\bin\$Configuration\$TargetFramework\$Runtime\$suffix"
+}
+$publishArgs += "-o", $OutputDir
+
+if ($Aot -and $Runtime -notmatch '^win-') {
+    Write-Host "  WARNING: NativeAOT on $Runtime is experimental in this project" -ForegroundColor Yellow
+    Write-Host "  No static SkiaSharp/HarfBuzz/ANGLE libraries are bundled" -ForegroundColor Yellow
+    Write-Host ""
+}
+
+$modeLabel = if ($Aot) { "AOT Publish" } else { "Publish" }
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "  SpaceKat Motion Mapper - Publish" -ForegroundColor Cyan
+Write-Host "  SpaceKat Motion Mapper - $modeLabel" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host "Configuration  : $Configuration"
 Write-Host "Runtime        : $Runtime"
 Write-Host "Framework      : $TargetFramework"
 Write-Host "SelfContained  : true"
-Write-Host "SingleFile     : true"
-Write-Host "Compression    : true"
-Write-Host "TrimMode       : full"
-if ($OutputDir) {
-    Write-Host "Output         : $OutputDir"
+if ($NoSingleFile) {
+    Write-Host "SingleFile     : false"
+} else {
+    Write-Host "SingleFile     : true"
+    Write-Host "Compression    : true"
+    Write-Host "TrimMode       : full"
 }
+if ($Aot) {
+    Write-Host "AOT            : true"
+    Write-Host "OptPreference  : Size"
+}
+Write-Host "Output         : $OutputDir"
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 
 Write-Host "[1/2] Cleaning..." -ForegroundColor Yellow
 dotnet clean $projectPath -c $Configuration -f $TargetFramework -r $Runtime 2>&1 | Out-Null
 
-Write-Host "[2/2] Publishing..." -ForegroundColor Yellow
+if ($Aot) {
+    Write-Host "[2/2] Publishing (NativeAOT, this may take several minutes)..." -ForegroundColor Yellow
+} else {
+    Write-Host "[2/2] Publishing..." -ForegroundColor Yellow
+}
+
+$sw = [System.Diagnostics.Stopwatch]::StartNew()
 dotnet @publishArgs
+$sw.Stop()
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host ""
-    Write-Host "Publish succeeded!" -ForegroundColor Green
+    Write-Host "$modeLabel succeeded! ($($sw.Elapsed.ToString('mm\:ss')) elapsed)" -ForegroundColor Green
+    Write-Host "Output: $OutputDir" -ForegroundColor Green
+
+    $exe = Join-Path $OutputDir "SpaceKatMotionMapper.exe"
+    if (Test-Path $exe) {
+        $size = [math]::Round((Get-Item $exe).Length / 1MB, 2)
+        Write-Host "Executable: SpaceKatMotionMapper.exe ($size MB)" -ForegroundColor Green
+    }
 } else {
     Write-Host ""
-    Write-Host "Publish failed with exit code: $LASTEXITCODE" -ForegroundColor Red
+    Write-Host "$modeLabel failed with exit code: $LASTEXITCODE" -ForegroundColor Red
     exit $LASTEXITCODE
 }

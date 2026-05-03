@@ -26,18 +26,18 @@
     
     
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="12.0.1" />
-        <PackageReference Include="Avalonia.Controls.ColorPicker" Version="12.0.1" />
-        <PackageReference Include="Avalonia.Desktop" Version="12.0.1" />
+        <PackageReference Include="Avalonia" Version="12.0.2" />
+        <PackageReference Include="Avalonia.Controls.ColorPicker" Version="12.0.2" />
+        <PackageReference Include="Avalonia.Desktop" Version="12.0.2" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
         <PackageReference Include="H.InputSimulator" Version="1.5.0" />
-        <PackageReference Include="Irihi.Ursa" Version="2.0.0-rc1" />
-        <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="2.0.0-rc1" />
+        <PackageReference Include="Irihi.Ursa" Version="2.0.0" />
+        <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="2.0.0" />
         <PackageReference Include="CSharpFunctionalExtensions" Version="3.7.0" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.6" />
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.6" />
-        <PackageReference Include="Semi.Avalonia" Version="12.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.7" />
+        <PackageReference Include="Semi.Avalonia" Version="12.0.1" />
         <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
         <PackageReference Include="Xaml.Behaviors.Interactions" Version="12.0.0" />
@@ -51,12 +51,12 @@
     </ItemGroup>
     
     <ItemGroup>
-        <DirectPInvoke Include="libHarfBuzzSharp" />
-        <NativeLibrary Include="E:\codeDir\CSharp\Avalonia\AotLibs\libHarfBuzzSharp.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
-        <DirectPInvoke Include="libSkiaSharp" />
-        <NativeLibrary Include="E:\codeDir\CSharp\Avalonia\AotLibs\libSkiaSharp.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
-        <DirectPInvoke Include="av_libglesv2" />
-        <NativeLibrary Include="E:\codeDir\CSharp\Avalonia\AotLibs\av_libglesv2.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+        <DirectPInvoke Include="libHarfBuzzSharp" Condition="'$(PublishAot)' == 'true' And $(RuntimeIdentifier.StartsWith('win'))" />
+        <NativeLibrary Include="E:\codeDir\CSharp\Avalonia\AotLibs\libHarfBuzzSharp.lib" Condition="'$(PublishAot)' == 'true' And $(RuntimeIdentifier.StartsWith('win'))" />
+        <DirectPInvoke Include="libSkiaSharp" Condition="'$(PublishAot)' == 'true' And $(RuntimeIdentifier.StartsWith('win'))" />
+        <NativeLibrary Include="E:\codeDir\CSharp\Avalonia\AotLibs\libSkiaSharp.lib" Condition="'$(PublishAot)' == 'true' And $(RuntimeIdentifier.StartsWith('win'))" />
+        <DirectPInvoke Include="av_libglesv2" Condition="'$(PublishAot)' == 'true' And $(RuntimeIdentifier.StartsWith('win'))" />
+        <NativeLibrary Include="E:\codeDir\CSharp\Avalonia\AotLibs\av_libglesv2.lib" Condition="'$(PublishAot)' == 'true' And $(RuntimeIdentifier.StartsWith('win'))" />
     </ItemGroup>
     
     </Project>

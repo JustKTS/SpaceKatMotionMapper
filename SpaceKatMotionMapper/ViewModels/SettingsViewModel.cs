@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
@@ -26,6 +27,18 @@ namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class SettingsViewModel : ObservableObject
 {
+    private static readonly object _startupLogLock = new();
+    private static void StartupLog(string msg)
+    {
+        var line = $"{DateTime.Now:HH:mm:ss.fff} [THREAD:{Environment.CurrentManagedThreadId}] {msg}\n";
+        lock (_startupLogLock)
+        {
+            using var fs = new FileStream(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "startup_debug.log"), FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+            fs.Write(System.Text.Encoding.UTF8.GetBytes(line));
+            fs.Flush(false);
+        }
+    }
+
     public GlobalStates GlobalStates => App.GetRequiredService<GlobalStates>();
     private readonly TransparentInfoService _transparentInfoService = App.GetRequiredService<TransparentInfoService>();
 
@@ -237,10 +250,25 @@ public partial class SettingsViewModel : ObservableObject
 
     private void LoadThreeDConnexionSetting()
     {
-        var enabled = Task.Run<bool?>(async () =>
-                await _localSettingsService.ReadSettingAsync<bool>(nameof(IsThreeDConnexionEnabled)))
-            .GetAwaiter().GetResult();
-        IsThreeDConnexionEnabled = enabled ?? false;
+        StartupLog("LoadThreeDConnexionSetting: START (async fire-and-forget)");
+        Task.Run(async () =>
+        {
+            try
+            {
+                var enabled = await _localSettingsService.ReadSettingAsync<bool>(nameof(IsThreeDConnexionEnabled));
+                StartupLog($"LoadThreeDConnexionSetting: ReadSettingAsync returned {enabled}");
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    IsThreeDConnexionEnabled = enabled;
+                    StartupLog("LoadThreeDConnexionSetting: UI updated, DONE");
+                });
+            }
+            catch (Exception ex)
+            {
+                StartupLog($"LoadThreeDConnexionSetting: EXCEPTION {ex.Message}");
+            }
+        });
+        StartupLog("LoadThreeDConnexionSetting: Task.Run dispatched, returning");
     }
 
     # endregion
@@ -249,9 +277,13 @@ public partial class SettingsViewModel : ObservableObject
 
     public void LoadInStart()
     {
+        StartupLog("LoadInStart: START");
         LoadHotKey();
+        StartupLog("LoadInStart: AFTER LoadHotKey, BEFORE LoadInfos");
         AutoDisableViewModel.LoadInfos();
+        StartupLog("LoadInStart: AFTER LoadInfos, BEFORE LoadThreeDConnexionSetting");
         LoadThreeDConnexionSetting();
+        StartupLog("LoadInStart: AFTER LoadThreeDConnexionSetting, DONE");
     }
 
     #endregion

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -14,8 +13,6 @@ public class FileService : IFileService
     
     private readonly ILogger _logger = App.GetRequiredService<ILogger>();
     
-    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access",
-        Justification = "All serializable types are registered in JsonSgOption source generator contexts.")]
     public T? Read<T>(string folderPath, string fileName)
     {
         var path = Path.Combine(folderPath, fileName);
@@ -23,7 +20,7 @@ public class FileService : IFileService
         var json = File.ReadAllText(path);
         try
         {
-            return JsonSerializer.Deserialize<T>(json, JsonSgOption.Default);
+            return JsonSerializer.Deserialize(json, JsonSgOption.GetTypeInfo<T>());
         }
         catch (Exception e)
         {
@@ -32,8 +29,6 @@ public class FileService : IFileService
         }
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access",
-        Justification = "All serializable types are registered in JsonSgOption source generator contexts.")]
     public void Save<T>(string folderPath, string fileName, T content)
     {
         if (!Directory.Exists(folderPath))
@@ -41,7 +36,7 @@ public class FileService : IFileService
             Directory.CreateDirectory(folderPath);
         }
 
-        var fileContent = JsonSerializer.Serialize(content, JsonSgOption.Default);
+        var fileContent = JsonSerializer.Serialize(content, JsonSgOption.GetTypeInfo<T>());
         File.WriteAllText(Path.Combine(folderPath, fileName), fileContent, Encoding.UTF8);
     }
 

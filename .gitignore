@@ -166,6 +166,7 @@ DocProject/Help/html
  
 # Click-Once directory
 publish/
+publish_aot/
  
 # Publish Web Output
 *.[Pp]ublish.xml

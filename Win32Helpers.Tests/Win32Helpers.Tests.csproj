@@ -17,8 +17,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="TUnit" Version="1.35.2" />
-        <PackageReference Include="TUnit.Assertions" Version="1.35.2" />
+        <PackageReference Include="TUnit" Version="1.43.11" />
+        <PackageReference Include="TUnit.Assertions" Version="1.43.11" />
     </ItemGroup>
 
     <ItemGroup>

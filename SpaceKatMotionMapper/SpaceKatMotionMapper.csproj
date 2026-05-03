@@ -14,7 +14,7 @@
         <Version>0.3.1</Version>
         <Authors>JustKTS</Authors>
         <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
-		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 
         <!-- 平台特定的编译符号 -->
         <DefineConstants Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(DefineConstants);WINDOWS</DefineConstants>
@@ -31,21 +31,23 @@
     </ItemGroup>
     
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="12.0.1" />
-        <PackageReference Include="Avalonia.Controls.ColorPicker" Version="12.0.1" />
+        <PackageReference Include="2ndLAB.ANGLE.Static" Version="7151.0.0-10.0.26100.0-1.79e529b" Condition="'$(PublishAot)' == 'true' And $(RuntimeIdentifier.StartsWith('win'))" />
+        <PackageReference Include="2ndLAB.SkiaSharp.Static" Version="3.119.0-10.0.26100.0-1.1c7d845" Condition="'$(PublishAot)' == 'true' And $(RuntimeIdentifier.StartsWith('win'))" />
+        <PackageReference Include="Avalonia" Version="12.0.2" />
+        <PackageReference Include="Avalonia.Controls.ColorPicker" Version="12.0.2" />
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="12.0.0" />
-        <PackageReference Include="Avalonia.Desktop" Version="12.0.1" />
+        <PackageReference Include="Avalonia.Desktop" Version="12.0.2" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
         <PackageReference Include="H.InputSimulator" Version="1.5.0" />
-        <PackageReference Include="Irihi.Ursa" Version="2.0.0-rc1" />
-        <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="2.0.0-rc1" />
+        <PackageReference Include="Irihi.Ursa" Version="2.0.0" />
+        <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="2.0.0" />
         <PackageReference Include="CSharpFunctionalExtensions" Version="3.7.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.6" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.6" />
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.6" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.7" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.7" />
         <PackageReference Include="NetEscapades.EnumGenerators" Version="1.0.0-beta21" />
-        <PackageReference Include="Semi.Avalonia" Version="12.0.0" />
-        <PackageReference Include="Semi.Avalonia.ColorPicker" Version="12.0.0" />
+        <PackageReference Include="Semi.Avalonia" Version="12.0.1" />
+        <PackageReference Include="Semi.Avalonia.ColorPicker" Version="12.0.1" />
         <PackageReference Include="Semi.Avalonia.DataGrid" Version="12.0.0" />
         <PackageReference Include="Serilog" Version="4.3.1" />
         <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
@@ -71,5 +73,42 @@
         <DependentUpon>FloatingControlWindow.axaml</DependentUpon>
       </Compile>
     </ItemGroup>
-   
+
+    <ItemGroup>
+        <DirectPInvoke Include="libHarfBuzzSharp" Condition="'$(PublishAot)' == 'true' And $(RuntimeIdentifier.StartsWith('win'))" />
+        <DirectPInvoke Include="libSkiaSharp" Condition="'$(PublishAot)' == 'true' And $(RuntimeIdentifier.StartsWith('win'))" />
+        <DirectPInvoke Include="av_libglesv2" Condition="'$(PublishAot)' == 'true' And $(RuntimeIdentifier.StartsWith('win'))" />
+        <DirectPInvoke Include="HidApi" Condition="'$(PublishAot)' == 'true' And $(RuntimeIdentifier.StartsWith('win'))" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <NativeLibrary Include="..\SpaceKatHIDWrapper\hidapi.lib" Condition="'$(PublishAot)' == 'true' And $([MSBuild]::IsOSPlatform('Windows'))" />
+        <NativeLibrary Include="opengl32.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+        <NativeLibrary Include="gdi32.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+        <NativeLibrary Include="dxgi.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+        <NativeLibrary Include="d3d9.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+        <NativeLibrary Include="dxguid.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+        <NativeLibrary Include="synchronization.lib" Condition="$(RuntimeIdentifier.StartsWith('win'))" />
+    </ItemGroup>
+
+    <Target Name="ExcludeStaticLibsFromPublish" AfterTargets="ComputeFilesToPublish" BeforeTargets="CopyFilesToPublishDirectory">
+        <ItemGroup>
+            <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="$([System.String]::Copy('%(Extension)').ToLower()) == '.lib'" />
+            <ContentWithTargetPath Remove="@(ContentWithTargetPath)" Condition="$([System.String]::Copy('%(Extension)').ToLower()) == '.lib'" />
+            <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(FileName)%(Extension)' == 'libSkiaSharp.dll' And '$(PublishAot)' == 'true'" />
+            <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(FileName)%(Extension)' == 'libHarfBuzzSharp.dll' And '$(PublishAot)' == 'true'" />
+            <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(FileName)%(Extension)' == 'av_libglesv2.dll' And '$(PublishAot)' == 'true'" />
+            <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(FileName)%(Extension)' == 'hidapi.dll' And '$(PublishAot)' == 'true'" />
+            <ResolvedFileToPublish Include="..\SpaceKatHIDWrapper\hidapi.dll" Condition="'$(PublishAot)' != 'true' And $(RuntimeIdentifier.StartsWith('win'))">
+                <RelativePath>hidapi.dll</RelativePath>
+                <AssetType>native</AssetType>
+            </ResolvedFileToPublish>
+        </ItemGroup>
+    </Target>
+
+    <ItemGroup>
+        <LinkerArg Include="/OPT:ICF" Condition="$([MSBuild]::IsOSPlatform('Windows'))" />
+        <LinkerArg Include="/OPT:REF" Condition="$([MSBuild]::IsOSPlatform('Windows'))" />
+    </ItemGroup>
+
 </Project>

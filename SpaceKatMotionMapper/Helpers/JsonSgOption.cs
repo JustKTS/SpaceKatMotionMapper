@@ -14,40 +14,45 @@ namespace SpaceKatMotionMapper.Helpers;
 
 public static class JsonSgOption
 {
-    public static JsonSerializerOptions Default => new()
-    {
-        TypeInfoResolver = JsonTypeInfoResolver.Combine(
-            JsonDefaultSgContext.Default,
-            ActionTypeJsonSgContext.Default,
-            KatMotionJsonSgContext.Default,
-            KatDeadZoneConfigJsonSgContext.Default,
-            KatMotionEnumJsonSgContext.Default,
-            KatPressModeEnumJsonSgContext.Default,
-            KatMotionTimeConfigsJsonSgContext.Default,
-            KatTriggerTimesConfigJsonSgContext.Default,
-            ActionTypeJsonSgContext.Default,
-            DelayActionConfigJsonSgContext.Default,
-            SpaceMouseXmlKeyEnumJsonSgContext.Default,
-            HotKeyRecordJsonSgContext.Default,
-            KatMotionConfigGroupJsonSgContext.Default,
-            KatMotionInfoJsonSgContext.Default,
-            KatMotionConfigJsonSgContext.Default,
-            KeyActionConfigJsonSgContext.Default,
-            KatButtonEnumJsonSgContext.Default,
-            KatDataWithInfoJsonSgContext.Default,
-            KeyBoardActionConfigJsonSgContext.Default,
-            MouseActionConfigJsonSgContext.Default,
-            MouseButtonEnumJsonSgContext.Default,
-            PressModeEnumJsonSgContext.Default,
-            TransparentInfoWindowConfigJsonSgContext.Default,
-            CombinationKeysRecordJsonSgContext.Default
+    private static readonly IJsonTypeInfoResolver _resolver = JsonTypeInfoResolver.Combine(
+        JsonDefaultSgContext.Default,
+        ActionTypeJsonSgContext.Default,
+        KatMotionJsonSgContext.Default,
+        KatDeadZoneConfigJsonSgContext.Default,
+        KatMotionEnumJsonSgContext.Default,
+        KatPressModeEnumJsonSgContext.Default,
+        KatMotionTimeConfigsJsonSgContext.Default,
+        KatTriggerTimesConfigJsonSgContext.Default,
+        ActionTypeJsonSgContext.Default,
+        DelayActionConfigJsonSgContext.Default,
+        SpaceMouseXmlKeyEnumJsonSgContext.Default,
+        HotKeyRecordJsonSgContext.Default,
+        KatMotionConfigGroupJsonSgContext.Default,
+        KatMotionInfoJsonSgContext.Default,
+        KatMotionConfigJsonSgContext.Default,
+        KeyActionConfigJsonSgContext.Default,
+        KatButtonEnumJsonSgContext.Default,
+        KatDataWithInfoJsonSgContext.Default,
+        KeyBoardActionConfigJsonSgContext.Default,
+        MouseActionConfigJsonSgContext.Default,
+        MouseButtonEnumJsonSgContext.Default,
+        PressModeEnumJsonSgContext.Default,
+        TransparentInfoWindowConfigJsonSgContext.Default,
+        CombinationKeysRecordJsonSgContext.Default
 #if LINUX
-            , LinuxHelpers.Services.Window.Lswt.LswtJsonContext.Default
+        , LinuxHelpers.Services.Window.Lswt.LswtJsonContext.Default
 #endif
-            ),
+        );
+
+    public static JsonSerializerOptions Default { get; } = new()
+    {
+        TypeInfoResolver = _resolver,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         ReadCommentHandling = JsonCommentHandling.Skip,
         AllowTrailingCommas = true,
         Encoder = JavaScriptEncoder.Create(UnicodeRanges.CjkUnifiedIdeographs, UnicodeRanges.BasicLatin)
     };
+
+    public static JsonTypeInfo<T> GetTypeInfo<T>() =>
+        (JsonTypeInfo<T>)_resolver.GetTypeInfo(typeof(T), Default)!;
 }

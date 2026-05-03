@@ -15,10 +15,10 @@
 
     <ItemGroup>
         <PackageReference Include="CSharpFunctionalExtensions" Version="3.7.0" />
-        <PackageReference Include="TUnit" Version="1.35.2" />
-        <PackageReference Include="TUnit.Assertions" Version="1.35.2" />
-        <PackageReference Include="Moq" Version="4.20.70" />
-        <PackageReference Include="FluentAssertions" Version="6.12.0" />
+        <PackageReference Include="TUnit" Version="1.43.11" />
+        <PackageReference Include="TUnit.Assertions" Version="1.43.11" />
+        <PackageReference Include="Moq" Version="4.20.72" />
+        <PackageReference Include="FluentAssertions" Version="8.9.0" />
     </ItemGroup>
 
     <ItemGroup>

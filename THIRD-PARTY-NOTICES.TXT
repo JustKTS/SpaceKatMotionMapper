@@ -435,10 +435,10 @@ Licensed under MIT
 Available at https://licenses.nuget.org/MIT
 
 
-License notice for HidApi.Net (v1.1.0)
+License notice for HidApi.Net (v1.2.0)
 ------------------------------------
 
-https://github.com/badcel/HidApi.Net at ca300b23145f4c2689f382413f66e8c440562295
+https://github.com/badcel/HidApi.Net at 5a41151
 
 Marcel Tiede
 
@@ -1296,10 +1296,10 @@ Licensed under MIT
 Available at https://licenses.nuget.org/MIT
 
 
-License notice for HidApi.Net (v1.1.0)
+License notice for HidApi.Net (v1.2.0)
 ------------------------------------
 
-https://github.com/badcel/HidApi.Net at ca300b23145f4c2689f382413f66e8c440562295
+https://github.com/badcel/HidApi.Net at 5a41151
 
 Marcel Tiede
 

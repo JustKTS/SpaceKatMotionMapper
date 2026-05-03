@@ -274,7 +274,7 @@ public class LinuxNotificationManager : ILinuxNotificationManager
                         format = 32,
                         data = new XClientMessageData
                         {
-                            l = new[] { 1L, (long)atom, 0L, 0L, 0L }
+                            l0 = 1L, l1 = (long)atom, l2 = 0L, l3 = 0L, l4 = 0L
                         }
                     };
 
@@ -379,14 +379,13 @@ public class LinuxNotificationManager : ILinuxNotificationManager
         public XClientMessageData data;
     }
 
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Sequential)]
     private struct XClientMessageData
     {
-        [FieldOffset(0)]
-        public long[] l;
-        [FieldOffset(0)]
-        public byte[] b;
-        [FieldOffset(0)]
-        public short[] s;
+        public long l0;
+        public long l1;
+        public long l2;
+        public long l3;
+        public long l4;
     }
 }

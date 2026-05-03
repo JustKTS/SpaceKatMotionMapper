@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -76,14 +75,12 @@ public class LocalSettingsService : ILocalSettingsService
         return await JsonConvertHelper.ToObjectAsync<T>(ret);
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access",
-        Justification = "All serializable types are registered in JsonSgOption source generator contexts.")]
     public async Task SaveSettingAsync<T>(string key, T value)
     {
         await InitializeAsync();
         try
         {
-            _settings[key] = JsonSerializer.Serialize(value, JsonSgOption.Default);
+            _settings[key] = JsonSerializer.Serialize(value, JsonSgOption.GetTypeInfo<T>());
             _fileService.Save(_applicationDataFolder, _localSettingsFile, _settings);
         }
         catch (Exception e)

@@ -5,23 +5,26 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <EnableEnumGeneratorInterceptor>true</EnableEnumGeneratorInterceptor>
-        <PublishAot>true</PublishAot>
         <PublishTrimmed>true</PublishTrimmed>
         <LangVersion>latestmajor</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
       <PackageReference Include="HidApi.Net" Version="1.2.0" />
+      <PackageReference Include="WCharT.Net" Version="0.1.3" />
       <PackageReference Include="CSharpFunctionalExtensions" Version="3.7.0" />
       <PackageReference Include="NetEscapades.EnumGenerators" Version="1.0.0-beta21" />
       <PackageReference Include="Tomlyn" Version="2.3.2" />
     </ItemGroup>
     
     <ItemGroup>
-      <None Update="hidapi.dll">
+      <None Remove="hidapi.dll" />
+      <Content Include="hidapi.dll" Condition="'$(PublishAot)' != 'true' And $(RuntimeIdentifier.StartsWith('win'))">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>

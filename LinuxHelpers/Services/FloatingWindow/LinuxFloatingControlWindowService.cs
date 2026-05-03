@@ -134,28 +134,4 @@ public class LinuxFloatingControlWindowService(IFloatingControlWindowUIFactory u
     private const int SubstructureNotifyMask = (1 << 19);
     private const UIntPtr XaAtom = 4;
 
-    // X11结构体（简化版）
-    [StructLayout(LayoutKind.Sequential)]
-    private struct XClientMessageEvent
-    {
-        public int type;
-        public ulong serial;
-        public bool send_event;
-        public IntPtr display;
-        public IntPtr window;
-        public long message_type;
-        public int format;
-        public XClientMessageData data;
-    }
-
-    [StructLayout(LayoutKind.Explicit)]
-    private struct XClientMessageData
-    {
-        [FieldOffset(0)]
-        public long[] l;
-        [FieldOffset(0)]
-        public byte[] b;
-        [FieldOffset(0)]
-        public short[] s;
-    }
 }
