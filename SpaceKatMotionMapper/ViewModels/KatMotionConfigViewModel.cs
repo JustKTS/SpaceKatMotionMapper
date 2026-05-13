@@ -14,7 +14,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using CSharpFunctionalExtensions;
 using SpaceKat.Shared.Helpers;
 using SpaceKatMotionMapper.Models;
-using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
 using SpaceKat.Shared.Defines;
 using SpaceKat.Shared.Models;
@@ -28,13 +27,15 @@ using SpaceKatMotionMapper.Views;
 using Ursa.Controls;
 using PlatformAbstractions;
 using Dispatcher = Avalonia.Threading.Dispatcher;
-using Log = Serilog.Log;
+using Serilog;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
 // TODO: 后续或需要拆分该ViewModel以匹配UI的修改
 public partial class KatMotionConfigViewModel : ViewModelBase
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<KatMotionConfigViewModel>();
+
     public OtherConfigsViewModel? Parent { get; init; }
 
     [ObservableProperty] private bool _isDefault;
@@ -50,10 +51,12 @@ public partial class KatMotionConfigViewModel : ViewModelBase
     private readonly IKatMotionActivateService _katMotionActivateService;
     private readonly IKatMotionFileService _katMotionFileService;
     private readonly IPopUpNotificationService _popUpNotificationService;
-    private readonly TimeAndDeadZoneVMService? _timeAndDeadZoneVmService;
+    private readonly Lazy<ITimeAndDeadZoneVMService>? _timeAndDeadZoneVmService;
     private readonly IStorageProviderService _storageProviderService;
     private readonly RunningProgramSelectorViewModel _runningProgramSelectorVM;
     private readonly IKatMotionSemanticProfile _katMotionSemanticProfile;
+    private readonly IModeChangeService _modeChangeService;
+    private readonly IKatMotionTimeConfigService _katMotionTimeConfigService;
 
     [ObservableProperty] private bool _isConfigNameEditing;
     public string ProcessFilename => Path.GetFileName(ProcessPath);
@@ -75,7 +78,9 @@ public partial class KatMotionConfigViewModel : ViewModelBase
         IPopUpNotificationService popUpNotificationService,
         IStorageProviderService storageProviderService,
         RunningProgramSelectorViewModel runningProgramSelectorVM,
-        TimeAndDeadZoneVMService? timeAndDeadZoneVmService = null,
+        IModeChangeService modeChangeService,
+        IKatMotionTimeConfigService katMotionTimeConfigService,
+        Lazy<ITimeAndDeadZoneVMService>? timeAndDeadZoneVmService = null,
         MainProjectKatMotionSemanticRuleAssembler? katMotionSemanticRuleAssembler = null,
         IKatMotionTimeConfigAdjustmentPolicy? motionTimeConfigAdjustmentPolicy = null,
         IKatMotionSemanticProfile? katMotionSemanticProfile = null)
@@ -86,6 +91,8 @@ public partial class KatMotionConfigViewModel : ViewModelBase
         _popUpNotificationService = popUpNotificationService;
         _storageProviderService = storageProviderService;
         _runningProgramSelectorVM = runningProgramSelectorVM;
+        _modeChangeService = modeChangeService;
+        _katMotionTimeConfigService = katMotionTimeConfigService;
         _katMotionSemanticProfile = katMotionSemanticProfile
                                   ?? new MainProjectKatMotionSemanticProfile(
                                       katMotionSemanticRuleAssembler,
@@ -155,7 +162,7 @@ public partial class KatMotionConfigViewModel : ViewModelBase
     [RelayCommand]
     private void AddKatMotionsWithMode()
     {
-        KatMotionsWithMode.Add(new KatMotionsWithModeViewModel(this, KatMotionsWithMode.Count));
+        KatMotionsWithMode.Add(new KatMotionsWithModeViewModel(this, KatMotionsWithMode.Count, _modeChangeService, _katMotionTimeConfigService));
         KatMotionsModeNums.Add(KatMotionsWithMode.Count-1);
         OnPropertyChanged(nameof(IsAvailable)); 
     }
@@ -183,7 +190,7 @@ public partial class KatMotionConfigViewModel : ViewModelBase
             }
             else
             {
-                Log.Error(ret.Error, "[配置激活] 配置激活失败. ViewModel Id: {ViewModelId}, 错误: {ErrorMessage}", Id, ret.Error.Message);
+                Log.Error(ret.Error, "配置激活失败. ViewModel Id: {ViewModelId}, 错误: {ErrorMessage}", Id, ret.Error.Message);
                 _popUpNotificationService.Pop(NotificationType.Error, ret.Error.Message);
                 success = false;
             }
@@ -206,7 +213,7 @@ public partial class KatMotionConfigViewModel : ViewModelBase
             }
             else
             {
-                Log.Error(ret.Error, "[配置激活] 重新激活失败. ViewModel Id: {ViewModelId}, 错误: {ErrorMessage}", Id, ret.Error.Message);
+                Log.Error(ret.Error, "重新激活失败. ViewModel Id: {ViewModelId}, 错误: {ErrorMessage}", Id, ret.Error.Message);
                 _popUpNotificationService.Pop(NotificationType.Error, ret.Error.Message);
                 success = false;
             }
@@ -395,13 +402,13 @@ public partial class KatMotionConfigViewModel : ViewModelBase
                 return;
             }
 
-            Log.Error("[配置保存] 配置保存失败. ViewModel Id: {ViewModelId}", Id);
+            Log.Error("配置保存失败. ViewModel Id: {ViewModelId}", Id);
             WeakReferenceMessenger.Default.Send(
                 new PopupNotificationData(NotificationType.Error, "保存失败"), Id);
         }
         else
         {
-            Log.Error(ret.Error, "[配置保存] 保存配置时发生异常. ViewModel Id: {ViewModelId}, 错误: {ErrorMessage}", Id, ret.Error.Message);
+            Log.Error(ret.Error, "保存配置时发生异常. ViewModel Id: {ViewModelId}, 错误: {ErrorMessage}", Id, ret.Error.Message);
             WeakReferenceMessenger.Default.Send(
                 new PopupNotificationData(NotificationType.Error, ret.Error.Message), Id);
         }
@@ -510,7 +517,7 @@ public partial class KatMotionConfigViewModel : ViewModelBase
         }
         catch (Exception e)
         {
-            Log.Error(e, "[配置保存] 保存配置组时发生未捕获异常. ViewModel Id: {ViewModelId}", Id);
+            Log.Error(e, "保存配置组时发生未捕获异常. ViewModel Id: {ViewModelId}", Id);
             return e;
         }
     }
@@ -603,14 +610,14 @@ public partial class KatMotionConfigViewModel : ViewModelBase
             var configGroupWithMode = processedMotions.GroupBy(e => e.ModeNum);
             foreach (var groupWithMode in configGroupWithMode)
             {
-                var katActionsWithModeVm = new KatMotionsWithModeViewModel(this, groupWithMode.Key);
+                var katActionsWithModeVm = new KatMotionsWithModeViewModel(this, groupWithMode.Key, _modeChangeService, _katMotionTimeConfigService);
                 katActionsWithModeVm.KatMotionGroups.Clear();
 
                 // 按 KatMotion 分组
                 var groupedByMotion = groupWithMode.GroupBy(e => e.Motion.Motion);
                 foreach (var motionGroup in groupedByMotion)
                 {
-                    var katMotionGroup = new KatMotionGroupViewModel(katActionsWithModeVm, motionGroup.Key);
+                    var katMotionGroup = new KatMotionGroupViewModel(katActionsWithModeVm, motionGroup.Key, _modeChangeService, _katMotionTimeConfigService);
                     katMotionGroup.Configs.Clear();
 
                     foreach (var katActionWithMode in motionGroup)
@@ -650,7 +657,7 @@ public partial class KatMotionConfigViewModel : ViewModelBase
         }
         catch (Exception e)
         {
-            Log.Error(e, "[{ViewModel}] Failed to load config from group", nameof(KatMotionConfigViewModel));
+            Log.Error(e, "Failed to load config from group");
             return false;
         }
 
@@ -745,14 +752,14 @@ public partial class KatMotionConfigViewModel : ViewModelBase
 
         if (IsDefault)
         {
-            _timeAndDeadZoneVmService.UpdateByDefault();
+            _timeAndDeadZoneVmService.Value.UpdateByDefault();
         }
         else
         {
-            _timeAndDeadZoneVmService.UpdateByGuid(Id);
+            _timeAndDeadZoneVmService.Value.UpdateByGuid(Id);
         }
 
-        await _timeAndDeadZoneVmService.ShowDialogAsync();
+        await _timeAndDeadZoneVmService.Value.ShowDialogAsync();
     }
 
 
@@ -770,7 +777,8 @@ public partial class KatMotionConfigViewModel : ViewModelBase
             return;
         }
 
-        var window = App.GetRequiredService<KatMotionGroupConfigWindow>();
+        var window = App.GetService<KatMotionGroupConfigWindow>();
+        if (window == null) return;
         window.DataContext = this;
         OpenEditWindows[Id] = window;
         window.Closed += (_, _) =>

@@ -10,8 +10,12 @@ namespace SpaceKatMotionMapper.Services;
 
 public class FileService : IFileService
 {
-    
-    private readonly ILogger _logger = App.GetRequiredService<ILogger>();
+    private readonly ILogger _logger;
+
+    public FileService(ILogger logger)
+    {
+        _logger = logger;
+    }
     
     public T? Read<T>(string folderPath, string fileName)
     {

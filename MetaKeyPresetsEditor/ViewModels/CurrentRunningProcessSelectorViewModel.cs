@@ -5,16 +5,16 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MetaKeyPresetsEditor.Helpers;
 using SpaceKat.Shared.Helpers;
 using MetaKeyPresetsEditor.Services;
-using Microsoft.Extensions.DependencyInjection;
 using SpaceKat.Shared.Defines;
 using PlatformAbstractions;
 
 namespace MetaKeyPresetsEditor.ViewModels;
 
-public partial class CurrentRunningProcessSelectorViewModel(IPlatformWindowService platformWindowService)
+public partial class CurrentRunningProcessSelectorViewModel(
+    IPlatformWindowService platformWindowService,
+    IUiInteractService uiInteractService)
     : ViewModelBase
 {
     public ObservableCollection<ForeProgramInfo> ForeProcessInfos { get; } = [];
@@ -32,14 +32,14 @@ public partial class CurrentRunningProcessSelectorViewModel(IPlatformWindowServi
     partial void OnSelectedFpInfoChanged(ForeProgramInfo? value)
     {
         if (value is null) return;
-        DIHelper.GetServiceProvider().GetRequiredService<IUiInteractService>()
+        uiInteractService
             .ChangeConfigNameAsync(Path.GetFileNameWithoutExtension(value.ProcessFileAddress));
     }
 
     [RelayCommand]
     private static async Task SelectFromFile()
     {
-        var storageFiles = await DIHelper.GetServiceProvider().GetRequiredService<IStorageProvider>().OpenFilePickerAsync(
+        var storageFiles = await App.GetStorageProvider().OpenFilePickerAsync(
             new FilePickerOpenOptions
             {
                 AllowMultiple = false, FileTypeFilter = [FilePickerFileTypeDefines.Exe],
@@ -47,7 +47,7 @@ public partial class CurrentRunningProcessSelectorViewModel(IPlatformWindowServi
             });
         if (storageFiles.Count == 0) return;
         var file = storageFiles[0];
-        await DIHelper.GetServiceProvider().GetRequiredService<IUiInteractService>()
+        await App.GetRequiredService<IUiInteractService>()
             .ChangeConfigNameAsync(Path.GetFileNameWithoutExtension(file.Path.LocalPath));
     }
 }

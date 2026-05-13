@@ -10,6 +10,8 @@ namespace SpaceKat.Shared.ViewModels;
 
 public partial class KeyActionConfigV2ViewModel : KeyActionConfigEditableBaseViewModel
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<KeyActionConfigV2ViewModel>();
+
     private readonly IHotKeyActionExpansionService _hotKeyActionExpansionService;
 
     [ObservableProperty] private bool _isCustomDescription;
@@ -57,7 +59,7 @@ public partial class KeyActionConfigV2ViewModel : KeyActionConfigEditableBaseVie
         }
         catch (Exception e)
         {
-            Log.Error(e, "[{ViewModel}] Failed to load key action config", nameof(KeyActionConfigV2ViewModel));
+            Log.Error(e, "Failed to load key action config");
             return false;
         }
     }

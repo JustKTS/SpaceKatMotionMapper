@@ -9,6 +9,8 @@ namespace SpaceKatMotionMapper.Services;
 
 public class KatMotionConfigVMManageService : IKatMotionConfigVMManageService
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<KatMotionConfigVMManageService>();
+
     private readonly Dictionary<Guid, KatMotionConfigViewModel> _configs = [];
 
     private Guid _commonConfigGuid = Guid.Empty;
@@ -25,7 +27,7 @@ public class KatMotionConfigVMManageService : IKatMotionConfigVMManageService
         }
         catch (Exception e)
         {
-            Log.Error(e, "[{Service}] Failed to get config by ID: {Id}", nameof(KatMotionConfigVMManageService), id);
+            Log.Error(e, "Failed to get config by ID: {Id}", id);
             return new Exception("获取配置组失败");
         }
     }

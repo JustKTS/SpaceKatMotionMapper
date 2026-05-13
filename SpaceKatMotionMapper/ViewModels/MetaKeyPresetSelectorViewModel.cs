@@ -9,29 +9,29 @@ using SpaceKat.Shared.Helpers;
 using SpaceKat.Shared.Models;
 using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Models;
-using SpaceKatMotionMapper.Services;
+using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class MetaKeyPresetSelectorViewModel : ViewModelBase, IDialogContext
 {
-    private readonly MetaKeyPresetService _metaKeyPresetService =
-        App.GetRequiredService<MetaKeyPresetService>();
-
     [ObservableProperty] private List<MetaKeySelectorSubViewModel> _configs = [];
 
     private readonly KeyActionConfigViewModel _parent;
+    private readonly IMetaKeyPresetService _metaKeyPresetService;
     private IRelayCommand<KeyActionsForPresetRecord> AddCustomActionsCommand { get; }
     private IRelayCommand<KeyValuePair<string, CombinationKeysRecord>> AddHotKeyActionsCommand{ get; }
 
     public MetaKeyPresetSelectorViewModel(
         KeyActionConfigViewModel parent,
         IRelayCommand<KeyActionsForPresetRecord> addCustomActionsCommand,
-        IRelayCommand<KeyValuePair<string, CombinationKeysRecord>> addHotKeyActionsCommand)
+        IRelayCommand<KeyValuePair<string, CombinationKeysRecord>> addHotKeyActionsCommand,
+        IMetaKeyPresetService? metaKeyPresetService = null)
     {
         _parent = parent;
         AddCustomActionsCommand = addCustomActionsCommand;
         AddHotKeyActionsCommand = addHotKeyActionsCommand;
+        _metaKeyPresetService = metaKeyPresetService ?? App.GetRequiredService<IMetaKeyPresetService>();
         LoadConfig();
     }
 

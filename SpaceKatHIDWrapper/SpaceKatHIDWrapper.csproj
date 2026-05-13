@@ -21,7 +21,7 @@
     
     <ItemGroup>
       <None Remove="hidapi.dll" />
-      <Content Include="hidapi.dll" Condition="'$(PublishAot)' != 'true' And $(RuntimeIdentifier.StartsWith('win'))">
+      <Content Include="hidapi.dll" Condition="'$(PublishAot)' != 'true' And $([MSBuild]::IsOSPlatform('Windows'))">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>

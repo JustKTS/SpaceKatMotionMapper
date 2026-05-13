@@ -10,10 +10,8 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MetaKeyPresetsEditor.Helpers;
 using SpaceKat.Shared.Helpers;
 using MetaKeyPresetsEditor.Services;
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using SpaceKat.Shared.Models;
 using SpaceKat.Shared.Services.Contract;
@@ -21,7 +19,10 @@ using SpaceKat.Shared.ViewModels;
 
 namespace MetaKeyPresetsEditor.ViewModels;
 
-public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelBase
+public partial class ProgramSpecificConfigViewModel(
+    ILogger logger,
+    IMetaKeyPresetFileService metaKeyPresetFileService,
+    IPopUpNotificationSpecService popUpNotificationSpecService) : ViewModelBase
 {
     [ObservableProperty] private bool _isDefault;
     [ObservableProperty] private string _configName = string.Empty;
@@ -32,7 +33,7 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
 
 #if DEBUG
 
-    public ProgramSpecificConfigViewModel():this(null!)
+    public ProgramSpecificConfigViewModel() : this(null!, null!, null!)
     {
         
     }
@@ -166,24 +167,21 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
 
     #region 保存配置
 
-    private readonly IMetaKeyPresetFileService _metaKeyPresetFileService =
-        DIHelper.GetServiceProvider().GetRequiredService<IMetaKeyPresetFileService>();
-
     [RelayCommand]
     private async Task SaveToConfigDir()
     {
         var checkResult = CheckAvailable();
         if (checkResult.IsFailure)
         {
-            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
+            await popUpNotificationSpecService.ShowPopUpNotificationAsync(
                 new PopupNotificationData(
                     NotificationType.Error,
                     $"保存失败，{checkResult.Error.Message}"));
             return;
         }
 
-        await Task.Run(() => _metaKeyPresetFileService.SaveToConfigDir(ToConfigRecord()));
-        await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
+        await Task.Run(() => metaKeyPresetFileService.SaveToConfigDir(ToConfigRecord()));
+        await popUpNotificationSpecService.ShowPopUpNotificationAsync(
             new PopupNotificationData(
                 NotificationType.Success,
                 $"保存成功!"));
@@ -195,7 +193,7 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
         var checkResult = CheckAvailable();
         if (checkResult.IsFailure)
         {
-            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
+            await popUpNotificationSpecService.ShowPopUpNotificationAsync(
                 new PopupNotificationData(
                     NotificationType.Error,
                     $"保存失败，{checkResult.Error.Message}"));
@@ -210,17 +208,17 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
             DefaultExtension = "json", ShowOverwritePrompt = true
         };
 
-        var sp = DIHelper.GetServiceProvider().GetRequiredService<IStorageProvider>();
+        var sp = App.GetStorageProvider();
 
         var retFilepath = await sp.SaveFilePickerAsync(options);
         if (retFilepath is null) return;
 
         var saveResult = await Task.Run(() =>
-            _metaKeyPresetFileService.SaveToFile(ToConfigRecord(), retFilepath.Path.LocalPath));
+            metaKeyPresetFileService.SaveToFile(ToConfigRecord(), retFilepath.Path.LocalPath));
 
         if (saveResult.IsSuccess && saveResult.Value)
         {
-            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
+            await popUpNotificationSpecService
                 .ShowPopUpNotificationAsync(
                     new PopupNotificationData(
                         NotificationType.Success,
@@ -229,7 +227,7 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
         else
         {
             var message = saveResult.IsSuccess ? "保存失败" : saveResult.Error.Message;
-            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>().ShowPopUpNotificationAsync(
+            await popUpNotificationSpecService.ShowPopUpNotificationAsync(
                 new PopupNotificationData(
                     NotificationType.Error,
                     $"保存失败，{message}"));
@@ -295,7 +293,7 @@ public partial class ProgramSpecificConfigViewModel(ILogger logger) : ViewModelB
         catch (Exception e)
         {
             logger.Error(e, "");
-            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
+            await popUpNotificationSpecService
                 .ShowPopUpNotificationAsync(
                     new PopupNotificationData(NotificationType.Error,
                         $"读取配置文件失败，具体错误信息为：{e.Message}"));

@@ -11,6 +11,8 @@ namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class KatMotionViewModel : ObservableObject
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<KatMotionViewModel>();
+
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsAvailable))]
     private KatMotionEnum _katMotion;
 
@@ -232,7 +234,7 @@ public partial class KatMotionViewModel : ObservableObject
         }
         catch (Exception e)
         {
-            Log.Error(e, "[{ViewModel}] Failed to load KatMotion config", nameof(KatMotionViewModel));
+            Log.Error(e, "Failed to load KatMotion config");
             return false;
         }
     }

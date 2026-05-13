@@ -115,8 +115,8 @@ public class KatMotionConfigViewModelTests : ViewModelTestBase
         // 确保 KatMotionsWithMode 不为空
         if (viewModel.KatMotionsWithMode.Count == 0)
         {
-            var modeVm = new KatMotionsWithModeViewModel(viewModel, 0);
-            var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationYPositive);
+            var modeVm = new KatMotionsWithModeViewModel(viewModel, 0, Mock.Of<IModeChangeService>(), Mock.Of<IKatMotionTimeConfigService>());
+            var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationYPositive, Mock.Of<IModeChangeService>(), Mock.Of<IKatMotionTimeConfigService>());
             var motionVm = new KatMotionViewModel(groupVm, 0)
             {
                 KatMotion = KatMotionEnum.TranslationYPositive,
@@ -256,6 +256,8 @@ public class KatMotionConfigViewModelTests : ViewModelTestBase
             MockNotificationService.Object,
             Mock.Of<IStorageProviderService>(),
             new FakeRunningProgramSelectorViewModel(),
+            Mock.Of<IModeChangeService>(),
+            Mock.Of<IKatMotionTimeConfigService>(),
             null // 不传递 TimeAndDeadZoneVMService，避免循环依赖
         )
         {
@@ -289,8 +291,8 @@ public class KatMotionConfigViewModelTests : ViewModelTestBase
     {
         // Arrange
         var viewModel = ViewModelTestHelpers.CreateConfigViewModel();
-        var modeVm = new KatMotionsWithModeViewModel(viewModel, 0);
-        var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationXPositive);
+        var modeVm = new KatMotionsWithModeViewModel(viewModel, 0, Mock.Of<IModeChangeService>(), Mock.Of<IKatMotionTimeConfigService>());
+        var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationXPositive, Mock.Of<IModeChangeService>(), Mock.Of<IKatMotionTimeConfigService>());
         modeVm.KatMotionGroups.Add(groupVm);
         viewModel.KatMotionsWithMode.Clear();
         viewModel.KatMotionsWithMode.Add(modeVm);
@@ -323,8 +325,8 @@ public class KatMotionConfigViewModelTests : ViewModelTestBase
     {
         // Arrange
         var viewModel = ViewModelTestHelpers.CreateConfigViewModel();
-        var modeVm = new KatMotionsWithModeViewModel(viewModel, 0);
-        var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationXPositive);
+        var modeVm = new KatMotionsWithModeViewModel(viewModel, 0, Mock.Of<IModeChangeService>(), Mock.Of<IKatMotionTimeConfigService>());
+        var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationXPositive, Mock.Of<IModeChangeService>(), Mock.Of<IKatMotionTimeConfigService>());
         modeVm.KatMotionGroups.Add(groupVm);
         viewModel.KatMotionsWithMode.Clear();
         viewModel.KatMotionsWithMode.Add(modeVm);
@@ -357,8 +359,8 @@ public class KatMotionConfigViewModelTests : ViewModelTestBase
     {
         // Arrange
         var viewModel = ViewModelTestHelpers.CreateConfigViewModel();
-        var modeVm = new KatMotionsWithModeViewModel(viewModel, 0);
-        var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationXPositive);
+        var modeVm = new KatMotionsWithModeViewModel(viewModel, 0, Mock.Of<IModeChangeService>(), Mock.Of<IKatMotionTimeConfigService>());
+        var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationXPositive, Mock.Of<IModeChangeService>(), Mock.Of<IKatMotionTimeConfigService>());
         modeVm.KatMotionGroups.Add(groupVm);
         viewModel.KatMotionsWithMode.Clear();
         viewModel.KatMotionsWithMode.Add(modeVm);
@@ -391,8 +393,8 @@ public class KatMotionConfigViewModelTests : ViewModelTestBase
     {
         // Arrange
         var viewModel = ViewModelTestHelpers.CreateConfigViewModel();
-        var modeVm = new KatMotionsWithModeViewModel(viewModel, 0);
-        var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationXPositive);
+        var modeVm = new KatMotionsWithModeViewModel(viewModel, 0, Mock.Of<IModeChangeService>(), Mock.Of<IKatMotionTimeConfigService>());
+        var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationXPositive, Mock.Of<IModeChangeService>(), Mock.Of<IKatMotionTimeConfigService>());
         modeVm.KatMotionGroups.Add(groupVm);
         viewModel.KatMotionsWithMode.Clear();
         viewModel.KatMotionsWithMode.Add(modeVm);
@@ -425,7 +427,7 @@ public class KatMotionConfigViewModelTests : ViewModelTestBase
         var viewModel = ViewModelTestHelpers.CreateConfigViewModel();
 
         var mode0 = viewModel.KatMotionsWithMode.First();
-        var group0 = new KatMotionGroupViewModel(mode0, KatMotionEnum.TranslationYPositive);
+        var group0 = new KatMotionGroupViewModel(mode0, KatMotionEnum.TranslationYPositive, Mock.Of<IModeChangeService>(), Mock.Of<IKatMotionTimeConfigService>());
         group0.Configs.Clear();
         var singleActionVm = new KatMotionViewModel(group0, 0)
         {
@@ -525,8 +527,8 @@ public class KatMotionConfigViewModelTests : ViewModelTestBase
     private void SetupValidConfig(KatMotionConfigViewModel viewModel)
     {
         viewModel.ProcessPath = "test.exe";
-        var modeVm = new KatMotionsWithModeViewModel(viewModel, 0);
-        var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationYPositive);
+        var modeVm = new KatMotionsWithModeViewModel(viewModel, 0, Mock.Of<IModeChangeService>(), Mock.Of<IKatMotionTimeConfigService>());
+        var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationYPositive, Mock.Of<IModeChangeService>(), Mock.Of<IKatMotionTimeConfigService>());
         var motionVm = new KatMotionViewModel(groupVm, 0)
         {
             KatMotion = KatMotionEnum.TranslationYPositive,

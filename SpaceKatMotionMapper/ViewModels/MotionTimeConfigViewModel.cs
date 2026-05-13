@@ -6,14 +6,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatHIDWrapper.Services;
-using SpaceKatMotionMapper.Services;
+using SpaceKatMotionMapper.Services.Contract;
 
 
 namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class MotionTimeConfigViewModel(
-    KatMotionRecognizeService katMotionRecognizeService,
-    KatMotionTimeConfigService katMotionTimeConfigService)
+    IKatMotionRecognizeService katMotionRecognizeService,
+    IKatMotionTimeConfigService katMotionTimeConfigService)
     : ViewModelBase
 {
     [ObservableProperty] private bool _showSingleActionModeHint;

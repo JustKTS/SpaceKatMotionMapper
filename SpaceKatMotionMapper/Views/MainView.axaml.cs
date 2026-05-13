@@ -1,5 +1,5 @@
 ﻿using Avalonia.Controls;
-using SpaceKatMotionMapper.Services;
+using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.ViewModels;
 using Ursa.Controls;
 
@@ -13,7 +13,7 @@ public partial class MainView : UserControl
         InitializeComponent();
         Loaded += (_, _) =>
         {
-            if (App.GetRequiredService<MetaKeyPresetService>().IsFirstStart())
+            if (App.GetRequiredService<IMetaKeyPresetService>().IsFirstStart())
             {
                 Dialog.ShowStandardAsync<FirstDownloadPresetsView, FirstDownloadPresetsViewModel>(
                     App.GetRequiredService<FirstDownloadPresetsViewModel>(), options: new DialogOptions

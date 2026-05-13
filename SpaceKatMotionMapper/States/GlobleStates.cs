@@ -4,8 +4,15 @@ using SpaceKat.Shared.Services.Contract;
 
 namespace SpaceKatMotionMapper.States;
 
-public partial class GlobalStates : ObservableObject
+public partial class GlobalStates : ObservableObject, IGlobalStates
 {
+    private readonly ILocalSettingsService _localSettingsService;
+
+    public GlobalStates(ILocalSettingsService localSettingsService)
+    {
+        _localSettingsService = localSettingsService;
+    }
+
     # region 全局信息
     [ObservableProperty] private bool _isConnected;
     [ObservableProperty] private bool _isMapperEnable;
@@ -24,7 +31,7 @@ public partial class GlobalStates : ObservableObject
     
     partial void OnIsMapperEnableChanged(bool value)
     {
-        App.GetRequiredService<ILocalSettingsService>().SaveSettingAsync(IsMapperEnableKey, value);
+        _localSettingsService.SaveSettingAsync(IsMapperEnableKey, value);
         IsMapperEnableChanged?.Invoke(this, value);
     }
     

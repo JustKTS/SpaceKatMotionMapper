@@ -4,14 +4,14 @@ using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatHIDWrapper.Services;
-using SpaceKatMotionMapper.Services;
+using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class TimeAndDeadZoneSettingViewModel(
-    KatMotionRecognizeService katMotionRecognizeService,
-    KatMotionConfigVMManageService katMotionConfigVmManageService,
-    PopUpNotificationService popUpNotificationService) : ViewModelBase
+    IKatMotionRecognizeService katMotionRecognizeService,
+    IKatMotionConfigVMManageService katMotionConfigVmManageService,
+    IPopUpNotificationService popUpNotificationService) : ViewModelBase
 {
     [ObservableProperty] private bool _isDefault;
     [ObservableProperty] private Guid _id = Guid.Empty;

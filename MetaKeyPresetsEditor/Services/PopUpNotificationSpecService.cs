@@ -1,20 +1,18 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Avalonia.LogicalTree;
-using MetaKeyPresetsEditor.Helpers;
 using MetaKeyPresetsEditor.Views;
-using Microsoft.Extensions.DependencyInjection;
 using SpaceKat.Shared.Models;
 
 namespace MetaKeyPresetsEditor.Services;
 
-public class PopUpNotificationSpecService : IPopUpNotificationSpecService
+public class PopUpNotificationSpecService(
+    Func<PresetsEditorMainView> viewFactory) : IPopUpNotificationSpecService
 {
-    private readonly PresetsEditorMainView
-        _view = DIHelper.GetServiceProvider().GetRequiredService<PresetsEditorMainView>();
-
     public async Task ShowPopUpNotificationAsync(PopupNotificationData popupData)
     {
-        var window = _view.GetLogicalParent() as PresetsEditorMainWindow;
+        var view = viewFactory();
+        var window = view.GetLogicalParent() as PresetsEditorMainWindow;
         if (window is null) return;
         await window.PopupNotification(popupData);
     }

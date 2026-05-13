@@ -6,7 +6,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
-using SpaceKatMotionMapper.Services;
+using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.ViewModels;
 using Ursa.Controls;
 
@@ -23,7 +23,7 @@ public partial class TransparentInfoWindow : UrsaWindow
     protected override void OnLoaded(RoutedEventArgs e)
     {
         base.OnLoaded(e);
-        App.GetRequiredService<TransparentInfoService>().LoadConfigs().ContinueWith(task =>
+        App.GetRequiredService<ITransparentInfoService>().LoadConfigs().ContinueWith(task =>
         {
             var config = task.Result;
             if (config is null)

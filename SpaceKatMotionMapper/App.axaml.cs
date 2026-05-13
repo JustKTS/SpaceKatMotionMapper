@@ -1,260 +1,127 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using HidApi;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using MetaKeyPresetsEditor.Helpers;
 using Serilog;
 using SpaceKat.Shared.Functions;
-using SpaceKat.Shared.Services;
+using SpaceKat.Shared.Logging;
 using SpaceKat.Shared.Services.Contract;
+using SpaceKat.Shared.States;
 using SpaceKatHIDWrapper.DeviceHIDSpecs;
-using SpaceKatHIDWrapper.DeviceWrappers;
-using SpaceKatHIDWrapper.Services;
+using SpaceKatMotionMapper.Composition;
 using SpaceKatMotionMapper.Functions;
-using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
-using SpaceKatMotionMapper.ViewModels;
 using SpaceKatMotionMapper.Views;
 using PlatformAbstractions;
-using Serilog.Sinks.OpenTelemetry;
-using SpaceKat.Shared.Logging;
-
-#if WINDOWS
-using Win32Helpers;
-#elif LINUX
-using LinuxHelpers;
-#endif
 
 using ILogger = Serilog.ILogger;
 using Path = System.IO.Path;
-using SpaceKat.Shared.States;
-using SpaceKat.Shared.ViewModels;
-using SpaceKatMotionMapper.NavVMs;
-using SpaceKatMotionMapper.States;
 
 namespace SpaceKatMotionMapper;
 
 public class App : Application
 {
-    private IHost Host { get; }
+    public static SpaceKatServiceProvider Container { get; private set; } = null!;
 
-    private static readonly object _startupLogLock = new();
-    private static void StartupLog(string msg)
+    public static T GetService<T>() where T : class
     {
-        var line = $"{DateTime.Now:HH:mm:ss.fff} [THREAD:{Environment.CurrentManagedThreadId}] {msg}\n";
-        lock (_startupLogLock)
-        {
-            using var fs = new System.IO.FileStream(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "startup_debug.log"), System.IO.FileMode.Append, System.IO.FileAccess.Write, System.IO.FileShare.ReadWrite);
-            fs.Write(System.Text.Encoding.UTF8.GetBytes(line));
-            fs.Flush(false);
-        }
-    }
-
-    public static T GetService<T>()
-        where T : class
-    {
+        var sw = Stopwatch.StartNew();
         try
         {
-            return (Current as App)!.Host.Services.GetRequiredService<T>();
+            return Container.GetService<T>()!;
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "[{App}] GetService failed for {ServiceType}", nameof(App), typeof(T).Name);
+            Log.Error(ex, "GetService failed for {ServiceType}", typeof(T).Name);
             throw;
+        }
+        finally
+        {
+            sw.Stop();
         }
     }
 
-    public static T GetRequiredService<T>()
-        where T : class
+    public static T GetRequiredService<T>() where T : class
     {
+        var sw = Stopwatch.StartNew();
         try
         {
-            return (Current as App)!.Host.Services.GetRequiredService<T>();
+            return Container.GetService<T>()!;
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "[{App}] GetRequiredService failed for {ServiceType}", nameof(App), typeof(T).Name);
+            Log.Error(ex, "GetRequiredService failed for {ServiceType}", typeof(T).Name);
             throw;
+        }
+        finally
+        {
+            sw.Stop();
         }
     }
 
-    public static object GetRequiredView(Type type)
+    public static object GetService(Type type)
     {
-        try
-        {
-            return (Current as App)!.Host.Services.GetRequiredService(type);
-        }
-        catch (Exception ex)
-        {
-            GetRequiredService<ILogger>().Fatal(ex, "");
-            throw;
-        }
+        var sw = Stopwatch.StartNew();
+        var result = ((IServiceProvider)Container).GetService(type)!;
+        sw.Stop();
+        return result;
     }
+
+    private static readonly ILogger Log = Serilog.Log.ForContext<App>();
 
     public App()
     {
-        StartupLog("App.ctor: START (before Host.Build)");
-        Host = Microsoft
-            .Extensions.Hosting.Host.CreateDefaultBuilder()
-            .ConfigureServices(services =>
-            {
-                services.AddSingleton<MainWindow>();
-                services.AddSingleton<NavViewModel>();
-                services.AddSingleton<ViewRegister>();
+        if (!Directory.Exists(GlobalPaths.AppLogPath))
+            Directory.CreateDirectory(GlobalPaths.AppLogPath);
 
-                services.AddTransient<KatMotionGroupConfigWindow>();
+        var logPath = Path.Combine(GlobalPaths.AppLogPath, "Log.log");
+        var instanceId = Guid.NewGuid().ToString();
+        var instanceIdEnricher = new InstanceIdEnricher(instanceId);
 
-                services.AddTransient<TransparentInfoWindow>();
-                services.AddSingleton<TransparentInfoViewModel>();
-
-                services.AddTransient<FavPresetsEditorView>();
-                services.AddTransient<FavPresetsEditorViewModel>();
-                services.AddTransient<FirstDownloadPresetsView>();
-                services.AddTransient<FirstDownloadPresetsViewModel>();
-
-                services.AddSingleton<MainView>();
-                services.AddSingleton<MainViewModel>();
-                services.AddSingleton<SettingsView>();
-                services.AddSingleton<SettingsViewModel>();
-
-                services.AddSingleton<ListeningInfoViewModel>();
-                services.AddSingleton<ConnectAndEnableViewModel>();
-                services.AddSingleton<AutoDisableViewModel>();
-                services.AddSingleton<RunningProgramSelectorViewModel>();
-
-                services.AddSingleton<IDeviceDataWrapper, SpaceDeviceDataWrapper>();
-                services.AddSingleton<KatMotionRecognizeService>();
-                services.AddSingleton<TransparentInfoActionDisplayService>();
-
-                services.AddSingleton<KatMotionTimeConfigService>();
-                services.AddSingleton<KatDeadZoneConfigService>();
-                services.AddSingleton<TimeAndDeadZoneSettingViewModel>();
-                services.AddSingleton<KatMotionTimeConfigView>();
-                services.AddSingleton<MotionTimeConfigViewModel>();
-                services.AddSingleton<DeadZoneConfigView>();
-                services.AddSingleton<DeadZoneConfigViewModel>();
-                services.AddSingleton<TimeAndDeadZoneVMService>();
-                services.AddSingleton<AutoDisableService>();
-
-                services.AddSingleton<PopUpNotificationService>();
-                services.AddSingleton<TransparentInfoService>();
-                services.AddSingleton<GlobalStates>();
-
-                services.AddSingleton<IStorageProviderService, StorageProviderService>();
-                services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
-                services.AddSingleton<IFileService, FileService>();
-
-                // 核心服务接口注册
-                services.AddSingleton<IKatMotionFileService, KatMotionFileService>();
-                services.AddSingleton<IPopUpNotificationService, PopUpNotificationService>();
-                services.AddSingleton<IKatMotionActivateService, KatMotionActivateService>();
-                services.AddSingleton<IActivationStatusService>(sp => sp.GetRequiredService<ActivationStatusService>());
-                services.AddSingleton<IKatMotionConfigVMManageService, KatMotionConfigVMManageService>();
-
-                // 平台特定服务
-#if LINUX
-                services.AddLinuxPlatformServices();
-                services.AddSingleton<IFloatingControlWindowUIFactory>(_ =>
-                    new LinuxHelpers.Services.FloatingWindow.FloatingControlWindowUIFactory(
-                        () => new FloatingControlWindow()));
-                services.AddTransient<FloatingControlWindow>();
-#elif WINDOWS
-                services.AddWindowsPlatformServices();
-#else
-                services.AddSingleton<IPlatformWindowService, PlatformAbstractions.Unsupported.UnsupportedPlatformWindowService>();
-                services.AddSingleton<IPlatformHotKeyService, PlatformAbstractions.Unsupported.UnsupportedPlatformHotKeyService>();
-                services.AddSingleton<IPlatformForegroundProgramService, PlatformAbstractions.Unsupported.UnsupportedPlatformForegroundProgramService>();
-                services.AddSingleton<IPlatformMinimizeService, GenericPlatformMinimizeService>();
-                services.AddSingleton<IFileExplorerService, PlatformAbstractions.Unsupported.UnsupportedFileExplorerService>();
-                services.AddSingleton<ISingletonInstanceService, PlatformAbstractions.Unsupported.UnsupportedSingletonInstanceService>();
-#endif
-                services.AddSingleton<ActivationStatusService>();
-                // 保留具体类注册以向后兼容，同时优先使用接口
-                services.AddSingleton<KatMotionActivateService>();
-                services.AddSingleton<KatMotionFileService>();
-                services.AddSingleton<CommonConfigViewModel>();
-                services.AddTransient<KatMotionConfigViewModel>();
-                services.AddSingleton<OtherConfigsViewModel>();
-                services.AddSingleton<ModeChangeService>();
-                services.AddSingleton<ConflictKatMotionService>();
-                // Ensure interface and concrete resolve to the same singleton instance.
-                services.AddSingleton(sp => (KatMotionConfigVMManageService)sp.GetRequiredService<IKatMotionConfigVMManageService>());
-                services.AddSingleton<IOfficialMapperHotKeyService, OfficialMapperHotKeyService>();
-                services.AddSingleton<MetaKeyPresetService>();
-                services.AddSingleton<MetaKeyPresetFileService>();
-
-                // 分应用快捷键预设配置工具
-                DIHelper.RegisterServices(services);
-            })
-            .UseSerilog()
-            .ConfigureLogging(logging =>
-            {
-                logging.ClearProviders();
-
-                if (!Directory.Exists(GlobalPaths.AppLogPath))
-                {
-                    Directory.CreateDirectory(GlobalPaths.AppLogPath);
-                }
-
-                var logPath = Path.Combine(GlobalPaths.AppLogPath, "Log.log");
-
-                // 生成实例ID并创建enricher
-                var instanceId = Guid.NewGuid().ToString();
-                var instanceIdEnricher = new InstanceIdEnricher(instanceId);
-
-                Log.Logger = new LoggerConfiguration()
-                    .MinimumLevel.Debug()
-                    .Enrich.FromLogContext()
-                    .Enrich.With(instanceIdEnricher)  // 添加实例ID enricher
+        Serilog.Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .Enrich.FromLogContext()
+            .Enrich.With(instanceIdEnricher)
 #if DEBUG
-                    .WriteTo.OpenTelemetry("http://localhost:9428/insert/opentelemetry/v1/logs", OtlpProtocol.HttpProtobuf)
+            .WriteTo.OpenTelemetry("http://localhost:9428/insert/opentelemetry/v1/logs", Serilog.Sinks.OpenTelemetry.OtlpProtocol.HttpProtobuf)
 #endif
-                    .WriteTo.File(logPath,
-                        rollingInterval: RollingInterval.Day,
-                        outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [InstanceId:{InstanceId}] {Message:lj}{NewLine}{Exception}")
-                    .CreateLogger();
-                logging.Services.AddSingleton(Log.Logger);
-            })
-            .Build();
-        DIHelper.SetServiceProvider(Host.Services);
-        StartupLog("App.ctor: END (Host.Build complete)");
+            .WriteTo.File(logPath,
+                rollingInterval: RollingInterval.Day,
+                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [InstanceId:{InstanceId}] {Message:lj}{NewLine}{Exception}")
+            .CreateLogger();
+
+        var provider = new SpaceKatServiceProvider();
+        provider.Logger = Serilog.Log.Logger;
+        Container = provider;
+        MetaKeyPresetsEditor.App.FallbackProvider = provider;
+
     }
 
-    // [AvaloniaHotReload]
     public override void Initialize()
     {
-        StartupLog("App.Initialize: START");
         OnStartOrCloseFunctions.LoadOnStart();
-        StartupLog("App.Initialize: AFTER LoadOnStart, BEFORE XamlLoader");
         DataContext = this;
         AvaloniaXamlLoader.Load(this);
-        StartupLog("App.Initialize: END (XamlLoader complete)");
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
-        StartupLog("OnFrameworkInitializationCompleted: START");
         switch (ApplicationLifetime)
         {
             case IClassicDesktopStyleApplicationLifetime desktop:
-                StartupLog("OnFrameworkInitializationCompleted: BEFORE singleton.TryAcquire");
-                var singleton = GetRequiredService<ISingletonInstanceService>();
+                var singleton = Container.GetService<ISingletonInstanceService>()!;
                 if (!singleton.TryAcquire())
                 {
-                    StartupLog("OnFrameworkInitializationCompleted: Singleton blocked, aborting");
                     var wrongWindow = new SingletonWrongWindow();
                     desktop.MainWindow = wrongWindow;
                     desktop.MainWindow.Closed += (_, _) => { desktop.Shutdown(); };
                     return;
                 }
 
-                StartupLog("OnFrameworkInitializationCompleted: BEFORE DeviceHidSpecDict.Initialize");
                 try
                 {
                     DeviceHidSpecDict.Initialize(GlobalPaths.AppDataPath);
@@ -270,81 +137,56 @@ public class App : Application
                             try
                             {
                                 DeviceHidSpecDict.ResetToDefault(GlobalPaths.AppDataPath);
-                                var mainWindow = GetService<MainWindow>();
+                                var mainWindow = Container.GetService<MainWindow>();
                                 desktop.MainWindow = mainWindow;
-                                mainWindow.Show();
+                                mainWindow!.Show();
                                 mainWindow.Closed += (_, _) => { CloseApp(); };
                             }
-                            catch
-                            {
-                                desktop.Shutdown();
-                            }
+                            catch { desktop.Shutdown(); }
                         }
-                        else
-                        {
-                            desktop.Shutdown();
-                        }
+                        else { desktop.Shutdown(); }
                     };
                     return;
                 }
 
-                StartupLog("OnFrameworkInitializationCompleted: AFTER DeviceHidSpecDict.Initialize, BEFORE MainWindow");
-                var mainWindow2 = GetService<MainWindow>();
-                StartupLog("OnFrameworkInitializationCompleted: MainWindow created, BEFORE setting desktop.MainWindow");
-                // var mainWindow2 = new TestWindow();
+                var mainWindow2 = Container.GetService<MainWindow>()!;
                 desktop.MainWindow = mainWindow2;
-                StartupLog("OnFrameworkInitializationCompleted: desktop.MainWindow set, registering Closed handler");
                 mainWindow2.Closed += (_, _) => { CloseApp(); };
-                StartupLog("OnFrameworkInitializationCompleted: DONE");
                 break;
         }
-
         base.OnFrameworkInitializationCompleted();
     }
 
     private void CloseApp()
     {
-        GetService<ActivationStatusService>().SaveActivationStatus();
+        var activationStatus = Container.GetService<IActivationStatusService>()!;
+        activationStatus.SaveActivationStatus();
 
         switch (ApplicationLifetime)
         {
             case IClassicDesktopStyleApplicationLifetime desktop:
-                var ofMs =
-                    GetRequiredService<IOfficialMapperHotKeyService>();
-                ofMs.UnregisterHotKeyWrapper();
-                ofMs.UnregisterHandle();
+                var ofms = Container.GetService<IOfficialMapperHotKeyService>()!;
+                ofms.UnregisterHotKeyWrapper();
+                ofms.UnregisterHandle();
                 OfficialWareConfigFunctions.CleanAllChange().GetAwaiter().GetResult();
                 Hid.Exit();
-                var foregroundService = GetRequiredService<IPlatformForegroundProgramService>();
+                var foregroundService = Container.GetService<IPlatformForegroundProgramService>()!;
                 if (foregroundService is IDisposable disposableForegroundService)
-                {
                     disposableForegroundService.Dispose();
-                }
-
-                var minimizeService = GetRequiredService<IPlatformMinimizeService>();
+                var minimizeService = Container.GetService<IPlatformMinimizeService>()!;
                 minimizeService.Dispose();
-
-                #if WINDOWS
-                if (GetRequiredService<CurrentForeProgramHelper>() is { } helper)
-                {
-                    helper.Dispose();
-                }
-                #endif
                 desktop.Shutdown();
                 break;
         }
+        Serilog.Log.CloseAndFlush();
     }
 
-    private void ExitMenuItem_OnClick(object? sender, EventArgs e)
-    {
-        CloseApp();
-    }
+    private void ExitMenuItem_OnClick(object? sender, EventArgs e) => CloseApp();
 
     private void ShowWindowMenuItem_OnClick(object? sender, EventArgs e)
     {
-        var window = GetService<MainWindow>();
-        var minimizeService = GetRequiredService<IPlatformMinimizeService>();
-        minimizeService.RestoreWindow(window);
+        var window = Container.GetService<MainWindow>();
+        var minimizeService = Container.GetService<IPlatformMinimizeService>()!;
+        minimizeService.RestoreWindow(window!);
     }
-
 }

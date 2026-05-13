@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
@@ -10,9 +11,7 @@ using Avalonia.LogicalTree;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Messaging;
 using PlatformAbstractions;
-using Serilog;
 using SpaceKat.Shared.Models;
-using SpaceKatMotionMapper.Extensions;
 using SpaceKatMotionMapper.Functions;
 using SpaceKatMotionMapper.NavVMs;
 using Ursa.Controls;
@@ -25,23 +24,12 @@ public partial class MainWindow : UrsaWindow
 {
     private readonly WindowNotificationManager _manager;
     private readonly IPlatformMinimizeService _minimizeService;
-    private readonly ILinuxNotificationManager? _notificationManager;
     public const string LocalHost = "LocalHost";
 
     public MainWindow()
     {
         DataContext = App.GetRequiredService<NavViewModel>();
         _minimizeService = App.GetRequiredService<IPlatformMinimizeService>();
-
-        // 尝试获取Linux通知管理器
-        try
-        {
-            _notificationManager = App.GetRequiredService<ILinuxNotificationManager>();
-        }
-        catch
-        {
-            _notificationManager = null;
-        }
 
         InitializeComponent();
         PropertyChanged += OnPropertyChanged;
@@ -77,37 +65,7 @@ public partial class MainWindow : UrsaWindow
 
             // 显示通知
             _manager.Show(notification);
-
-            // 如果是Linux平台且运行在平铺窗口管理器上，应用防平铺属性
-            if (_notificationManager != null && _notificationManager.IsSupported)
-            {
-                // 异步获取通知窗口并应用防平铺属性
-                await ApplyAntiTilingToNotificationsAsync();
-            }
         });
-    }
-
-    private async Task ApplyAntiTilingToNotificationsAsync()
-    {
-        try
-        {
-            // 使用扩展方法异步获取通知窗口
-            var notificationWindows = await _manager.GetNotificationWindowsAsync(maxRetries: 10, delayMs: 50);
-
-            foreach (var window in notificationWindows)
-            {
-                if (_notificationManager != null &&
-                    _notificationManager.IsNotificationWindow(window))
-                {
-                    _notificationManager.ApplyAntiTilingProperties(window, this);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            // 忽略错误，通知仍然可以正常显示
-            Log.Warning(ex, "[{View}] Error applying anti-tiling properties: {Message}", nameof(MainWindow), ex.Message);
-        }
     }
 
     private void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
@@ -152,9 +110,13 @@ public partial class MainWindow : UrsaWindow
     {
         base.OnLoaded(e);
         HideNativeDecorations();
+        var swOnLoaded = Stopwatch.StartNew();
         OnStartOrCloseFunctions.LoadOnMainWindowLoaded();
+        var swNav = Stopwatch.StartNew();
         var navVm = App.GetRequiredService<NavViewModel>();
         navVm.OnNavigation(navVm, typeof(MainView).FullName!);
+        swNav.Stop();
+        swOnLoaded.Stop();
     }
 
     private void HideNativeDecorations()

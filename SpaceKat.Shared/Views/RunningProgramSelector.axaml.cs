@@ -7,6 +7,8 @@ namespace SpaceKat.Shared.Views;
 
 public partial class RunningProgramSelector : UserControl
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<RunningProgramSelector>();
+
     public RunningProgramSelector()
     {
         InitializeComponent();
@@ -40,7 +42,7 @@ public partial class RunningProgramSelector : UserControl
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "[{View}] Failed to load window list", nameof(RunningProgramSelector));
+            Log.Error(ex, "Failed to load window list");
         }
     }
 }

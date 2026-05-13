@@ -6,7 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using Serilog;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Models;
-using SpaceKatMotionMapper.Services;
+using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.Views;
 using Ursa.Controls;
 
@@ -17,11 +17,13 @@ namespace SpaceKatMotionMapper.ViewModels;
 /// </summary>
 public partial class KatMotionGroupViewModel : ObservableObject
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<KatMotionGroupViewModel>();
+
     private bool _isInternalFirstConfigModeUpdate;
     private bool _isModeChangeConfirming;
 
 #if DEBUG
-    public KatMotionGroupViewModel() : this(null!, KatMotionEnum.Null)
+    public KatMotionGroupViewModel() : this(null!, KatMotionEnum.Null, null!, null!)
     {
     }
 #endif
@@ -86,8 +88,14 @@ public partial class KatMotionGroupViewModel : ObservableObject
         }
     }
 
-    public KatMotionGroupViewModel(KatMotionsWithModeViewModel parent, KatMotionEnum katMotion)
+    private readonly IModeChangeService _modeChangeService;
+    private readonly IKatMotionTimeConfigService _timeConfigService;
+
+    public KatMotionGroupViewModel(KatMotionsWithModeViewModel parent, KatMotionEnum katMotion,
+        IModeChangeService modeChangeService, IKatMotionTimeConfigService timeConfigService)
     {
+        _modeChangeService = modeChangeService;
+        _timeConfigService = timeConfigService;
         Parent = parent;
         Configs = [];
 
@@ -107,7 +115,7 @@ public partial class KatMotionGroupViewModel : ObservableObject
         {
             // Fallback for empty collection (should not happen under normal circumstances)
             FirstConfigMode = KatConfigModeEnum.SingleAction;
-            Log.Warning("[KatMotionGroupViewModel] Constructor: Configs collection is empty after AddConfig()");
+            Log.Warning("Constructor: Configs collection is empty after AddConfig()");
         }
     }
 
@@ -196,7 +204,7 @@ public partial class KatMotionGroupViewModel : ObservableObject
 
         _isModeChangeConfirming = true;
 
-        Log.Information("[OnFirstConfigModeChanging] Starting mode change: {OldMode} -> {NewMode}, Group KatMotion: {KatMotion}", oldValue, newValue, KatMotion);
+        Log.Debug("Starting mode change: {OldMode} -> {NewMode}, Group KatMotion: {KatMotion}", oldValue, newValue, KatMotion);
 
         // 保存旧值，以便恢复
         var oldValueToRestore = oldValue;
@@ -219,7 +227,7 @@ public partial class KatMotionGroupViewModel : ObservableObject
 
             if (!confirmed)
             {
-                Log.Information("[OnFirstConfigModeChanging] User cancelled mode change");
+                Log.Debug("User cancelled mode change");
                 _isInternalFirstConfigModeUpdate = true;
                 try
                 {
@@ -233,12 +241,12 @@ public partial class KatMotionGroupViewModel : ObservableObject
                 return;
             }
 
-            Log.Information("[OnFirstConfigModeChanging] User confirmed mode change, calling RebuildConfigsAfterModeChange");
+            Log.Debug("User confirmed mode change, calling RebuildConfigsAfterModeChange");
             RebuildConfigsAfterModeChange(newValue);
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "[OnFirstConfigModeChanging] Failed while confirming mode change");
+            Log.Error(ex, "Failed while confirming mode change");
         }
         finally
         {
@@ -248,7 +256,7 @@ public partial class KatMotionGroupViewModel : ObservableObject
 
     private void RebuildConfigsAfterModeChange(KatConfigModeEnum newMode)
     {
-        Log.Information("[RebuildConfigsAfterModeChange] Starting rebuild. Group KatMotion: {KatMotion}, Old config count: {OldCount}", KatMotion, Configs.Count);
+        Log.Debug("Starting rebuild. Group KatMotion: {KatMotion}, Old config count: {OldCount}", KatMotion, Configs.Count);
 
         try
         {
@@ -262,7 +270,7 @@ public partial class KatMotionGroupViewModel : ObservableObject
             // 如果组的 KatMotion 是 Null，只创建一个空配置
             var configCountToCreate = KatMotion != KatMotionEnum.Null ? oldConfigCount : 1;
 
-            Log.Information("[RebuildConfigsAfterModeChange] Creating {ConfigCount} configs with KatMotion: {KatMotion}", configCountToCreate, KatMotion);
+            Log.Debug("Creating {ConfigCount} configs with KatMotion: {KatMotion}", configCountToCreate, KatMotion);
 
             for (var i = 0; i < configCountToCreate; i++)
             {
@@ -274,7 +282,7 @@ public partial class KatMotionGroupViewModel : ObservableObject
                     RepeatCount = 1  // 重置为默认
                 };
                 Configs.Add(newConfig);
-                Log.Information("[RebuildConfigsAfterModeChange] Created config {Index}: KatMotion={KatMotion}, ConfigMode={ConfigMode}", i, newConfig.KatMotion, newConfig.ConfigMode);
+                Log.Debug("Created config {Index}: KatMotion={KatMotion}, ConfigMode={ConfigMode}", i, newConfig.KatMotion, newConfig.ConfigMode);
             }
 
             // 更新 FirstConfigMode 属性
@@ -282,15 +290,15 @@ public partial class KatMotionGroupViewModel : ObservableObject
             FirstConfigMode = newMode;
 
             // 调试日志
-            Log.Information("[RebuildConfigsAfterModeChange] Completed. Group KatMotion: {KatMotion}, Configs Count: {ConfigsCount}, FirstConfigMode: {FirstConfigMode}", KatMotion, Configs.Count, FirstConfigMode);
-            Log.Information("[RebuildConfigsAfterModeChange] Each config's KatMotion: {ConfigKatMotions}", string.Join(", ", Configs.Select(c => c.KatMotion.ToString())));
+            Log.Debug("Completed. Group KatMotion: {KatMotion}, Configs Count: {ConfigsCount}, FirstConfigMode: {FirstConfigMode}", KatMotion, Configs.Count, FirstConfigMode);
+            Log.Debug("Each config's KatMotion: {ConfigKatMotions}", string.Join(", ", Configs.Select(c => c.KatMotion.ToString())));
 
             // 模式切换后重新应用时间配置
             ReApplyTimeConfigs();
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "[RebuildConfigsAfterModeChange] Failed during rebuild");
+            Log.Error(ex, "Failed during rebuild");
             // Ensure at least one config exists
             if (Configs.Count == 0)
             {
@@ -302,7 +310,7 @@ public partial class KatMotionGroupViewModel : ObservableObject
                     RepeatCount = 1
                 };
                 Configs.Add(fallbackConfig);
-                Log.Warning("[RebuildConfigsAfterModeChange] Created fallback config due to error");
+                Log.Warning("Created fallback config due to error");
             }
         }
     }
@@ -311,16 +319,14 @@ public partial class KatMotionGroupViewModel : ObservableObject
     {
         try
         {
-            var modeChangeService = App.GetRequiredService<ModeChangeService>();
-            var timeConfigService = App.GetRequiredService<KatMotionTimeConfigService>();
-            if (modeChangeService.ConfigIsDefault)
-                timeConfigService.ApplyDefaultMotionTimeConfig();
+            if (_modeChangeService.ConfigIsDefault)
+                _timeConfigService.ApplyDefaultMotionTimeConfig();
             else
-                timeConfigService.ApplyMotionTimeConfigById(modeChangeService.CurrentActivatedConfig);
+                _timeConfigService.ApplyMotionTimeConfigById(_modeChangeService.CurrentActivatedConfig);
         }
         catch (Exception ex)
         {
-            Log.Warning(ex, "[ReApplyTimeConfigs] Failed to re-apply time configs after mode change");
+            Log.Warning(ex, "Failed to re-apply time configs after mode change");
         }
     }
 
@@ -339,13 +345,13 @@ public partial class KatMotionGroupViewModel : ObservableObject
             var firstConfig = Configs[0];
             newConfig.KatMotion = firstConfig.KatMotion;
             newConfig.ConfigMode = firstConfig.ConfigMode;
-            Log.Debug("[AddConfig] Added config #{Index}. Inherited KatMotion: {KatMotion}, ConfigMode: {ConfigMode}", Configs.Count, newConfig.KatMotion, newConfig.ConfigMode);
+            Log.Debug("Added config #{Index}. Inherited KatMotion: {KatMotion}, ConfigMode: {ConfigMode}", Configs.Count, newConfig.KatMotion, newConfig.ConfigMode);
         }
         else
         {
             // 第一个配置：继承组的 KatMotion
             newConfig.KatMotion = KatMotion;
-            Log.Information("[AddConfig] Added first config. Group KatMotion: {KatMotion}, Config KatMotion: {ConfigKatMotion}", KatMotion, newConfig.KatMotion);
+            Log.Debug("Added first config. Group KatMotion: {KatMotion}, Config KatMotion: {ConfigKatMotion}", KatMotion, newConfig.KatMotion);
         }
 
         Configs.Add(newConfig);
@@ -385,7 +391,7 @@ public partial class KatMotionGroupViewModel : ObservableObject
         }
         else
         {
-            Log.Warning("[RemoveSelf] Cannot find self in parent collection");
+            Log.Warning("Cannot find self in parent collection");
         }
     }
 
@@ -405,11 +411,11 @@ public partial class KatMotionGroupViewModel : ObservableObject
                 config.PropertyChanged -= ChildPropertyChanged;
             }
 
-            Log.Debug("[KatMotionGroupViewModel] Cleanup completed for KatMotion: {KatMotion}", KatMotion);
+            Log.Debug("Cleanup completed for KatMotion: {KatMotion}", KatMotion);
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "[KatMotionGroupViewModel] Error during cleanup");
+            Log.Error(ex, "Error during cleanup");
         }
     }
 }

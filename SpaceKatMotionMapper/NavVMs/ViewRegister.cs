@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Avalonia.Controls;
+using Serilog;
+using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.NavVMs;
 
-public class ViewRegister
+public class ViewRegister : IViewRegister
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<ViewRegister>();
+
     private readonly Dictionary<string, Type> _viewDict = [];
     public List<MenuItemViewModel> MenuItems { get; } = [];
 
@@ -29,8 +34,13 @@ public class ViewRegister
     {
         if (_viewDict.TryGetValue(key, out var type))
         {
-            return App.GetRequiredView(type) as Control
-                   ?? throw new Exception($"\"{key}\" have not been registered in App.axaml.cs");
+            var sw = Stopwatch.StartNew();
+            var view = App.GetService(type) as Control
+                       ?? throw new Exception($"\"{key}\" have not been registered in App.axaml.cs");
+            sw.Stop();
+            if (sw.Elapsed.TotalMilliseconds > 1)
+                Log.Information("ViewRegister.GetView({Key}) => {Type} took {Ms:F2}ms", key, type.Name, sw.Elapsed.TotalMilliseconds);
+            return view;
         }
         else
         {

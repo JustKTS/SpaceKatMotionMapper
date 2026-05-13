@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using SpaceKat.Shared.Models;
+using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.Services;
 
-public sealed class TransparentInfoActionDisplayService
+public sealed class TransparentInfoActionDisplayService : ITransparentInfoActionDisplayService
 {
     private readonly Dictionary<Guid, Dictionary<Guid, KeyActionConfig[]>> _motionGroup = [];
 

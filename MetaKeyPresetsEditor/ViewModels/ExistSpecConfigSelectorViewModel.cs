@@ -11,23 +11,23 @@ using Irihi.Avalonia.Shared.Contracts;
 using MetaKeyPresetsEditor.Helpers;
 using SpaceKat.Shared.Helpers;
 using MetaKeyPresetsEditor.Services;
-using Microsoft.Extensions.DependencyInjection;
 using SpaceKat.Shared.Models;
 using SpaceKat.Shared.Services.Contract;
 
 namespace MetaKeyPresetsEditor.ViewModels;
 
-public partial class ExistSpecConfigSelectorViewModel : ObservableRecipient, IDialogContext
+public partial class ExistSpecConfigSelectorViewModel(
+    IMetaKeyPresetFileService metaKeyPresetFileService,
+    IPopUpNotificationSpecService popUpNotificationSpecService) : ObservableRecipient, IDialogContext
 {
-    private readonly IMetaKeyPresetFileService _metaKeyPresetFileService =
-        DIHelper.GetServiceProvider().GetRequiredService<IMetaKeyPresetFileService>();
-
     [ObservableProperty] private Dictionary<string, ProgramSpecMetaKeysRecord> _programSpecificConfigs = [];
 
     [ObservableProperty] private ProgramSpecMetaKeysRecord _selectedConfig =
         new ProgramSpecMetaKeysRecord(string.Empty, string.Empty, false, [], []);
 
     public ExistSpecConfigSelectorViewModel()
+        : this(App.GetRequiredService<IMetaKeyPresetFileService>(),
+            App.GetRequiredService<IPopUpNotificationSpecService>())
     {
         _ = LoadConfigs();
     }
@@ -37,7 +37,7 @@ public partial class ExistSpecConfigSelectorViewModel : ObservableRecipient, IDi
     {
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
-            var ret = _metaKeyPresetFileService.LoadConfigs();
+            var ret = metaKeyPresetFileService.LoadConfigs();
             if (ret.IsSuccess)
             {
                 var dict = ret.Value;
@@ -47,7 +47,7 @@ public partial class ExistSpecConfigSelectorViewModel : ObservableRecipient, IDi
             }
             else
             {
-                DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
+                popUpNotificationSpecService
                     .ShowPopUpNotificationAsync(new PopupNotificationData(NotificationType.Error, ret.Error.Message));
             }
         });

@@ -1,5 +1,7 @@
 using System.Reflection;
 using TUnit.Assertions;
+using Moq;
+using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.Tests.Helpers;
 using SpaceKatMotionMapper.ViewModels;
 using SpaceKatHIDWrapper.Models;
@@ -14,8 +16,10 @@ public class KatMotionGroupViewModelTests
     {
         // Arrange
         var configVm = ViewModelTestHelpers.CreateConfigViewModel();
-        var modeVm = new KatMotionsWithModeViewModel(configVm, 0);
-        var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationYPositive);
+        var modeChangeSvc = Mock.Of<IModeChangeService>();
+        var timeConfigSvc = Mock.Of<IKatMotionTimeConfigService>();
+        var modeVm = new KatMotionsWithModeViewModel(configVm, 0, modeChangeSvc, timeConfigSvc);
+        var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationYPositive, modeChangeSvc, timeConfigSvc);
 
         SetPrivateField(groupVm, "_isInternalFirstConfigModeUpdate", true);
 
@@ -33,8 +37,10 @@ public class KatMotionGroupViewModelTests
     {
         // Arrange
         var configVm = ViewModelTestHelpers.CreateConfigViewModel();
-        var modeVm = new KatMotionsWithModeViewModel(configVm, 0);
-        var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationYPositive);
+        var modeChangeSvc = Mock.Of<IModeChangeService>();
+        var timeConfigSvc = Mock.Of<IKatMotionTimeConfigService>();
+        var modeVm = new KatMotionsWithModeViewModel(configVm, 0, modeChangeSvc, timeConfigSvc);
+        var groupVm = new KatMotionGroupViewModel(modeVm, KatMotionEnum.TranslationYPositive, modeChangeSvc, timeConfigSvc);
         groupVm.Configs.Clear();
 
         var receivedNotifications = new System.Collections.Generic.List<string>();

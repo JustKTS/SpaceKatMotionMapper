@@ -2,8 +2,6 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
-using MetaKeyPresetsEditor.Helpers;
-using Microsoft.Extensions.DependencyInjection;
 using SpaceKat.Shared.Models;
 using Ursa.Controls;
 using Notification = Ursa.Controls.Notification;
@@ -19,7 +17,7 @@ public partial class PresetsEditorMainWindow : UrsaWindow
 
     public PresetsEditorMainWindow()
     {
-        Content = DIHelper.GetServiceProvider().GetRequiredService<PresetsEditorMainView>();
+        Content = App.GetRequiredService<PresetsEditorMainView>();
         InitializeComponent();
 
         var topLevel = GetTopLevel(this);

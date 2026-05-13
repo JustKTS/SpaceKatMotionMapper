@@ -26,7 +26,7 @@ sealed class Program
         }
         catch (Exception e)
         {
-            App.GetRequiredService<ILogger>().Fatal(e, "");
+            Log.Fatal(e, "Application crashed");
             OfficialWareConfigFunctions.CleanAllChange().GetAwaiter().GetResult();
             throw;
         }
@@ -36,5 +36,8 @@ sealed class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .LogToTrace();
+#if DEBUG
+            .LogToTrace()
+#endif
+            ;
 }

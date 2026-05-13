@@ -9,15 +9,16 @@ namespace LinuxHelpers.Services.ForegroundProgram.Strategies;
 
 /// <summary>
 /// Niri 窗口管理器监控策略
-/// 通过 niri msg --json event-stream 监听窗口焦点变化事件
+/// 通过 niri msg --json event-stream 监听焦点事件（字符串匹配判断事件类型）
 /// </summary>
 public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<NiriWindowManagerStrategy>();
+
     private const int CommandTimeoutMs = 5000;
     private const int MaxRestartAttempts = 3;
 
     private Process? _eventStreamProcess;
-    private readonly LinuxProcessPathResolver _pathResolver = new();
     private ForeProgramInfo? _lastProgramInfo;
     private readonly Lock _lock = new();
     private int _restartCount;
@@ -36,7 +37,7 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
             return;
         }
 
-        Log.Information("[{Strategy}] Starting monitoring...", nameof(NiriWindowManagerStrategy));
+        Log.Information("Starting monitoring...");
         StartEventStreamProcess();
     }
 
@@ -45,7 +46,7 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
     /// </summary>
     public void StopMonitoring()
     {
-        Log.Information("[{Strategy}] Stopping monitoring...", nameof(NiriWindowManagerStrategy));
+        Log.Information("Stopping monitoring...");
         CleanupEventStreamProcess();
         _restartCount = 0;
     }
@@ -70,7 +71,7 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
             _eventStreamProcess = Process.Start(startInfo);
             if (_eventStreamProcess == null)
             {
-                Log.Error("[{Strategy}] Failed to start niri event-stream process", nameof(NiriWindowManagerStrategy));
+                Log.Error("Failed to start niri event-stream process");
                 return;
             }
 
@@ -83,7 +84,7 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "[{Strategy}] Failed to start event-stream: {Message}", nameof(NiriWindowManagerStrategy), ex.Message);
+            Log.Error(ex, "Failed to start event-stream: {Message}", ex.Message);
         }
     }
 
@@ -94,7 +95,7 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
     {
         if (_eventStreamProcess == null)
         {
-            Log.Warning("[{Strategy}] Event stream process is null", nameof(NiriWindowManagerStrategy));
+            Log.Warning("Event stream process is null");
             return;
         }
 
@@ -126,7 +127,7 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "[{Strategy}] Error reading event stream: {Message}", nameof(NiriWindowManagerStrategy), ex.Message);
+            Log.Error(ex, "Error reading event stream: {Message}", ex.Message);
         }
     }
 
@@ -150,13 +151,13 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
                 }
                 if (!string.IsNullOrEmpty(error))
                 {
-                    Log.Warning("[{Strategy}] Error stream: {Error}", nameof(NiriWindowManagerStrategy), error);
+                    Log.Warning("Error stream: {Error}", error);
                 }
             }
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "[{Strategy}] Error reading error stream: {Message}", nameof(NiriWindowManagerStrategy), ex.Message);
+            Log.Error(ex, "Error reading error stream: {Message}", ex.Message);
         }
     }
 
@@ -171,7 +172,7 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
             var focusedWindowInfo = await GetFocusedWindowInfoAsync();
             if (focusedWindowInfo == null)
             {
-                Log.Warning("[{Strategy}] Failed to get focused window info", nameof(NiriWindowManagerStrategy));
+                Log.Warning("Failed to get focused window info");
                 return;
             }
 
@@ -193,12 +194,12 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
 
             // 触发事件
             ForeProgramChanged?.Invoke(this, programInfo);
-            Log.Information("[{Strategy}] Window changed: [{Process}] {Title}",
-                nameof(NiriWindowManagerStrategy), programInfo.ProcessName, programInfo.Title);
+            Log.Debug("Window changed: [{Process}] {Title}",
+                programInfo.ProcessName, programInfo.Title);
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "[{Strategy}] HandleWindowFocusChanged failed: {Message}", nameof(NiriWindowManagerStrategy), ex.Message);
+            Log.Error(ex, "HandleWindowFocusChanged failed: {Message}", ex.Message);
         }
     }
 
@@ -222,7 +223,7 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
             using var process = Process.Start(startInfo);
             if (process == null)
             {
-                Log.Error("[{Strategy}] Failed to start focused-window command", nameof(NiriWindowManagerStrategy));
+                Log.Error("Failed to start focused-window command");
                 return null;
             }
 
@@ -231,7 +232,7 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
 
             if (!process.WaitForExit(CommandTimeoutMs))
             {
-                Log.Warning("[{Strategy}] focused-window command timeout", nameof(NiriWindowManagerStrategy));
+                Log.Warning("focused-window command timeout");
                 try
                 {
                     process.Kill();
@@ -245,8 +246,8 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
 
             if (process.ExitCode != 0)
             {
-                Log.Error("[{Strategy}] focused-window command failed (exit code: {ExitCode}): {Error}",
-                    nameof(NiriWindowManagerStrategy), process.ExitCode, error);
+                Log.Error("focused-window command failed (exit code: {ExitCode}): {Error}",
+                    process.ExitCode, error);
                 return null;
             }
 
@@ -256,7 +257,7 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
 
             if (response == null)
             {
-                Log.Warning("[{Strategy}] Failed to deserialize focused window response", nameof(NiriWindowManagerStrategy));
+                Log.Warning("Failed to deserialize focused window response");
                 return null;
             }
 
@@ -264,7 +265,7 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "[{Strategy}] GetFocusedWindowInfoAsync failed: {Message}", nameof(NiriWindowManagerStrategy), ex.Message);
+            Log.Error(ex, "GetFocusedWindowInfoAsync failed: {Message}", ex.Message);
             return null;
         }
     }
@@ -278,7 +279,7 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
             ? window.AppId
             : "unknown";
 
-        var processPath = _pathResolver.GetExecutablePathFromAppId(
+        var processPath = LinuxProcessPathResolver.GetExecutablePathFromAppId(
             window.AppId ?? string.Empty,
             window.Title ?? string.Empty);
 
@@ -318,7 +319,7 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
         }
         else
         {
-            Log.Warning("[{Strategy}] Max restart attempts reached, stopping monitoring", nameof(NiriWindowManagerStrategy));
+            Log.Warning("Max restart attempts reached, stopping monitoring");
             CleanupEventStreamProcess();
         }
     }
@@ -344,7 +345,7 @@ public class NiriWindowManagerStrategy : IWindowManagerMonitorStrategy
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "[{Strategy}] Error cleaning up event stream process: {Message}", nameof(NiriWindowManagerStrategy), ex.Message);
+            Log.Error(ex, "Error cleaning up event stream process: {Message}", ex.Message);
         }
     }
 

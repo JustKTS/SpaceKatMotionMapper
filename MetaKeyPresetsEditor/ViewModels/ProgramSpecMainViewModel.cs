@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.Input;
 using MetaKeyPresetsEditor.Helpers;
 using MetaKeyPresetsEditor.Services;
 using MetaKeyPresetsEditor.Views;
-using Microsoft.Extensions.DependencyInjection;
 using PlatformAbstractions;
 using SpaceKat.Shared.Defines;
 using SpaceKat.Shared.Helpers;
@@ -16,15 +15,11 @@ using Ursa.Controls;
 
 namespace MetaKeyPresetsEditor.ViewModels;
 
-public partial class ProgramSpecMainViewModel : ViewModelBase
+public partial class ProgramSpecMainViewModel(
+    IMetaKeyPresetFileService metaKeyPresetFileService,
+    IFileExplorerService fileExplorerService,
+    IPopUpNotificationSpecService popUpNotificationSpecService) : ViewModelBase
 {
-    private readonly IMetaKeyPresetFileService _metaKeyPresetFileService =
-        DIHelper.GetServiceProvider().GetRequiredService<IMetaKeyPresetFileService>();
-
-    private readonly IFileExplorerService _fileExplorerService =
-        DIHelper.GetServiceProvider().GetRequiredService<IFileExplorerService>();
-
-
     private static readonly OverlayDialogOptions OverlayDialogOptions = new()
     {
         Buttons = DialogButton.None,
@@ -40,8 +35,8 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
     [RelayCommand]
     private static async Task OpenExistProgramSelector()
     {
-        await OverlayDialog.ShowStandardAsync(DIHelper.GetServiceProvider().GetRequiredService<ExistPresetSelectorView>(),
-            DIHelper.GetServiceProvider().GetRequiredService<ExistSpecConfigSelectorViewModel>(),
+        await OverlayDialog.ShowStandardAsync(App.GetRequiredService<ExistPresetSelectorView>(),
+            App.GetRequiredService<ExistSpecConfigSelectorViewModel>(),
             PresetsEditorMainWindow.LocalHost,
             OverlayDialogOptions);
     }
@@ -49,11 +44,11 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
     [RelayCommand]
     private void ModifyDefaultConfig()
     {
-        var recordsRet = _metaKeyPresetFileService.LoadConfigs();
+        var recordsRet = metaKeyPresetFileService.LoadConfigs();
         if (recordsRet.IsSuccess)
         {
             var records = recordsRet.Value;
-            var vm = DIHelper.GetServiceProvider().GetRequiredService<ProgramSpecificConfigViewModel>();
+            var vm = App.GetRequiredService<ProgramSpecificConfigViewModel>();
             vm.IsDefault = true;
 
             if (records.TryGetValue("默认配置", out var record))
@@ -63,7 +58,7 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
         }
         else
         {
-            DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
+            popUpNotificationSpecService
                 .ShowPopUpNotificationAsync(
                     new PopupNotificationData(NotificationType.Error, $"加载配置文件失败，{recordsRet.Error.Message}"));
         }
@@ -73,7 +68,7 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
     [RelayCommand]
     private static void AddNewConfig()
     {
-        var vm = DIHelper.GetServiceProvider().GetRequiredService<ProgramSpecificConfigViewModel>();
+        var vm = App.GetRequiredService<ProgramSpecificConfigViewModel>();
         vm.ClearAll();
     }
 
@@ -81,7 +76,7 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
     [RelayCommand]
     private void OpenConfigFolder()
     {
-        _fileExplorerService.OpenPath(GlobalPaths.MetaKeysConfigPath);
+        fileExplorerService.OpenPath(GlobalPaths.MetaKeysConfigPath);
     }
 
     [RelayCommand]
@@ -90,13 +85,13 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
         var ret = await DownloadMetaKeyPresetsHelper.DownloadAndCopyMetaKeyPresetsAsync();
         if (ret.IsSuccess)
         {
-            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
+            await popUpNotificationSpecService
                 .ShowPopUpNotificationAsync(
                     new PopupNotificationData(NotificationType.Success, "预设下载成功"));
         }
         else
         {
-            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
+            await popUpNotificationSpecService
                 .ShowPopUpNotificationAsync(
                     new PopupNotificationData(NotificationType.Error, $"预设下载失败：{ret.Error.Message}"));
         }
@@ -112,18 +107,17 @@ public partial class ProgramSpecMainViewModel : ViewModelBase
     [RelayCommand]
     private async Task GetPresetsFromFile()
     {
-        var filePaths = await DIHelper.GetServiceProvider()
-            .GetRequiredService<IStorageProvider>().OpenFilePickerAsync(FileOpenOptions);
+        var filePaths = await App.GetStorageProvider()
+            .OpenFilePickerAsync(FileOpenOptions);
 
-        var loadRet = DIHelper.GetServiceProvider()
-            .GetRequiredService<IMetaKeyPresetFileService>().LoadFromFile(filePaths[0].Path.LocalPath);
+        var loadRet = metaKeyPresetFileService.LoadFromFile(filePaths[0].Path.LocalPath);
         if (loadRet.IsSuccess)
         {
             await ChangeMetaKeyVMHelper.LoadVMFromConfig(loadRet.Value);
         }
         else
         {
-            await DIHelper.GetServiceProvider().GetRequiredService<IPopUpNotificationSpecService>()
+            await popUpNotificationSpecService
                 .ShowPopUpNotificationAsync(new PopupNotificationData(NotificationType.Error, $"预设文件读取失败：{loadRet.Error}"));
         }
     }

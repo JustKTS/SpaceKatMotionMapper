@@ -3,7 +3,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatHIDWrapper.Services;
-using SpaceKatMotionMapper.Services;
+using SpaceKatMotionMapper.Services.Contract;
 using PlatformAbstractions;
 
 namespace SpaceKatMotionMapper.ViewModels;
@@ -18,8 +18,8 @@ public partial class ListeningInfoViewModel : ViewModelBase
     [ObservableProperty] private int _repeatCount;
 
 
-    private readonly KatMotionRecognizeService _katMotionRecognizeService;
-    private readonly KatMotionActivateService _katMotionActivateService;
+    private readonly IKatMotionRecognizeService _katMotionRecognizeService;
+    private readonly IKatMotionActivateService _katMotionActivateService;
 
     private void StartKatListening()
     {
@@ -58,7 +58,7 @@ public partial class ListeningInfoViewModel : ViewModelBase
 
     # endregion
     
-    private readonly TransparentInfoService _transparentInfoService;
+    private readonly ITransparentInfoService _transparentInfoService;
 
 #if DEBUG
     public ListeningInfoViewModel() : this(null!, null!,  null!, null!)
@@ -69,9 +69,9 @@ public partial class ListeningInfoViewModel : ViewModelBase
 
     public ListeningInfoViewModel(
         IPlatformForegroundProgramService currentForeProgramHelper, 
-        KatMotionRecognizeService katMotionRecognizeService,
-        KatMotionActivateService katMotionActivateService,
-        TransparentInfoService transparentInfoService)
+        IKatMotionRecognizeService katMotionRecognizeService,
+        IKatMotionActivateService katMotionActivateService,
+        ITransparentInfoService transparentInfoService)
     {
         _katMotionRecognizeService = katMotionRecognizeService;
         _katMotionActivateService = katMotionActivateService;

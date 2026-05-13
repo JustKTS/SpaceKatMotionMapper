@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SpaceKatHIDWrapper.Models;
+using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.Views;
 using Ursa.Controls;
 
@@ -11,6 +12,9 @@ namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class KatMotionsWithModeViewModel: ViewModelBase
 {
+    private readonly IModeChangeService _modeChangeService;
+    private readonly IKatMotionTimeConfigService _katMotionTimeConfigService;
+
     [ObservableProperty] private int _modeNum;
     [ObservableProperty] private bool _hasAvailableMotions = true;
     [ObservableProperty] private int _selectedMotionGroupIndex = -1;
@@ -25,14 +29,17 @@ public partial class KatMotionsWithModeViewModel: ViewModelBase
     }
     
 #if DEBUG
-    public KatMotionsWithModeViewModel():this(null!, 0)
+    public KatMotionsWithModeViewModel():this(null!, 0, null!, null!)
     {
         
     }
 #endif
 
-    public KatMotionsWithModeViewModel(KatMotionConfigViewModel parent, int modeNum)
+    public KatMotionsWithModeViewModel(KatMotionConfigViewModel parent, int modeNum,
+        IModeChangeService modeChangeService, IKatMotionTimeConfigService katMotionTimeConfigService)
     {
+        _modeChangeService = modeChangeService;
+        _katMotionTimeConfigService = katMotionTimeConfigService;
         Parent = parent;
         ModeNum = modeNum;
         KatMotionGroups = [];
@@ -96,7 +103,7 @@ public partial class KatMotionsWithModeViewModel: ViewModelBase
         // 如果用户选择了有效的运动类型
         if (ret is { } motion)
         {
-            KatMotionGroups.Add(new KatMotionGroupViewModel(this, motion));
+            KatMotionGroups.Add(new KatMotionGroupViewModel(this, motion, _modeChangeService, _katMotionTimeConfigService));
             SelectedMotionGroupIndex = KatMotionGroups.Count - 1; // 自动切换到新选项卡
             UpdateHasAvailableMotions();
             OnPropertyChanged(nameof(IsAvailable));

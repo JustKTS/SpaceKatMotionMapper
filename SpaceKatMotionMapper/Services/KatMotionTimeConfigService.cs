@@ -12,7 +12,7 @@ namespace SpaceKatMotionMapper.Services;
 public class KatMotionTimeConfigService(
     IKatMotionFileService katMotionFileService,
     IKatMotionConfigVMManageService katMotionConfigVmManageService,
-    KatMotionRecognizeService katMotionRecognizeService)
+    IKatMotionRecognizeService katMotionRecognizeService) : IKatMotionTimeConfigService
 {
     public KatMotionTimeConfigs LoadDefaultTimeConfigs()
     {

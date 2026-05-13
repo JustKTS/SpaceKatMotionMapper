@@ -2,12 +2,12 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using SpaceKat.Shared.Models;
 using SpaceKatHIDWrapper.Models;
-using SpaceKatMotionMapper.Services;
+using SpaceKatMotionMapper.Services.Contract;
 using IBrush = Avalonia.Media.IBrush;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
-public partial class TransparentInfoViewModel(TransparentInfoService transparentInfoService) : ViewModelBase
+public partial class TransparentInfoViewModel(ITransparentInfoService transparentInfoService) : ViewModelBase
 {
     [ObservableProperty]
     public partial bool IsAdjustMode { get; set; }

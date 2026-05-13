@@ -5,13 +5,22 @@ using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.Input;
 using Irihi.Avalonia.Shared.Contracts;
 using SpaceKat.Shared.Helpers;
-using SpaceKatMotionMapper.Services;
+using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class FirstDownloadPresetsViewModel : ViewModelBase, IDialogContext
 {
-    private readonly MetaKeyPresetService _metaKeyPresetService = App.GetRequiredService<MetaKeyPresetService>();
+    private readonly IMetaKeyPresetService _metaKeyPresetService;
+    private readonly IPopUpNotificationService _popUpNotificationService;
+
+    public FirstDownloadPresetsViewModel(
+        IMetaKeyPresetService metaKeyPresetService,
+        IPopUpNotificationService popUpNotificationService)
+    {
+        _metaKeyPresetService = metaKeyPresetService;
+        _popUpNotificationService = popUpNotificationService;
+    }
 
     [RelayCommand]
     private async Task Download()
@@ -23,8 +32,7 @@ public partial class FirstDownloadPresetsViewModel : ViewModelBase, IDialogConte
         }
         else
         {
-            App.GetRequiredService<PopUpNotificationService>()
-                .Pop(NotificationType.Error, $"预设下载失败：{ret.Error.Message}");
+            _popUpNotificationService.Pop(NotificationType.Error, $"预设下载失败：{ret.Error.Message}");
         }
         Close();
     }

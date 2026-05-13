@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
+using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.Views;
 
 namespace SpaceKatMotionMapper.NavVMs;
@@ -12,10 +13,10 @@ public partial class NavViewModel : ObservableRecipient
 
     [ObservableProperty] private object? _content;
 
-    private readonly ViewRegister _viewRegister;
+    private readonly IViewRegister _viewRegister;
 
 
-    public NavViewModel(ViewRegister viewRegister)
+    public NavViewModel(IViewRegister viewRegister)
     {
         _viewRegister = viewRegister;
         _viewRegister.RegisterViewOfMenuItem<MainView>("主页面", "fa-solid fa-home-alt");

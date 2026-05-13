@@ -1,9 +1,9 @@
 ﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CSharpFunctionalExtensions;
-using SpaceKat.Shared.Services;
+using SpaceKat.Shared.Services.Contract;
 using SpaceKatHIDWrapper.Models;
-using SpaceKatMotionMapper.Services;
+using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
@@ -11,21 +11,26 @@ public partial class CommonConfigViewModel : ViewModelBase
 {
     [ObservableProperty] private KatMotionConfigViewModel _defaultKatMotionConfig;
 
-    private readonly KatMotionFileService _katMotionFileService =
-        App.GetRequiredService<KatMotionFileService>();
+    private readonly IKatMotionFileService _katMotionFileService;
+    private readonly IKatMotionConfigVMManageService _katMotionConfigVmManageService;
+    private readonly IKatMotionTimeConfigService _katMotionTimeConfigService;
+    private readonly IKatDeadZoneConfigService _katDeadZoneConfigService;
+    private readonly IActivationStatusService _activationStatusService;
 
-    private readonly KatMotionConfigVMManageService _katMotionConfigVmManageService =
-        App.GetRequiredService<KatMotionConfigVMManageService>();
-    private readonly KatMotionTimeConfigService _katMotionTimeConfigService =
-        App.GetRequiredService<KatMotionTimeConfigService>();
-    private readonly KatDeadZoneConfigService _katDeadZoneConfigService =
-        App.GetRequiredService<KatDeadZoneConfigService>();
-
-    private readonly ActivationStatusService _activationStatusService = App.GetRequiredService<ActivationStatusService>();
-
-    public CommonConfigViewModel()
+    public CommonConfigViewModel(
+        IKatMotionFileService katMotionFileService,
+        IKatMotionConfigVMManageService katMotionConfigVmManageService,
+        IKatMotionTimeConfigService katMotionTimeConfigService,
+        IKatDeadZoneConfigService katDeadZoneConfigService,
+        IActivationStatusService activationStatusService,
+        KatMotionConfigViewModel defaultKatMotionConfig)
     {
-        DefaultKatMotionConfig = App.GetRequiredService<KatMotionConfigViewModel>();
+        _katMotionFileService = katMotionFileService;
+        _katMotionConfigVmManageService = katMotionConfigVmManageService;
+        _katMotionTimeConfigService = katMotionTimeConfigService;
+        _katDeadZoneConfigService = katDeadZoneConfigService;
+        _activationStatusService = activationStatusService;
+        DefaultKatMotionConfig = defaultKatMotionConfig;
         var configGroupRet = _katMotionFileService.LoadDefaultConfigGroup();
         if (configGroupRet.IsSuccess)
         {

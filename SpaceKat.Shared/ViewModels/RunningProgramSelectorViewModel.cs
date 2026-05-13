@@ -14,6 +14,8 @@ namespace SpaceKat.Shared.ViewModels;
 
 public partial class RunningProgramSelectorViewModel : ObservableObject, IDialogContext
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<RunningProgramSelectorViewModel>();
+
     public static readonly DialogOptions DialogOptions = new()
     {
         Button = DialogButton.None,
@@ -39,8 +41,8 @@ public partial class RunningProgramSelectorViewModel : ObservableObject, IDialog
     {
         _storageProviderService = storageProviderService;
         _platformWindowService = platformWindowService;
-        Log.Debug("[{ViewModel}] Constructor called, service type: {ServiceType}",
-            nameof(RunningProgramSelectorViewModel), _platformWindowService.GetType().FullName);
+        Log.Debug("Constructor called, service type: {ServiceType}",
+            _platformWindowService.GetType().FullName);
         // 不在构造函数中加载数据，等待对话框显示时再加载
     }
 
@@ -49,21 +51,19 @@ public partial class RunningProgramSelectorViewModel : ObservableObject, IDialog
     /// </summary>
     public async Task UpdateForeProcessInfosAsync(CancellationToken cancellationToken=default)
     {
-        Log.Debug("[{ViewModel}] UpdateForeProcessInfosAsync() started", nameof(RunningProgramSelectorViewModel));
+        Log.Debug("UpdateForeProcessInfosAsync() started");
         ForeProcessInfos.Clear();
         var count = 0;
         await foreach(var fpInfo in _platformWindowService.FindAllForegroundProgramsAsync(cancellationToken))
         {
             count++;
-            Log.Debug("[{ViewModel}] Received window info #{Count}: {Title}",
-                nameof(RunningProgramSelectorViewModel), count, fpInfo.Title);
             Dispatcher.UIThread.Invoke(()=>
             {
                 ForeProcessInfos.Add(fpInfo);
             });
         }
-        Log.Information("[{ViewModel}] UpdateForeProcessInfosAsync() completed, total windows: {Count}",
-            nameof(RunningProgramSelectorViewModel), count);
+        Log.Information("UpdateForeProcessInfosAsync() completed, total windows: {Count}",
+            count);
     }
 
 

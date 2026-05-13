@@ -13,7 +13,6 @@ using SpaceKat.Shared.Defines;
 using SpaceKat.Shared.Services.Contract;
 using SpaceKat.Shared.ViewModels;
 using SpaceKatMotionMapper.Models;
-using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.ViewModels;
@@ -26,7 +25,9 @@ public partial class OtherConfigsViewModel(
     IKatMotionConfigVMManageService katMotionConfigVmManageService,
     IKatMotionActivateService katMotionActivateService,
     RunningProgramSelectorViewModel runningProgramSelectorVM,
-    TimeAndDeadZoneVMService? timeAndDeadZoneVmService = null)
+    IModeChangeService modeChangeService,
+    IKatMotionTimeConfigService katMotionTimeConfigService,
+    Lazy<ITimeAndDeadZoneVMService>? timeAndDeadZoneVmService = null)
     : ViewModelBase
 {
     public ObservableCollection<KatMotionConfigViewModel> KatMotionConfigGroups { get; } = [];
@@ -40,6 +41,8 @@ public partial class OtherConfigsViewModel(
             popUpNotificationService,
             storageProviderService,
             runningProgramSelectorVM,
+            modeChangeService,
+            katMotionTimeConfigService,
             timeAndDeadZoneVmService
         ){Parent = this};
 
@@ -64,6 +67,8 @@ public partial class OtherConfigsViewModel(
             popUpNotificationService,
             storageProviderService,
             runningProgramSelectorVM,
+            modeChangeService,
+            katMotionTimeConfigService,
             timeAndDeadZoneVmService
         ){Parent = this};
         katMotionConfigVmManageService.RegisterConfig(vm);
@@ -95,6 +100,8 @@ public partial class OtherConfigsViewModel(
                     popUpNotificationService,
                     storageProviderService,
                     runningProgramSelectorVM,
+                    modeChangeService,
+                    katMotionTimeConfigService,
                     timeAndDeadZoneVmService
                 ){Parent = this};
                 cgvm.LoadFromConfigGroup(cg);
@@ -132,6 +139,8 @@ public partial class OtherConfigsViewModel(
                     popUpNotificationService,
                     storageProviderService,
                     runningProgramSelectorVM,
+                    modeChangeService,
+                    katMotionTimeConfigService,
                     timeAndDeadZoneVmService
                 ){Parent = this};
                 cgVm.LoadFromConfigGroup(cg);

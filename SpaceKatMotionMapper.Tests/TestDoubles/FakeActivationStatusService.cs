@@ -32,4 +32,10 @@ public class FakeActivationStatusService : IActivationStatusService
     {
         // 测试中不需要实际保存
     }
+
+    /// <inheritdoc />
+    public void WaitForActivationStatusLoaded()
+    {
+        // Fake 实现无需等待
+    }
 }

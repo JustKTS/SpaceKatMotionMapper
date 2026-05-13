@@ -29,6 +29,8 @@ namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class KeyActionConfigViewModel : ViewModelBase
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<KeyActionConfigViewModel>();
+
 # if DEBUG
     public KeyActionConfigViewModel() : this(null!)
     {
@@ -74,18 +76,8 @@ public partial class KeyActionConfigViewModel : ViewModelBase
         _keyActionAvailabilityValidator = keyActionAvailabilityValidator ?? _strategyProfile.AvailabilityValidator;
         _semanticValidators = semanticValidators?.ToArray() ?? _strategyProfile.SemanticValidators;
 
-        // 尝试从服务定位器获取服务，如果失败（测试环境）则使用传入的服务或 null
-        try
-        {
-            _metaKeyPresetService = metaKeyPresetService ?? App.GetRequiredService<MetaKeyPresetService>();
-            _popUpNotificationService = popUpNotificationService ?? App.GetRequiredService<PopUpNotificationService>();
-        }
-        catch (NullReferenceException)
-        {
-            // 在测试环境中，App.Current 可能为 null，这是可以接受的
-            _metaKeyPresetService = metaKeyPresetService;
-            _popUpNotificationService = popUpNotificationService;
-        }
+        _metaKeyPresetService = metaKeyPresetService;
+        _popUpNotificationService = popUpNotificationService;
 
         CurrentConfigModeNums = Parent.Parent.Parent.Parent.KatMotionsModeNums;
         ActionConfigGroups = [];
@@ -228,7 +220,7 @@ public partial class KeyActionConfigViewModel : ViewModelBase
         }
         catch (Exception e)
         {
-            Log.Error(e, "[{ViewModel}] Failed to load key action config", nameof(KeyActionConfigViewModel));
+            Log.Error(e, "Failed to load key action config");
             return false;
         }
     }
@@ -295,13 +287,13 @@ public partial class KeyActionConfigViewModel : ViewModelBase
     {
         await OverlayDialog
             .ShowCustomAsync<MetaKeyPresetSelectorView, MetaKeyPresetSelectorViewModel, object?>(
-                new MetaKeyPresetSelectorViewModel(this, new RelayCommand<KeyActionsForPresetRecord>(
-                        param =>
-                        {
-                            if (param is null) return;
-                            AddCustomActions(param.Description, param.Actions);
-                        }),
-                    new RelayCommand<KeyValuePair<string, CombinationKeysRecord>>(param =>
+            new MetaKeyPresetSelectorViewModel(this, new RelayCommand<KeyActionsForPresetRecord>(
+                    param =>
+                    {
+                        if (param is null) return;
+                        AddCustomActions(param.Description, param.Actions);
+                    }),
+                new RelayCommand<KeyValuePair<string, CombinationKeysRecord>>(param =>
                     {
                         AddHotKeyActions(param.Value.UseCtrl, param.Value.UseWin, param.Value.UseAlt,
                             param.Value.UseShift, param.Value.Key, param.Key);

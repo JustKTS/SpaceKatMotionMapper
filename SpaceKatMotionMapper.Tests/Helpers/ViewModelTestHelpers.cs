@@ -4,7 +4,6 @@ using SpaceKatMotionMapper.Defines;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.ViewModels;
-using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Functions.Contract;
 using SpaceKatMotionMapper.Tests.TestDoubles;
 using SpaceKat.Shared.Services.Contract;
@@ -22,7 +21,9 @@ public static class ViewModelTestHelpers
         IKatMotionActivateService? activateService = null,
         IStorageProviderService? storageProviderService = null,
         RunningProgramSelectorViewModel? runningProgramSelectorVM = null,
-        TimeAndDeadZoneVMService? timeAndDeadZoneVmService = null,
+        IModeChangeService? modeChangeService = null,
+        IKatMotionTimeConfigService? timeConfigService = null,
+        Lazy<ITimeAndDeadZoneVMService>? timeAndDeadZoneVmService = null,
         IKatMotionSemanticProfile? semanticProfile = null,
         OtherConfigsViewModel? parent = null)
     {
@@ -32,6 +33,8 @@ public static class ViewModelTestHelpers
             notificationService ?? Mock.Of<IPopUpNotificationService>(),
             storageProviderService ?? Mock.Of<IStorageProviderService>(),
             runningProgramSelectorVM ?? new FakeRunningProgramSelectorViewModel(),
+            modeChangeService ?? Mock.Of<IModeChangeService>(),
+            timeConfigService ?? Mock.Of<IKatMotionTimeConfigService>(),
             timeAndDeadZoneVmService, // 默认为 null，避免循环依赖
             katMotionSemanticProfile: semanticProfile
         )
@@ -45,8 +48,10 @@ public static class ViewModelTestHelpers
         KatConfigModeEnum mode = KatConfigModeEnum.SingleAction)
     {
         var configVm = CreateConfigViewModel();
-        var modeVm = new KatMotionsWithModeViewModel(configVm, 0);
-        var groupVm = new KatMotionGroupViewModel(modeVm, motion);
+        var modeVm = new KatMotionsWithModeViewModel(configVm, 0,
+            Mock.Of<IModeChangeService>(), Mock.Of<IKatMotionTimeConfigService>());
+        var groupVm = new KatMotionGroupViewModel(modeVm, motion,
+            Mock.Of<IModeChangeService>(), Mock.Of<IKatMotionTimeConfigService>());
         var motionVm = new KatMotionViewModel(groupVm, 0)
         {
             KatMotion = motion,
@@ -75,7 +80,9 @@ public static class ViewModelTestHelpers
         IActivationStatusService? activationStatusService = null,
         IKatMotionConfigVMManageService? vmManageService = null,
         IKatMotionActivateService? activateService = null,
-        RunningProgramSelectorViewModel? runningProgramSelectorViewModel = null)
+        RunningProgramSelectorViewModel? runningProgramSelectorViewModel = null,
+        IModeChangeService? modeChangeService = null,
+        IKatMotionTimeConfigService? timeConfigService = null)
     {
         return new OtherConfigsViewModel(
             fileService ?? Mock.Of<IKatMotionFileService>(),
@@ -84,7 +91,9 @@ public static class ViewModelTestHelpers
             activationStatusService ?? new FakeActivationStatusService(),
             vmManageService ?? new FakeKatMotionConfigVMManageService(),
             activateService ?? Mock.Of<IKatMotionActivateService>(),
-            runningProgramSelectorViewModel ?? new FakeRunningProgramSelectorViewModel()
+            runningProgramSelectorViewModel ?? new FakeRunningProgramSelectorViewModel(),
+            modeChangeService ?? Mock.Of<IModeChangeService>(),
+            timeConfigService ?? Mock.Of<IKatMotionTimeConfigService>()
         );
     }
 }

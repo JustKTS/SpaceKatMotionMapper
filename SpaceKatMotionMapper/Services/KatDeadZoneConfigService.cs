@@ -8,8 +8,8 @@ namespace SpaceKatMotionMapper.Services;
 
 public class KatDeadZoneConfigService(
     IKatMotionFileService katMotionFileService,
-    KatMotionRecognizeService katMotionRecognizeService,
-    IKatMotionConfigVMManageService katMotionConfigVmManageService)
+    IKatMotionRecognizeService katMotionRecognizeService,
+    IKatMotionConfigVMManageService katMotionConfigVmManageService) : IKatDeadZoneConfigService
 {
     public KatDeadZoneConfig LoadDefaultDeadZoneConfigs()
     {

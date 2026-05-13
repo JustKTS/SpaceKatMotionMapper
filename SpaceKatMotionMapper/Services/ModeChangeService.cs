@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using Avalonia.Threading;
 using Serilog;
 using SpaceKatMotionMapper.Models;
+using SpaceKatMotionMapper.Services.Contract;
 using PlatformAbstractions;
 
 namespace SpaceKatMotionMapper.Services;
 
-public class ModeChangeService
+public class ModeChangeService : IModeChangeService
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<ModeChangeService>();
+
     public int CurrentMode { get; set; }
     public bool ConfigIsDefault { get; private set; } = true;
 
@@ -16,16 +19,16 @@ public class ModeChangeService
     public bool IsPlatformSupported => _currentForeProgramHelper.IsSupported;
 
     private readonly IPlatformForegroundProgramService _currentForeProgramHelper;
-    private readonly KatMotionTimeConfigService _katMotionTimeConfigService;
-    private readonly KatDeadZoneConfigService _katDeadZoneConfigService;
-    private readonly KatMotionConfigVMManageService _katMotionConfigVmManageService;
+    private readonly IKatMotionTimeConfigService _katMotionTimeConfigService;
+    private readonly IKatDeadZoneConfigService _katDeadZoneConfigService;
+    private readonly IKatMotionConfigVMManageService _katMotionConfigVmManageService;
     public ForeProgramInfo? CurrentForeProgramInfo { get; private set; }
     private Dictionary<string, Guid> BindProcessPathList { get; } = [];
 
     public ModeChangeService(IPlatformForegroundProgramService currentForeProgramHelper,
-        KatMotionTimeConfigService katMotionTimeConfigService,
-        KatDeadZoneConfigService katDeadZoneConfigService,
-        KatMotionConfigVMManageService katMotionConfigVmManageService
+        IKatMotionTimeConfigService katMotionTimeConfigService,
+        IKatDeadZoneConfigService katDeadZoneConfigService,
+        IKatMotionConfigVMManageService katMotionConfigVmManageService
     )
     {
         _katMotionConfigVmManageService = katMotionConfigVmManageService;
@@ -36,12 +39,11 @@ public class ModeChangeService
         // 添加平台支持日志
         if (_currentForeProgramHelper.IsSupported)
         {
-            Log.Information("[{Service}] Platform supports foreground program monitoring", nameof(ModeChangeService));
+            Log.Information("Platform supports foreground program monitoring");
         }
         else
         {
-            Log.Warning("[{Service}] Platform does NOT support foreground program monitoring", nameof(ModeChangeService));
-            Log.Warning("[{Service}] Window mode switching will be disabled", nameof(ModeChangeService));
+            Log.Warning("Platform does NOT support foreground program monitoring. Window mode switching will be disabled");
         }
 
         _currentForeProgramHelper.ForeProgramChanged += ForeProgramChangeHandler;

@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using CSharpFunctionalExtensions;
 using Serilog;
 using SpaceKat.Shared.Models;
-using SpaceKat.Shared.Services;
+using SpaceKat.Shared.Services.Contract;
+using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.Services;
 
-public class MetaKeyPresetService
+public class MetaKeyPresetService : IMetaKeyPresetService
 {
-    private readonly MetaKeyPresetFileService _metaKeyPresetFileService;
+    private readonly IMetaKeyPresetFileService _metaKeyPresetFileService;
     private readonly ILogger _logger;
     public Dictionary<string, ProgramSpecMetaKeysRecord> Configs { get; private set; } = [];
-    
-    public MetaKeyPresetService(MetaKeyPresetFileService metaKeyPresetFileService, ILogger logger)
+
+    public MetaKeyPresetService(IMetaKeyPresetFileService metaKeyPresetFileService, ILogger logger)
     {
         _metaKeyPresetFileService = metaKeyPresetFileService;
         _logger = logger;

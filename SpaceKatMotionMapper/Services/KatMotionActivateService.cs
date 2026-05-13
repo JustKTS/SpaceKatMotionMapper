@@ -1,51 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SpaceKat.Shared.Services;
+using SpaceKat.Shared.Helpers;
 using SpaceKat.Shared.Services.Contract;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatHIDWrapper.Services;
-using SpaceKat.Shared.Helpers;
 using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Models;
 using SpaceKatMotionMapper.Services.Contract;
-using SpaceKatMotionMapper.States;
-using Log = Serilog.Log;
+using Serilog;
 
 namespace SpaceKatMotionMapper.Services;
 
 public class KatMotionActivateService : IKatMotionActivateService
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<KatMotionActivateService>();
+
     public bool IsActivated { get; set; }
 
     private event EventHandler<KatDataWithInfo>? KatDataReceived;
 
     private readonly Dictionary<Guid, EventHandler<KatDataWithInfo>> _katData = [];
 
-    private readonly ModeChangeService _modeChangeService =
-        App.GetRequiredService<ModeChangeService>();
-
-    private readonly ConflictKatMotionService _conflictKatMotionService =
-        App.GetRequiredService<ConflictKatMotionService>();
-
-    private readonly ActivationStatusService _activationStatusService =
-        App.GetRequiredService<ActivationStatusService>();
-
-    private readonly TransparentInfoActionDisplayService _transparentInfoActionDisplayService
-        = App.GetRequiredService<TransparentInfoActionDisplayService>();
-    
-    private readonly IKeyActionExecutor _keyActionExecutor
-        = App.GetRequiredService<IKeyActionExecutor>();
-
-    private readonly KatMotionRecognizeService _katMotionRecognizeService;
-
-    private GlobalStates GlobalStates => App.GetRequiredService<GlobalStates>();
+    private readonly IModeChangeService _modeChangeService;
+    private readonly IConflictKatMotionService _conflictKatMotionService;
+    private readonly IActivationStatusService _activationStatusService;
+    private readonly ITransparentInfoActionDisplayService _transparentInfoActionDisplayService;
+    private readonly IKeyActionExecutor _keyActionExecutor;
+    private readonly IKatMotionRecognizeService _katMotionRecognizeService;
+    private readonly IGlobalStates _globalStates;
+    private readonly ITransparentInfoService _transparentInfoService;
 
     private KatMotionWithTimeStamp _lastKatMotionWithTimeStamp = new(KatMotionEnum.Null, KatPressModeEnum.Null, 0);
 
-    public KatMotionActivateService(KatMotionRecognizeService katMotionRecognizeService)
+    public KatMotionActivateService(
+        IKatMotionRecognizeService katMotionRecognizeService,
+        IModeChangeService modeChangeService,
+        IConflictKatMotionService conflictKatMotionService,
+        IActivationStatusService activationStatusService,
+        ITransparentInfoActionDisplayService transparentInfoActionDisplayService,
+        IKeyActionExecutor keyActionExecutor,
+        IGlobalStates globalStates,
+        ITransparentInfoService transparentInfoService)
     {
         _katMotionRecognizeService = katMotionRecognizeService;
+        _modeChangeService = modeChangeService;
+        _conflictKatMotionService = conflictKatMotionService;
+        _activationStatusService = activationStatusService;
+        _transparentInfoActionDisplayService = transparentInfoActionDisplayService;
+        _keyActionExecutor = keyActionExecutor;
+        _globalStates = globalStates;
+        _transparentInfoService = transparentInfoService;
+
         _katMotionRecognizeService.DataReceived += (o, data) =>
         {
             if (!IsActivated) return;
@@ -53,7 +59,7 @@ public class KatMotionActivateService : IKatMotionActivateService
             if (!(data.Motion == _lastKatMotionWithTimeStamp.Motion &&
                   data.KatPressMode == _lastKatMotionWithTimeStamp.KatPressMode))
             {
-                App.GetRequiredService<TransparentInfoService>().SetActionInfoMotion(false);
+                _transparentInfoService.SetActionInfoMotion(false);
             }
 
             KatDataReceived?.Invoke(o,
@@ -63,7 +69,7 @@ public class KatMotionActivateService : IKatMotionActivateService
 
             _lastKatMotionWithTimeStamp = data;
         };
-        GlobalStates.IsMapperEnableChanged += ChangeIsActivated;
+        _globalStates.IsMapperEnableChanged += ChangeIsActivated;
     }
 
     private void ChangeIsActivated(object? sender, bool e)
@@ -74,30 +80,30 @@ public class KatMotionActivateService : IKatMotionActivateService
 
     public void ActivateKatMotions(KatMotionConfigGroup configGroup)
     {
-        Log.Information("[激活服务] 开始激活配置. 配置组 Guid: {ConfigGuid}, 是否默认配置: {IsDefault}, 进程路径: {ProcessPath}",
+        Log.Debug("开始激活配置. 配置组 Guid: {ConfigGuid}, 是否默认配置: {IsDefault}, 进程路径: {ProcessPath}",
             configGroup.Guid, configGroup.IsDefault, configGroup.ProcessPath);
 
         var id = Guid.Parse(configGroup.Guid);
-        Log.Debug("[激活服务] 解析 Guid: {ParsedId}", id);
+        Log.Debug("解析 Guid: {ParsedId}", id);
 
         // 如果配置已经激活，先停用旧的配置（防止重复键错误）
         if (_katData.ContainsKey(id))
         {
-            Log.Warning("[激活服务] 配置已存在，先停用旧配置. Guid: {Guid}", id);
+            Log.Warning("配置已存在，先停用旧配置. Guid: {Guid}", id);
             DeactivateKatMotions(configGroup);
         }
 
-        Log.Debug("[激活服务] 开始组装事件处理器. 配置数量: {ConfigCount}", configGroup.Motions.Count);
+        Log.Debug("开始组装事件处理器. 配置数量: {ConfigCount}", configGroup.Motions.Count);
         var handler = AssembleKatEvent(configGroup);
 
         _katData.Add(id, handler);
         KatDataReceived += handler;
 
-        Log.Information("[激活服务] 事件处理器已注册，添加到 _katData 字典. Guid: {Guid}", id);
+        Log.Debug("事件处理器已注册，添加到 _katData 字典. Guid: {Guid}", id);
         _modeChangeService.UpdateBindProcessPathList(configGroup);
         _activationStatusService.SetActivationStatus(id, true);
 
-        Log.Information("[激活服务] 配置激活完成. Guid: {Guid}", id);
+        Log.Debug("配置激活完成. Guid: {Guid}", id);
     }
 
     public void DeactivateKatMotions(KatMotionConfigGroup configGroup)
@@ -156,7 +162,7 @@ public class KatMotionActivateService : IKatMotionActivateService
                         config.Motion.KatPressMode,
                         config.Motion.RepeatCount)) return;
                     
-                App.GetRequiredService<TransparentInfoService>()
+                _transparentInfoService
                     .SetActionInfoMotion(true, _transparentInfoActionDisplayService.GetDisplay(motionId, displayId));
 
                 _keyActionExecutor.ExecuteActions(config.ActionConfigs);

@@ -1,7 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
@@ -17,9 +16,7 @@ using SpaceKat.Shared.States;
 using SpaceKatHIDWrapper.DeviceHIDSpecs;
 using SpaceKatHIDWrapper.DeviceWrappers;
 using SpaceKatMotionMapper.Models;
-using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Contract;
-using SpaceKatMotionMapper.States;
 using SpaceKatMotionMapper.Views;
 using Ursa.Controls;
 
@@ -27,37 +24,54 @@ namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class SettingsViewModel : ObservableObject
 {
-    private static readonly object _startupLogLock = new();
-    private static void StartupLog(string msg)
+    private readonly IGlobalStates _globalStates;
+    private readonly ITransparentInfoService _transparentInfoService;
+    private readonly IPopUpNotificationService _popUpNotificationService;
+    private readonly IFileExplorerService _fileExplorerService;
+    private readonly IDeviceDataWrapper _deviceDataWrapper;
+    private readonly TransparentInfoViewModel _transparentInfoViewModel;
+    private readonly IOfficialMapperHotKeyService _officialMapperHotKeyService;
+    private readonly ILocalSettingsService _localSettingsService;
+    private readonly AutoDisableViewModel _autoDisableViewModel;
+    private readonly MainWindow _mainWindow;
+    private readonly PresetsEditorMainWindow _presetsEditorMainWindow;
+    private readonly FavPresetsEditorViewModel _favPresetsEditorViewModel;
+
+    public SettingsViewModel(
+        IGlobalStates globalStates,
+        ITransparentInfoService transparentInfoService,
+        IPopUpNotificationService popUpNotificationService,
+        IFileExplorerService fileExplorerService,
+        IDeviceDataWrapper deviceDataWrapper,
+        TransparentInfoViewModel transparentInfoViewModel,
+        IOfficialMapperHotKeyService officialMapperHotKeyService,
+        ILocalSettingsService localSettingsService,
+        AutoDisableViewModel autoDisableViewModel,
+        MainWindow mainWindow,
+        PresetsEditorMainWindow presetsEditorMainWindow,
+        FavPresetsEditorViewModel favPresetsEditorViewModel)
     {
-        var line = $"{DateTime.Now:HH:mm:ss.fff} [THREAD:{Environment.CurrentManagedThreadId}] {msg}\n";
-        lock (_startupLogLock)
-        {
-            using var fs = new FileStream(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "startup_debug.log"), FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
-            fs.Write(System.Text.Encoding.UTF8.GetBytes(line));
-            fs.Flush(false);
-        }
-    }
+        _globalStates = globalStates;
+        _transparentInfoService = transparentInfoService;
+        _popUpNotificationService = popUpNotificationService;
+        _fileExplorerService = fileExplorerService;
+        _deviceDataWrapper = deviceDataWrapper;
+        _transparentInfoViewModel = transparentInfoViewModel;
+        _officialMapperHotKeyService = officialMapperHotKeyService;
+        _localSettingsService = localSettingsService;
+        _autoDisableViewModel = autoDisableViewModel;
+        _mainWindow = mainWindow;
+        _presetsEditorMainWindow = presetsEditorMainWindow;
+        _favPresetsEditorViewModel = favPresetsEditorViewModel;
+        AutoDisableViewModel = autoDisableViewModel;
 
-    public GlobalStates GlobalStates => App.GetRequiredService<GlobalStates>();
-    private readonly TransparentInfoService _transparentInfoService = App.GetRequiredService<TransparentInfoService>();
-
-    private readonly PopUpNotificationService _popUpNotificationService =
-        App.GetRequiredService<PopUpNotificationService>();
-
-    private readonly IFileExplorerService _fileExplorerService = App.GetRequiredService<IFileExplorerService>();
-
-    private readonly IDeviceDataWrapper _deviceDataWrapper = App.GetRequiredService<IDeviceDataWrapper>();
-
-    public SettingsViewModel()
-    {
         DisappearTimeMs = _transparentInfoViewModel.DisappearTimeMs;
         AnimationTimeMs = _transparentInfoViewModel.AnimationTimeMs;
     }
+
+    public IGlobalStates GlobalStates => _globalStates;
     
     # region 透明通知窗设置
-    private readonly TransparentInfoViewModel _transparentInfoViewModel =
-        App.GetRequiredService<TransparentInfoViewModel>();
 
     [ObservableProperty] private int _disappearTimeMs;
     [ObservableProperty] private int _animationTimeMs;
@@ -65,11 +79,9 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private async Task SetTransparentInfoWindowTimes()
     {
-        // TODO: 此处时间设置冗余，window打开时会重新读取LocalConfig
-        var infoService = App.GetRequiredService<TransparentInfoService>();
         _transparentInfoViewModel.DisappearTimeMs = DisappearTimeMs;
         _transparentInfoViewModel.AnimationTimeMs = AnimationTimeMs;
-        await infoService.UpdateTimeConfigs(DisappearTimeMs, AnimationTimeMs);
+        await _transparentInfoService.UpdateTimeConfigs(DisappearTimeMs, AnimationTimeMs);
     }
     
     [RelayCommand]
@@ -97,11 +109,6 @@ public partial class SettingsViewModel : ObservableObject
     # endregion
 
     #region 禁用官方映射
-
-    private readonly IOfficialMapperHotKeyService _officialMapperHotKeyService =
-        App.GetRequiredService<IOfficialMapperHotKeyService>();
-    
-    private readonly ILocalSettingsService _localSettingsService = App.GetRequiredService<ILocalSettingsService>();
 
 
     [ObservableProperty] private bool _useCtrl = true;
@@ -153,13 +160,15 @@ public partial class SettingsViewModel : ObservableObject
                 {
                     _popUpNotificationService.Pop(NotificationType.Warning, "注册热键失败");
                 }
-
-                _popUpNotificationService.Pop(NotificationType.Success, "注册热键成功");
-                SaveHotKey();
+                else
+                {
+                    _popUpNotificationService.Pop(NotificationType.Success, "注册热键成功");
+                    SaveHotKey();
+                }
             }
             else
             {
-                _popUpNotificationService.Pop(NotificationType.Warning, "注册热键失败");
+                _popUpNotificationService.Pop(NotificationType.Warning, $"注册热键失败：{ret.Error.Message}");
             }
         }
         else
@@ -172,7 +181,7 @@ public partial class SettingsViewModel : ObservableObject
 
     # region 自动禁用官方映射
 
-    public static AutoDisableViewModel AutoDisableViewModel => App.GetRequiredService<AutoDisableViewModel>();
+    public AutoDisableViewModel AutoDisableViewModel { get; }
 
     # endregion
 
@@ -207,7 +216,7 @@ public partial class SettingsViewModel : ObservableObject
         catch (Exception ex)
         {
             var dialog = new ConfigReplaceDialog(ex.Message);
-            dialog.ShowDialog(App.GetRequiredService<MainWindow>());
+            dialog.ShowDialog(_mainWindow);
 
             if (dialog.ShouldReplace)
             {
@@ -250,25 +259,20 @@ public partial class SettingsViewModel : ObservableObject
 
     private void LoadThreeDConnexionSetting()
     {
-        StartupLog("LoadThreeDConnexionSetting: START (async fire-and-forget)");
         Task.Run(async () =>
         {
             try
             {
                 var enabled = await _localSettingsService.ReadSettingAsync<bool>(nameof(IsThreeDConnexionEnabled));
-                StartupLog($"LoadThreeDConnexionSetting: ReadSettingAsync returned {enabled}");
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     IsThreeDConnexionEnabled = enabled;
-                    StartupLog("LoadThreeDConnexionSetting: UI updated, DONE");
                 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                StartupLog($"LoadThreeDConnexionSetting: EXCEPTION {ex.Message}");
             }
         });
-        StartupLog("LoadThreeDConnexionSetting: Task.Run dispatched, returning");
     }
 
     # endregion
@@ -277,13 +281,9 @@ public partial class SettingsViewModel : ObservableObject
 
     public void LoadInStart()
     {
-        StartupLog("LoadInStart: START");
         LoadHotKey();
-        StartupLog("LoadInStart: AFTER LoadHotKey, BEFORE LoadInfos");
         AutoDisableViewModel.LoadInfos();
-        StartupLog("LoadInStart: AFTER LoadInfos, BEFORE LoadThreeDConnexionSetting");
         LoadThreeDConnexionSetting();
-        StartupLog("LoadInStart: AFTER LoadThreeDConnexionSetting, DONE");
     }
 
     #endregion
@@ -291,10 +291,9 @@ public partial class SettingsViewModel : ObservableObject
     #region 各应用预设快捷键配置工具
     
     [RelayCommand]
-    private static void OpenProgramSpecificConfigCreator()
+    private void OpenProgramSpecificConfigCreator()
     {
-        var mainWindow = App.GetRequiredService<PresetsEditorMainWindow>();
-        mainWindow.Show();
+        _presetsEditorMainWindow.Show();
     }   
     
     [RelayCommand]
@@ -315,10 +314,10 @@ public partial class SettingsViewModel : ObservableObject
     };
     
     [RelayCommand]
-    private static async Task OpenFavPresetsEditor()
+    private async Task OpenFavPresetsEditor()
     {
         await Dialog.ShowCustomAsync<FavPresetsEditorView, FavPresetsEditorViewModel, object>(
-            App.GetRequiredService<FavPresetsEditorViewModel>(), App.GetRequiredService<MainWindow>(), FavEditorDialogOptions
+            _favPresetsEditorViewModel, _mainWindow, FavEditorDialogOptions
             );
     }
     

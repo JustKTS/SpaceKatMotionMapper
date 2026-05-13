@@ -9,8 +9,6 @@ using CommunityToolkit.Mvvm.Input;
 using Irihi.Avalonia.Shared.Contracts;
 using CSharpFunctionalExtensions;
 using SpaceKat.Shared.Helpers;
-using Microsoft.Extensions.DependencyInjection;
-using MetaKeyPresetsEditor.Helpers;
 using Serilog;
 using SpaceKat.Shared.Models;
 using SpaceKat.Shared.Services.Contract;
@@ -24,9 +22,12 @@ public partial class FavPresetsEditorViewModel : ViewModelBase, IDialogContext
 {
     private readonly ILogger _logger;
 
-    public FavPresetsEditorViewModel()
+    public FavPresetsEditorViewModel(
+        ILogger logger,
+        IMetaKeyPresetFileService metaKeyPresetFileService)
     {
-        _logger = App.GetRequiredService<ILogger>();
+        _logger = logger;
+        _metaKeyPresetFileService = metaKeyPresetFileService;
         LoadFromRecord();
     }
 
@@ -135,8 +136,7 @@ public partial class FavPresetsEditorViewModel : ViewModelBase, IDialogContext
 
     # region 数据存取
 
-    private readonly IMetaKeyPresetFileService _metaKeyPresetFileService =
-        DIHelper.GetServiceProvider().GetRequiredService<IMetaKeyPresetFileService>();
+    private readonly IMetaKeyPresetFileService _metaKeyPresetFileService;
 
     [RelayCommand]
     private async Task SaveToConfigDir()

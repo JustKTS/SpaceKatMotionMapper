@@ -6,45 +6,59 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
 using SpaceKat.Shared.Helpers;
-using SpaceKat.Shared.Services;
+using SpaceKat.Shared.Services.Contract;
 using SpaceKat.Shared.ViewModels;
 using SpaceKat.Shared.Views;
-using SpaceKatMotionMapper.States;
 using Ursa.Controls;
 using PlatformAbstractions;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
-public partial class AutoDisableViewModel(AutoDisableService autoDisableService) : ViewModelBase
+public partial class AutoDisableViewModel : ViewModelBase
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<AutoDisableViewModel>();
+
+    private readonly IAutoDisableService _autoDisableService;
+    private readonly IGlobalStates _globalStates;
+    private readonly RunningProgramSelectorViewModel _runningProgramSelectorVM;
+
+    public AutoDisableViewModel(
+        IAutoDisableService autoDisableService,
+        IGlobalStates globalStates,
+        RunningProgramSelectorViewModel runningProgramSelectorVM)
+    {
+        _autoDisableService = autoDisableService;
+        _globalStates = globalStates;
+        _runningProgramSelectorVM = runningProgramSelectorVM;
+    }
+
     [ObservableProperty] private bool _isEnable;
     [ObservableProperty] private bool _isPlatformSupported;
 
     partial void OnIsEnableChanged(bool value)
     {
-        // 双重检查：如果平台不支持，坚决阻止启用
         if (value && !IsPlatformSupported)
         {
-            Log.Warning("[{ViewModel}] Cannot enable: platform not supported, forcing to false", nameof(AutoDisableViewModel));
+            Log.Warning("Cannot enable: platform not supported, forcing to false");
             IsEnable = false;
             return;
         }
 
         if (value)
         {
-            autoDisableService.IsCurrentFpInList += CurrentFpInListHandler;
+            _autoDisableService.IsCurrentFpInList += CurrentFpInListHandler;
         }
         else
         {
-            autoDisableService.IsCurrentFpInList -= CurrentFpInListHandler;
+            _autoDisableService.IsCurrentFpInList -= CurrentFpInListHandler;
         }
 
-        autoDisableService.IsEnable = value;
+        _autoDisableService.IsEnable = value;
     }
 
     private void CurrentFpInListHandler(object? sender, bool e)
     {
-        Dispatcher.UIThread.Invoke(() => { App.GetRequiredService<GlobalStates>().IsMapperEnable = e; });
+        Dispatcher.UIThread.Invoke(() => { _globalStates.IsMapperEnable = e; });
     }
 
     public ObservableCollection<AutoDisableProgramViewModel> AutoDisableInfos { get; } = [];
@@ -54,54 +68,61 @@ public partial class AutoDisableViewModel(AutoDisableService autoDisableService)
     private async Task OpenRunningProgramSelector()
     {
         var ret = await Dialog.ShowCustomAsync<RunningProgramSelector, RunningProgramSelectorViewModel, object?>(
-            App.GetRequiredService<RunningProgramSelectorViewModel>(), null, RunningProgramSelectorViewModel.DialogOptions);
+            _runningProgramSelectorVM, null, RunningProgramSelectorViewModel.DialogOptions);
         if (ret is not ForeProgramInfo info) return;
         Add(info);
     }
 
     private void Add(ForeProgramInfo info)
     {
-        if (autoDisableService.IsPathContained(info.ProcessFileAddress)) return;
-        AutoDisableInfos.Add(new AutoDisableProgramViewModel(this, info.ProcessFileAddress, info.ProcessName));
-        App.GetRequiredService<AutoDisableService>().AddProgramPath(info.ProcessFileAddress, info.ProcessName);
+        if (_autoDisableService.IsPathContained(info.ProcessFileAddress)) return;
+        AutoDisableInfos.Add(new AutoDisableProgramViewModel(this, info.ProcessFileAddress, info.ProcessName, _autoDisableService));
+        _autoDisableService.AddProgramPath(info.ProcessFileAddress, info.ProcessName);
     }
 
     public void LoadInfos()
     {
-        autoDisableService.WaitForInitializedAsync().ContinueWith(t =>
+        _autoDisableService.WaitForInitializedAsync().ContinueWith(t =>
         {
             if (!t.Result) return;
 
-            // 加载平台支持状态
-            IsPlatformSupported = autoDisableService.IsPlatformSupported;
+            IsPlatformSupported = _autoDisableService.IsPlatformSupported;
 
             if (IsPlatformSupported)
             {
-                IsEnable = autoDisableService.IsEnable;
+                IsEnable = _autoDisableService.IsEnable;
             }
             else
             {
                 IsEnable = false;
             }
 
-            // 始终加载已保存的程序列表（即使平台不支持，也显示列表）
             AutoDisableInfos.Clear();
-            autoDisableService.GetAllProgramPaths()
-                .Iter(e => AutoDisableInfos.Add(new AutoDisableProgramViewModel(this, e, string.Empty)));
+            _autoDisableService.GetAllProgramPaths()
+                .Iter(e => AutoDisableInfos.Add(new AutoDisableProgramViewModel(this, e, string.Empty, _autoDisableService)));
         });
     }
 }
 
-public partial class AutoDisableProgramViewModel(AutoDisableViewModel parent, string programProgramPath, string processName) : ViewModelBase
+public partial class AutoDisableProgramViewModel : ViewModelBase
 {
-    public string ProgramPath { get; } = programProgramPath;
-    public string ProcessName { get; } = processName;
+    private readonly AutoDisableViewModel _parent;
+    private readonly IAutoDisableService _autoDisableService;
+    public string ProgramPath { get; }
+    public string ProcessName { get; }
+
+    public AutoDisableProgramViewModel(AutoDisableViewModel parent, string programProgramPath, string processName, IAutoDisableService autoDisableService)
+    {
+        _parent = parent;
+        _autoDisableService = autoDisableService;
+        ProgramPath = programProgramPath;
+        ProcessName = processName;
+    }
 
     public string Name
     {
         get
         {
-            // 优先从路径中提取名称
             if (!string.IsNullOrEmpty(ProgramPath))
             {
                 var fileName = Path.GetFileNameWithoutExtension(ProgramPath);
@@ -111,13 +132,11 @@ public partial class AutoDisableProgramViewModel(AutoDisableViewModel parent, st
                 }
             }
 
-            // 降级到进程名
             if (!string.IsNullOrEmpty(ProcessName))
             {
                 return ProcessName;
             }
 
-            // 最后的备选
             return "Unknown Program";
         }
     }
@@ -125,7 +144,7 @@ public partial class AutoDisableProgramViewModel(AutoDisableViewModel parent, st
     [RelayCommand]
     private void RemoveSelf()
     {
-        parent.AutoDisableInfos.Remove(this);
-        App.GetRequiredService<AutoDisableService>().RemoveProgramPath(ProgramPath);
+        _parent.AutoDisableInfos.Remove(this);
+        _autoDisableService.RemoveProgramPath(ProgramPath);
     }
 }

@@ -4,9 +4,9 @@ using Avalonia.Controls;
 using CSharpFunctionalExtensions;
 using SpaceKat.Shared.Functions;
 using SpaceKat.Shared.Models;
+using SpaceKat.Shared.Services.Contract;
 using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Services.Contract;
-using SpaceKatMotionMapper.States;
 using PlatformAbstractions;
 
 namespace SpaceKatMotionMapper.Services;
@@ -14,10 +14,14 @@ namespace SpaceKatMotionMapper.Services;
 public class OfficialMapperHotKeyService : IOfficialMapperHotKeyService
 {
     private readonly IPlatformHotKeyService _hotKeyService;
+    private static IGlobalStates? _globalStates;
 
-    public OfficialMapperHotKeyService(IPlatformHotKeyService hotKeyService)
+    public bool IsSupported => _hotKeyService.IsSupported;
+
+    public OfficialMapperHotKeyService(IPlatformHotKeyService hotKeyService, IGlobalStates globalStates)
     {
         _hotKeyService = hotKeyService;
+        _globalStates = globalStates;
     }
 
     # region 热键注册
@@ -83,8 +87,7 @@ public class OfficialMapperHotKeyService : IOfficialMapperHotKeyService
                 switch (wParam.ToInt32())
                 {
                     case HotKeyEventId:
-                        var globalStates = App.GetRequiredService<GlobalStates>();
-                        globalStates.IsMapperEnable = !globalStates.IsMapperEnable;
+                        _globalStates!.IsMapperEnable = !_globalStates.IsMapperEnable;
                         break;
                 }
 

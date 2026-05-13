@@ -29,4 +29,9 @@ public interface IActivationStatusService
     /// 保存激活状态到持久化存储
     /// </summary>
     void SaveActivationStatus();
+
+    /// <summary>
+    /// 等待激活状态加载完成
+    /// </summary>
+    void WaitForActivationStatusLoaded();
 }

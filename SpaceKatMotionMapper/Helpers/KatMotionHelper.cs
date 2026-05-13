@@ -68,10 +68,8 @@ public class KatMotionConverter : IValueConverter
         if (value is string keyName)
         {
             var result = KatMotionHelper.ParseKatMotionEnum(keyName);
-            Log.Information("[UI绑定] KatMotionConverter ConvertBack: '{KeyName}' -> {Result}", keyName, result);
             return result;
         }
-        Log.Information("[UI绑定] KatMotionConverter ConvertBack: 无效值 {Value}, 返回 Null", value);
         return KatMotionEnum.Null;
     }
 }
@@ -88,10 +86,8 @@ public class KatPressModeConverter : IValueConverter
         if (value is string keyName)
         {
             var result = KatMotionHelper.ParsePressModeEnum(keyName);
-            Log.Information("[UI绑定] KatPressModeConverter ConvertBack: '{KeyName}' -> {Result}", keyName, result);
             return result;
         }
-        Log.Information("[UI绑定] KatPressModeConverter ConvertBack: 无效值 {Value}, 返回 Null", value);
         return KatPressModeEnum.Null;
     }
 }

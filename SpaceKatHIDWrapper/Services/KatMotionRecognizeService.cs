@@ -5,7 +5,7 @@ using SpaceKatHIDWrapper.Models;
 
 namespace SpaceKatHIDWrapper.Services;
 
-public partial class KatMotionRecognizeService : ObservableObject
+public partial class KatMotionRecognizeService : ObservableObject, IKatMotionRecognizeService
 {
     private bool IsConnected => _deviceDataWrapper.IsConnected;
     public event EventHandler<Result<bool, Exception>>? ConnectionChanged;

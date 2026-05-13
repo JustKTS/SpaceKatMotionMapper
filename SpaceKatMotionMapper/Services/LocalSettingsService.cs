@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using SpaceKat.Shared.Services.Contract;
 using SpaceKatMotionMapper.Helpers;
 using SpaceKatMotionMapper.Models;
@@ -28,21 +27,20 @@ public class LocalSettingsService : ILocalSettingsService
 
     private bool _isInitialized;
     
-    public LocalSettingsService(IFileService fileService, IOptions<LocalSettingsOptions> options)
+    public LocalSettingsService(IFileService fileService, LocalSettingsOptions options)
     {
         _fileService = fileService;
-        var options1 = options.Value;
 
         _applicationDataFolder = Path.Combine(
             _localApplicationData,
-            options1.ApplicationDataFolder ?? nameof(SpaceKatMotionMapper)
+            options.ApplicationDataFolder ?? nameof(SpaceKatMotionMapper)
         );
         if (!Directory.Exists(_applicationDataFolder))
         {
             Directory.CreateDirectory(_applicationDataFolder);
         }
 
-        _localSettingsFile = options1.LocalSettingsFile ?? DefaultLocalSettingsFile;
+        _localSettingsFile = options.LocalSettingsFile ?? DefaultLocalSettingsFile;
 
         _settings = [];
     }
@@ -58,7 +56,7 @@ public class LocalSettingsService : ILocalSettingsService
                             _applicationDataFolder,
                             _localSettingsFile
                         )
-                ) ?? [];
+                ).ConfigureAwait(false) ?? [];
 
             _isInitialized = true;
         }
@@ -66,18 +64,18 @@ public class LocalSettingsService : ILocalSettingsService
 
     public async Task<T?> ReadSettingAsync<T>(string key)
     {
-        await InitializeAsync();
+        await InitializeAsync().ConfigureAwait(false);
 
         if (string.IsNullOrEmpty(key) || !_settings.TryGetValue(key, out var obj)) return default;
-        if (obj is not JsonElement value) return await JsonConvertHelper.ToObjectAsync<T>((string)obj);
+        if (obj is not JsonElement value) return await JsonConvertHelper.ToObjectAsync<T>((string)obj).ConfigureAwait(false);
         var ret = value.ToString();
         if (string.IsNullOrEmpty(ret)) return default;
-        return await JsonConvertHelper.ToObjectAsync<T>(ret);
+        return await JsonConvertHelper.ToObjectAsync<T>(ret).ConfigureAwait(false);
     }
 
     public async Task SaveSettingAsync<T>(string key, T value)
     {
-        await InitializeAsync();
+        await InitializeAsync().ConfigureAwait(false);
         try
         {
             _settings[key] = JsonSerializer.Serialize(value, JsonSgOption.GetTypeInfo<T>());

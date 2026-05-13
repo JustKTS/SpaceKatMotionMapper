@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -6,14 +7,14 @@ using SpaceKat.Shared.Models;
 using SpaceKat.Shared.Services.Contract;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatMotionMapper.Models;
-using SpaceKatMotionMapper.States;
+using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.ViewModels;
 using SpaceKatMotionMapper.Views;
 using Timer = System.Timers.Timer;
 
 namespace SpaceKatMotionMapper.Services;
 
-public class TransparentInfoService
+public class TransparentInfoService : ITransparentInfoService
 {
     private const string EnableStr = "IsTransparentInfoEnable";
     private const string ConfigStr = "TransparentInfoWindowConfig";
@@ -31,13 +32,20 @@ public class TransparentInfoService
     };
 
     private readonly ILocalSettingsService _localSettingsService;
-    private readonly GlobalStates _globalStates;
+    private readonly IGlobalStates _globalStates;
+    private readonly Func<TransparentInfoWindow> _windowFactory;
+    private readonly Func<TransparentInfoViewModel> _vmFactory;
 
     public TransparentInfoService(
-        ILocalSettingsService localSettingsService)
+        ILocalSettingsService localSettingsService,
+        IGlobalStates globalStates,
+        Func<TransparentInfoWindow> windowFactory,
+        Func<TransparentInfoViewModel> vmFactory)
     {
         _localSettingsService = localSettingsService;
-        _globalStates = App.GetRequiredService<GlobalStates>();
+        _globalStates = globalStates;
+        _windowFactory = windowFactory;
+        _vmFactory = vmFactory;
 
         _globalStates.IsTransparentInfoEnableChanged += (_, value) =>
         {
@@ -51,7 +59,7 @@ public class TransparentInfoService
         {
             Dispatcher.UIThread.InvokeAsync(async () =>
             {
-                _window ??= App.GetRequiredService<TransparentInfoWindow>();
+                _window ??= _windowFactory();
                 _window.SetOpacity(0);
                 await Task.Delay(AnimationTimeMs);
                 _window.Close();
@@ -70,7 +78,7 @@ public class TransparentInfoService
     {
         Dispatcher.UIThread.Invoke(() =>
         {
-            var vm = App.GetRequiredService<TransparentInfoViewModel>();
+            var vm = _vmFactory();
             vm.KatMotion = motion.ToKatMotion();
             vm.IsOtherInfo = false;
         });
@@ -83,7 +91,7 @@ public class TransparentInfoService
         actionInfo ??= [];
         Dispatcher.UIThread.Invoke(() =>
         {
-            var vm = App.GetRequiredService<TransparentInfoViewModel>();
+            var vm = _vmFactory();
             if (!isAction)
             {
                 vm.IsActionInfo = false;
@@ -98,7 +106,7 @@ public class TransparentInfoService
     {
         Dispatcher.UIThread.Invoke(() =>
         {
-            var vm = App.GetRequiredService<TransparentInfoViewModel>();
+            var vm = _vmFactory();
             vm.OtherInfo = info;
             vm.IsOtherInfo = true;
         });
@@ -109,7 +117,7 @@ public class TransparentInfoService
     {
         if (!_globalStates.IsTransparentInfoEnable) return;
 
-        var vm = App.GetRequiredService<TransparentInfoViewModel>();
+        var vm = _vmFactory();
         if (vm.IsAdjustMode) return;
 
         if (_isWindowShow)
@@ -120,7 +128,7 @@ public class TransparentInfoService
         {
             Dispatcher.UIThread.Invoke(() =>
             {
-                _window ??= App.GetRequiredService<TransparentInfoWindow>();
+                _window ??= _windowFactory();
 
                 _window.Show();
                 _window.SetOpacity(1);
@@ -135,9 +143,9 @@ public class TransparentInfoService
     {
         Dispatcher.UIThread.Invoke(() =>
         {
-            var vm = App.GetRequiredService<TransparentInfoViewModel>();
+            var vm = _vmFactory();
             vm.IsAdjustMode = true;
-            _window ??= App.GetRequiredService<TransparentInfoWindow>();
+            _window ??= _windowFactory();
             _window.ShowActivated = true;
             _window.IsManagedResizerVisible = true;
             _window.IsHitTestVisible = true;
@@ -150,8 +158,8 @@ public class TransparentInfoService
     {
         Dispatcher.UIThread.Invoke(async () =>
         {
-            _window ??= App.GetRequiredService<TransparentInfoWindow>();
-            var vm = App.GetRequiredService<TransparentInfoViewModel>();
+            _window ??= _windowFactory();
+            var vm = _vmFactory();
             _window.IsHitTestVisible = false;
             _window.IsManagedResizerVisible = false;
             _window.ShowActivated = false;
@@ -200,7 +208,7 @@ public class TransparentInfoService
         var config = await LoadConfigs();
         if (config is null)
         {
-            var window = App.GetRequiredService<TransparentInfoWindow>();
+            var window = _windowFactory();
             var screen = window.Screens.Primary;
             if (screen == null) return;
             var area = screen.WorkingArea;

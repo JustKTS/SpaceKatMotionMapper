@@ -4,10 +4,11 @@ using System.Linq;
 using SpaceKatHIDWrapper.Models;
 using SpaceKat.Shared.Helpers;
 using SpaceKatMotionMapper.Models;
+using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.Services;
 
-public class ConflictKatMotionService
+public class ConflictKatMotionService : IConflictKatMotionService
 {
     private List<KatMotionInfo> OverwriteKatMotions { get; } = [];
 

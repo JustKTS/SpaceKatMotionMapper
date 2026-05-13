@@ -11,5 +11,5 @@ public static class JsonConvertHelper
 #pragma warning disable CS8603 // 可能返回 null 引用。
             return JsonSerializer.Deserialize(value, JsonSgOption.GetTypeInfo<T>());
 #pragma warning restore CS8603 // 可能返回 null 引用。
-        });
+        }).ConfigureAwait(false);
 }

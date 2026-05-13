@@ -7,29 +7,31 @@ using CommunityToolkit.Mvvm.Input;
 using CSharpFunctionalExtensions;
 using Serilog;
 using SpaceKat.Shared.Functions;
+using SpaceKat.Shared.Services.Contract;
 using SpaceKatHIDWrapper.DeviceWrappers;
 using SpaceKatHIDWrapper.Services;
-using SpaceKatMotionMapper.Services;
-using SpaceKatMotionMapper.States;
+using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class ConnectAndEnableViewModel : ObservableObject
 {
-    private readonly TransparentInfoService _transparentInfoService;
-    private readonly PopUpNotificationService _popUpNotificationService;
-    private readonly KatMotionRecognizeService _katMotionRecognizeService;
-    private readonly IDeviceDataWrapper _deviceDataWrapper;
-    private readonly GlobalStates _globalStates;
+    private static readonly ILogger Log = Serilog.Log.ForContext<ConnectAndEnableViewModel>();
 
-    public GlobalStates GlobalStates => _globalStates;
+    private readonly ITransparentInfoService _transparentInfoService;
+    private readonly IPopUpNotificationService _popUpNotificationService;
+    private readonly IKatMotionRecognizeService _katMotionRecognizeService;
+    private readonly IDeviceDataWrapper _deviceDataWrapper;
+    private readonly IGlobalStates _globalStates;
+
+    public IGlobalStates GlobalStates => _globalStates;
 
     public ConnectAndEnableViewModel(
-        TransparentInfoService transparentInfoService,
-        PopUpNotificationService popUpNotificationService,
-        KatMotionRecognizeService katMotionRecognizeService,
+        ITransparentInfoService transparentInfoService,
+        IPopUpNotificationService popUpNotificationService,
+        IKatMotionRecognizeService katMotionRecognizeService,
         IDeviceDataWrapper deviceDataWrapper,
-        GlobalStates globalStates)
+        IGlobalStates globalStates)
     {
         _transparentInfoService = transparentInfoService;
         _popUpNotificationService = popUpNotificationService;
@@ -87,7 +89,7 @@ public partial class ConnectAndEnableViewModel : ObservableObject
                 }
                 catch (Exception e)
                 {
-                    Log.Error(e, "[{ViewModel}] Error in motion recognition task", nameof(ConnectAndEnableViewModel));
+                    Log.Error(e, "Error in motion recognition task");
                 }
             }, TaskCreationOptions.LongRunning);
             _listenTask.Start();
@@ -150,7 +152,7 @@ public partial class ConnectAndEnableViewModel : ObservableObject
             OfficialWareConfigFunctions.CloseOfficialMapper().ContinueWith(t =>
             {
                 if (t.IsFaulted)
-                    Log.Error(t.Exception, "[{ViewModel}] Failed to close official mapper", nameof(ConnectAndEnableViewModel));
+                    Log.Error(t.Exception, "Failed to close official mapper");
                 else
                     _transparentInfoService.DisplayOtherInfo("官方映射已禁用");
             });
@@ -160,7 +162,7 @@ public partial class ConnectAndEnableViewModel : ObservableObject
             OfficialWareConfigFunctions.OpenOfficialMapper().ContinueWith(t =>
             {
                 if (t.IsFaulted)
-                    Log.Error(t.Exception, "[{ViewModel}] Failed to open official mapper", nameof(ConnectAndEnableViewModel));
+                    Log.Error(t.Exception, "Failed to open official mapper");
                 else
                     _transparentInfoService.DisplayOtherInfo("官方映射已启用");
             });

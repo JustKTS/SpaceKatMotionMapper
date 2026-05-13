@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Text.Json.Serialization;
 using System.Threading;
 using Serilog;
@@ -9,17 +8,7 @@ namespace SpaceKat.Shared.Services;
 
 public class ActivationStatusService : IActivationStatusService, IDisposable
 {
-    private static readonly object _startupLogLock = new();
-    private static void StartupLog(string msg)
-    {
-        var line = $"{DateTime.Now:HH:mm:ss.fff} [THREAD:{Environment.CurrentManagedThreadId}] {msg}\n";
-        lock (_startupLogLock)
-        {
-            using var fs = new FileStream(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "startup_debug.log"), FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
-            fs.Write(System.Text.Encoding.UTF8.GetBytes(line));
-            fs.Flush(false);
-        }
-    }
+    private static readonly ILogger Log = Serilog.Log.ForContext<ActivationStatusService>();
 
     private Dictionary<Guid, bool> _activationStatus = [];
     private const string SaveToken = "ActivationStatus";
@@ -29,37 +18,25 @@ public class ActivationStatusService : IActivationStatusService, IDisposable
 
     public ActivationStatusService(ILocalSettingsService localSettingsService)
     {
-        StartupLog("ActivationStatusService.ctor: START");
         _localSettingsService = localSettingsService;
-        WaitForActivationStatusLoaded();
-        StartupLog("ActivationStatusService.ctor: END");
+        _ = LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            await LoadActivationStatusAsync().ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            _loadException = e;
+        }
     }
 
     public void WaitForActivationStatusLoaded()
     {
-        StartupLog("WaitForActivationStatusLoaded: BEFORE Task.Run");
-        Task.Run(async () =>
-        {
-            StartupLog("WaitForActivationStatusLoaded: Task.Run ENTERED");
-            try
-            {
-                await LoadActivationStatusAsync();
-                StartupLog("WaitForActivationStatusLoaded: LoadActivationStatusAsync completed successfully");
-            }
-            catch (Exception e)
-            {
-                _loadException = e;
-                _isLoadedEvent.Set();
-                StartupLog($"WaitForActivationStatusLoaded: Task.Run EXCEPTION: {e.Message}");
-            }
-        });
-        StartupLog("WaitForActivationStatusLoaded: BEFORE _isLoadedEvent.WaitOne()");
-        var signalled = _isLoadedEvent.WaitOne(TimeSpan.FromSeconds(5));
-        if (!signalled)
-            StartupLog("WaitForActivationStatusLoaded: _isLoadedEvent.WaitOne() TIMEOUT after 5s!");
-        else
-            StartupLog("WaitForActivationStatusLoaded: _isLoadedEvent.WaitOne() returned OK");
-        StartupLog("WaitForActivationStatusLoaded: AFTER _isLoadedEvent.WaitOne()");
+        _isLoadedEvent.WaitOne(TimeSpan.FromSeconds(5));
 
         if (_loadException is not null)
             throw _loadException;
@@ -69,15 +46,13 @@ public class ActivationStatusService : IActivationStatusService, IDisposable
     {
         try
         {
-            var ret = await _localSettingsService.ReadSettingAsync<Dictionary<Guid, bool>>(SaveToken);
+            var ret = await _localSettingsService.ReadSettingAsync<Dictionary<Guid, bool>>(SaveToken).ConfigureAwait(false);
             _activationStatus = ret ?? new Dictionary<Guid, bool>();
-            StartupLog("LoadActivationStatusAsync: BEFORE _isLoadedEvent.Set()");
             _isLoadedEvent.Set();
-            StartupLog("LoadActivationStatusAsync: AFTER _isLoadedEvent.Set()");
         }
         catch (Exception e)
         {
-            Log.Error(e, "[{Service}] Failed to load activation status", nameof(ActivationStatusService));
+            Log.Error(e, "Failed to load activation status");
             throw;
         }
     }
@@ -101,7 +76,7 @@ public class ActivationStatusService : IActivationStatusService, IDisposable
         }
         catch (Exception e)
         {
-            Log.Error(e, "[{Service}] Failed to check activation status for {ConfigGroupId}", nameof(ActivationStatusService), configGroupId);
+            Log.Error(e, "Failed to check activation status for {ConfigGroupId}", configGroupId);
             return false;
         }
     }

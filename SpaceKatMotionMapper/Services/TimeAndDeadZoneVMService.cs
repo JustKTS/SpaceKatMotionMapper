@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using SpaceKatMotionMapper.States;
+using SpaceKat.Shared.Services.Contract;
+using SpaceKatMotionMapper.Services.Contract;
 using SpaceKatMotionMapper.ViewModels;
 using SpaceKatMotionMapper.Views;
 using Ursa.Controls;
@@ -13,7 +14,7 @@ public class TimeAndDeadZoneVMService(
     MotionTimeConfigViewModel motionTimeConfigViewModel,
     DeadZoneConfigViewModel deadZoneConfigViewModel,
     TimeAndDeadZoneSettingViewModel timeAndDeadZoneSettingViewModel,
-    GlobalStates globalStates)
+    IGlobalStates globalStates) : ITimeAndDeadZoneVMService
 {
     public void UpdateByDefault()
     {

@@ -6,14 +6,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SpaceKatHIDWrapper.Models;
 using SpaceKatHIDWrapper.Services;
-using SpaceKatMotionMapper.Services;
+using SpaceKatMotionMapper.Services.Contract;
 
 namespace SpaceKatMotionMapper.ViewModels;
 
 public partial class DeadZoneConfigViewModel : ViewModelBase
 {
-    private readonly KatMotionRecognizeService _katMotionRecognizeService;
-    private readonly KatDeadZoneConfigService _katDeadZoneConfigService;
+    private readonly IKatMotionRecognizeService _katMotionRecognizeService;
+    private readonly IKatDeadZoneConfigService _katDeadZoneConfigService;
 
     [ObservableProperty] private bool _isDefault = true;
 
@@ -38,8 +38,8 @@ public partial class DeadZoneConfigViewModel : ViewModelBase
     }
 #endif
 
-    public DeadZoneConfigViewModel(KatMotionRecognizeService katMotionRecognizeService,
-        KatDeadZoneConfigService katDeadZoneConfigService)
+    public DeadZoneConfigViewModel(IKatMotionRecognizeService katMotionRecognizeService,
+        IKatDeadZoneConfigService katDeadZoneConfigService)
     {
         _katMotionRecognizeService = katMotionRecognizeService;
         _katDeadZoneConfigService = katDeadZoneConfigService;

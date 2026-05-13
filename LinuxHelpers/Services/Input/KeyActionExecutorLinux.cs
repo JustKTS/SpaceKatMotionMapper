@@ -1,3 +1,4 @@
+using Serilog;
 using SpaceKat.Shared.Models;
 using SpaceKat.Shared.Services.Contract;
 
@@ -5,10 +6,12 @@ namespace LinuxHelpers.Services.Input;
 
 public class KeyActionExecutorLinux : IKeyActionExecutor
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<KeyActionExecutorLinux>();
+
     public void MouseActionHandler(MouseActionConfig mouseActionConfig)
     {
-        // TODO: 处理失败的情况
-        var ret = KeyExecutorYDoTool.ExecuteMouseAction(mouseActionConfig);
+        if (!KeyExecutorYDoTool.ExecuteMouseAction(mouseActionConfig))
+            Log.Warning("鼠标模拟失败: {Action}", mouseActionConfig.Key);
     }
 
     public void KeyBoardActionHandler(KeyBoardActionConfig keyBoardActionConfig)

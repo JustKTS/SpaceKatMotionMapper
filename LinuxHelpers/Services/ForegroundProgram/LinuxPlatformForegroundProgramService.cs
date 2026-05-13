@@ -10,6 +10,8 @@ namespace LinuxHelpers.Services.ForegroundProgram;
 /// </summary>
 public class LinuxPlatformForegroundProgramService : IPlatformForegroundProgramService
 {
+    private static readonly ILogger Log = Serilog.Log.ForContext<LinuxPlatformForegroundProgramService>();
+
     private readonly IWindowManagerMonitorStrategy? _strategy;
     private bool _disposed;
 
@@ -27,19 +29,19 @@ public class LinuxPlatformForegroundProgramService : IPlatformForegroundProgramS
         {
             if (_strategy != null)
             {
-                Log.Debug("[{Service}] Subscribing to ForeProgramChanged event", nameof(LinuxPlatformForegroundProgramService));
+                Log.Debug("Subscribing to ForeProgramChanged event");
                 _strategy.ForeProgramChanged += value;
             }
             else
             {
-                Log.Warning("[{Service}] Cannot subscribe: no strategy available", nameof(LinuxPlatformForegroundProgramService));
+                Log.Warning("Cannot subscribe: no strategy available");
             }
         }
         remove
         {
             if (_strategy != null)
             {
-                Log.Debug("[{Service}] Unsubscribing from ForeProgramChanged event", nameof(LinuxPlatformForegroundProgramService));
+                Log.Debug("Unsubscribing from ForeProgramChanged event");
                 _strategy.ForeProgramChanged -= value;
             }
         }
@@ -52,8 +54,8 @@ public class LinuxPlatformForegroundProgramService : IPlatformForegroundProgramS
     public LinuxPlatformForegroundProgramService()
     {
         var windowManagerType = WindowManagerDetector.DetectWindowManager();
-        Log.Information("[{Service}] Detected window manager: {WindowManager}",
-            nameof(LinuxPlatformForegroundProgramService), windowManagerType);
+        Log.Information("Detected window manager: {WindowManager}",
+            windowManagerType);
 
         _strategy = WindowManagerStrategyFactory.CreateStrategy(windowManagerType);
 
@@ -61,20 +63,20 @@ public class LinuxPlatformForegroundProgramService : IPlatformForegroundProgramS
         {
             if (_strategy.IsSupported)
             {
-                Log.Information("[{Service}] Using strategy: {Strategy}",
-                    nameof(LinuxPlatformForegroundProgramService), _strategy.GetType().Name);
+                Log.Information("Using strategy: {Strategy}",
+                    _strategy.GetType().Name);
                 _strategy.StartMonitoring();
             }
             else
             {
-                Log.Warning("[{Service}] Detected {WindowManager} but not supported yet",
-                    nameof(LinuxPlatformForegroundProgramService), windowManagerType);
+                Log.Warning("Detected {WindowManager} but not supported yet",
+                    windowManagerType);
             }
         }
         else
         {
-            Log.Warning("[{Service}] No strategy available for {WindowManager}",
-                nameof(LinuxPlatformForegroundProgramService), windowManagerType);
+            Log.Warning("No strategy available for {WindowManager}",
+                windowManagerType);
         }
     }
 
@@ -88,7 +90,7 @@ public class LinuxPlatformForegroundProgramService : IPlatformForegroundProgramS
             return;
         }
 
-        Log.Debug("[{Service}] Disposing...", nameof(LinuxPlatformForegroundProgramService));
+        Log.Debug("Disposing...");
         _strategy?.Dispose();
         _disposed = true;
         GC.SuppressFinalize(this);

@@ -14,7 +14,7 @@ public class FakeTimeAndDeadZoneVMService : TimeAndDeadZoneVMService
               CreateFakeMotionTimeConfigViewModel(),
               CreateFakeDeadZoneConfigViewModel(),
               new FakeTimeAndDeadZoneSettingViewModel(),
-              new GlobalStates()
+              new GlobalStates(null!)
           )
     {
     }

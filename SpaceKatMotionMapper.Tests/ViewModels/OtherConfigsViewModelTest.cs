@@ -44,7 +44,9 @@ public class OtherConfigsViewModelTest
             mockActivationService,
             mockVmManageService,
             mockKatMotionActivateService,
-            mockRunningProgramSelectorViewModel
+            mockRunningProgramSelectorViewModel,
+            Mock.Of<IModeChangeService>(),
+            Mock.Of<IKatMotionTimeConfigService>()
         );
 
         // Assert - 构造函数不再自动添加配置
