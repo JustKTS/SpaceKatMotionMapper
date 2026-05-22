@@ -35,6 +35,7 @@
 9. 支持 MiniE 有线模式，应该兼容后续的mini2等设备，欢迎反馈（v0.3.0+)
 10. Linux 初步支持，当前适配 Niri 窗口管理器（v0.3.0+)
 11. 添加对 3DConnexion 设备的支持 (SpaceMouse 等)，可在设置中切换。但由于我没有设备，仅理论上支持，无法测试（v0.3.1+）
+12. windows下添加开机最小化自启动（v0.3.2+)
 
 ## TODO
 - [x] 模式切换的验证
@@ -58,5 +59,3 @@ UI由[AvaloniaUI](https://github.com/AvaloniaUI/Avalonia)实现
 HidApi.dll来自[https://github.com/libusb/hidapi](https://github.com/libusb/hidapi),使用其BSD许可
 
 HID定义与组织学习自[PySpaceMouse](https://github.com/JakubAndrysek/PySpaceMouse)
-
-
