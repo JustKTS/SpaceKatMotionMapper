@@ -75,6 +75,8 @@ public class App : Application
 
     public App()
     {
+        GlobalPaths.Initialize("SpaceKatMotionMapper");
+
         if (!Directory.Exists(GlobalPaths.AppLogPath))
             Directory.CreateDirectory(GlobalPaths.AppLogPath);
 

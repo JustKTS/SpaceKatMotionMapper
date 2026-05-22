@@ -43,7 +43,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SpaceKatHIDWrapper\SpaceKatHIDWrapper.csproj" />
       <ProjectReference Include="..\PlatformAbstractions\PlatformAbstractions.csproj" />
     </ItemGroup>
 

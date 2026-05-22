@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <EnableEnumGeneratorInterceptor>true</EnableEnumGeneratorInterceptor>
+        <LangVersion>latestmajor</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+      <PackageReference Include="CSharpFunctionalExtensions" Version="3.7.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SpaceKat.KatMotionDomain\SpaceKat.KatMotionDomain.csproj" />
+      <ProjectReference Include="..\SpaceKatHIDWrapper\SpaceKatHIDWrapper.csproj" />
+    </ItemGroup>
+
+</Project>

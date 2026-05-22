@@ -21,5 +21,6 @@ namespace SpaceKatMotionMapper.Composition;
 [Singleton<IPlatformMinimizeService, LinuxPlatformMinimizeService>]
 [Singleton<IFileExplorerService, LinuxFileExplorerService>]
 [Singleton<ISingletonInstanceService, LinuxSingletonInstanceService>]
+[Singleton<IPlatformAutostartService, UnsupportedAutostartService>]
 public interface ILinuxPlatformModule { }
 #endif

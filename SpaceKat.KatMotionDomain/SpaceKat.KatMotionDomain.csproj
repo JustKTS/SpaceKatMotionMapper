@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <EnableEnumGeneratorInterceptor>true</EnableEnumGeneratorInterceptor>
+        <LangVersion>latestmajor</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CSharpFunctionalExtensions" Version="3.7.0" />
+      <PackageReference Include="NetEscapades.EnumGenerators" Version="1.0.0-beta21" />
+    </ItemGroup>
+
+</Project>

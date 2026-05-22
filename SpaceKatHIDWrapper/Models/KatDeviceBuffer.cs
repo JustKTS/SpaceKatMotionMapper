@@ -1,4 +1,4 @@
-﻿namespace SpaceKatHIDWrapper.Models;
+namespace SpaceKatHIDWrapper.Models;
 
 public class KatDeviceBuffer(double[] axesData, bool[] buttons)
 {

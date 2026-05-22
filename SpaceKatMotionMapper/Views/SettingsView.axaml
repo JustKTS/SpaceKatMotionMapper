@@ -202,6 +202,37 @@
                 Margin="0"
                 Padding="2"
                 Theme="{StaticResource CardBorder}">
+
+                <Grid ColumnDefinitions="Auto, *, Auto" >
+                    <TextBlock Grid.Column="0"
+                               Margin="16,0,10,0"
+                               VerticalAlignment="Center"
+                               Classes="SettingTitle"
+                               Foreground="{DynamicResource SemiColorPrimary}">开机自启动</TextBlock>
+                        <TextBlock Grid.Column="1"
+                                   Margin="10 0"
+                                   VerticalAlignment="Center" HorizontalAlignment="Left"
+                                   Text="开启后系统启动时自动运行并最小化到托盘"
+                                   TextWrapping="Wrap" />
+                    <ToggleSwitch
+                        Grid.Column="2"
+                        Margin="10,0,40,0"
+                        HorizontalAlignment="Right"
+                        Classes="Large"
+                        IsChecked="{Binding IsAutostartEnabled, Mode=TwoWay}"
+                        IsEnabled="{Binding IsAutostartAvailable}"
+                        OffContent="关"
+                        OnContent="开"
+                        Theme="{StaticResource SimpleToggleSwitch}" />
+                </Grid>
+
+            </Border>
+
+            <Border
+                Classes="Hover"
+                Margin="0"
+                Padding="2"
+                Theme="{StaticResource CardBorder}">
                 <Expander>
                     <Expander.Header>
                         <TextBlock Classes="SettingTitle" Foreground="{DynamicResource SemiColorPrimary}">全局启用/禁用快捷键设置</TextBlock>

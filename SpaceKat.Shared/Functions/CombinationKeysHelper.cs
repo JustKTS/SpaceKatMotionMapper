@@ -21,17 +21,19 @@ public static class CombinationKeysHelper
     public static bool ValidateIsCombinationKeys(List<KeyActionConfig> actionConfigs)
     {
         return actionConfigs
-            .Select(c => RemoveLorR(c.Key)) // 取出所有的Key并去除LR
-            .Where(key => ModifierKeys.Contains(key)) // 过滤出组合键
-            .GroupBy(key => key) // 分组
-            .Any(group => group.Count() > 1); // 判断是否有重复的组合键
+            .Where(c => c.ActionType == ActionType.KeyBoard)
+            .Select(c => RemoveLorR(c.Key))
+            .Where(key => ModifierKeys.Contains(key))
+            .GroupBy(key => key)
+            .Any(group => group.Count() > 1);
     }
 
 
     public static KeyActionConfig[] GenerateCombinationKeys(List<KeyActionConfig> actionConfigs)
     {
         var allKeys = actionConfigs
-            .Select(c => c with { Key = RemoveLorR(c.Key) }) // 取出所有的Key并去除LR
+            .Where(c => c.ActionType == ActionType.KeyBoard)
+            .Select(c => c with { Key = RemoveLorR(c.Key) })
             .GroupBy(c => c.Key).Select(group => group.First()).ToArray();
         var modifierKeys = allKeys
             .Where(c => ModifierKeys.Contains(c.Key));
@@ -43,7 +45,8 @@ public static class CombinationKeysHelper
     public static CombinationKeysRecord ConvertActionsToCombinationRecord(List<KeyActionConfig> actionConfigs)
     {
         var allKeys = actionConfigs
-            .Select(c => c with { Key = RemoveLorR(c.Key) }) // 取出所有的Key并去除LR
+            .Where(c => c.ActionType == ActionType.KeyBoard)
+            .Select(c => c with { Key = RemoveLorR(c.Key) })
             .GroupBy(c => c.Key).Select(group => group.First()).ToArray();
         var modifierKeys = allKeys
             .Where(c => ModifierKeys.Contains(c.Key));

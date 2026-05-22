@@ -56,6 +56,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\SpaceKat.KatMotionDomain\SpaceKat.KatMotionDomain.csproj" />
+      <ProjectReference Include="..\SpaceKat.KatMotionRecognition\SpaceKat.KatMotionRecognition.csproj" />
       <ProjectReference Include="..\MetaKeyPresetsEditor\MetaKeyPresetsEditor.csproj" />
       <ProjectReference Include="..\SpaceKat.Shared\SpaceKat.Shared.csproj" />
       <ProjectReference Include="..\SpaceKatHIDWrapper\SpaceKatHIDWrapper.csproj" />

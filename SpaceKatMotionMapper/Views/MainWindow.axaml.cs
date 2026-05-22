@@ -117,6 +117,11 @@ public partial class MainWindow : UrsaWindow
         navVm.OnNavigation(navVm, typeof(MainView).FullName!);
         swNav.Stop();
         swOnLoaded.Stop();
+
+        if (Program.ShouldMinimizeToTray)
+        {
+            WindowState = WindowState.Minimized;
+        }
     }
 
     private void HideNativeDecorations()

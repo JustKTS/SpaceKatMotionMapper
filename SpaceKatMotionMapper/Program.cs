@@ -10,12 +10,16 @@ namespace SpaceKatMotionMapper;
 
 sealed class Program
 {
+    public static bool ShouldMinimizeToTray { get; private set; }
+
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
     [STAThread]
     public static void Main(string[] args)
     {
+        ShouldMinimizeToTray = Array.Exists(args, a => a == "--minimized");
+
 #if LINUX
         LinuxScaleDetector.DetectAndApply();
 #endif

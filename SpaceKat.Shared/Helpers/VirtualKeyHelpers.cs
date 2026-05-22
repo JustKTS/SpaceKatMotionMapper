@@ -9,17 +9,23 @@ namespace SpaceKat.Shared.Helpers;
 public static class VirtualKeyHelpers
 {
     private static FrozenDictionary<string, KeyCodeWrapper> KeyDict { get; }
+    private static Dictionary<string, KeyCodeWrapper> NoUnderscoreDict { get; }
     public static IReadOnlyList<string> KeyNames { get; }
 
     static VirtualKeyHelpers()
     {
         var keyDict = new Dictionary<string, KeyCodeWrapper>();
+        var noUnderscoreDict = new Dictionary<string, KeyCodeWrapper>();
         foreach (var key in KeyCodeWrapper.GetValues())
         {
-            _ = keyDict.TryAdd(key.ToStringFast(useMetadataAttributes:true), key);
+            var name = key.ToStringFast(useMetadataAttributes:true);
+            _ = keyDict.TryAdd(name, key);
+            if (name.Contains('_'))
+                _ = noUnderscoreDict.TryAdd(name.Replace("_", ""), key);
         }
 
         KeyDict = keyDict.ToFrozenDictionary();
+        NoUnderscoreDict = noUnderscoreDict;
         KeyNames = KeyCodeWrapper.GetNames()
             .ToList()
             .AsReadOnly();
@@ -27,7 +33,11 @@ public static class VirtualKeyHelpers
 
     public static KeyCodeWrapper Parse(string key)
     {
-        return KeyDict.GetValueOrDefault(key, KeyCodeWrapper.NONE);
+        if (KeyDict.TryGetValue(key, out var result)) return result;
+        var upperKey = key.ToUpperInvariant();
+        if (KeyDict.TryGetValue(upperKey, out result)) return result;
+        if (NoUnderscoreDict.TryGetValue(upperKey, out result)) return result;
+        return KeyCodeWrapper.NONE;
     }
 
 }

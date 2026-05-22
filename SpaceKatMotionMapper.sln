@@ -30,6 +30,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinuxHelpers.Tests", "Linux
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceKatHIDWrapper.SourceGen", "SpaceKatHIDWrapper.SourceGen\SpaceKatHIDWrapper.SourceGen.csproj", "{6E085839-66F8-48A6-A961-C7A57750CA67}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceKat.KatMotionDomain", "SpaceKat.KatMotionDomain\SpaceKat.KatMotionDomain.csproj", "{BA558D2C-CD34-44CD-A0D7-EF4D9B25D918}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceKat.KatMotionRecognition", "SpaceKat.KatMotionRecognition\SpaceKat.KatMotionRecognition.csproj", "{371383BA-F75F-4CE9-BCCE-992326308AF0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -220,6 +224,30 @@ Global
 		{6E085839-66F8-48A6-A961-C7A57750CA67}.Release|x64.Build.0 = Release|Any CPU
 		{6E085839-66F8-48A6-A961-C7A57750CA67}.Release|x86.ActiveCfg = Release|Any CPU
 		{6E085839-66F8-48A6-A961-C7A57750CA67}.Release|x86.Build.0 = Release|Any CPU
+		{BA558D2C-CD34-44CD-A0D7-EF4D9B25D918}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA558D2C-CD34-44CD-A0D7-EF4D9B25D918}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA558D2C-CD34-44CD-A0D7-EF4D9B25D918}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BA558D2C-CD34-44CD-A0D7-EF4D9B25D918}.Debug|x64.Build.0 = Debug|Any CPU
+		{BA558D2C-CD34-44CD-A0D7-EF4D9B25D918}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BA558D2C-CD34-44CD-A0D7-EF4D9B25D918}.Debug|x86.Build.0 = Debug|Any CPU
+		{BA558D2C-CD34-44CD-A0D7-EF4D9B25D918}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA558D2C-CD34-44CD-A0D7-EF4D9B25D918}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA558D2C-CD34-44CD-A0D7-EF4D9B25D918}.Release|x64.ActiveCfg = Release|Any CPU
+		{BA558D2C-CD34-44CD-A0D7-EF4D9B25D918}.Release|x64.Build.0 = Release|Any CPU
+		{BA558D2C-CD34-44CD-A0D7-EF4D9B25D918}.Release|x86.ActiveCfg = Release|Any CPU
+		{BA558D2C-CD34-44CD-A0D7-EF4D9B25D918}.Release|x86.Build.0 = Release|Any CPU
+		{371383BA-F75F-4CE9-BCCE-992326308AF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{371383BA-F75F-4CE9-BCCE-992326308AF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{371383BA-F75F-4CE9-BCCE-992326308AF0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{371383BA-F75F-4CE9-BCCE-992326308AF0}.Debug|x64.Build.0 = Debug|Any CPU
+		{371383BA-F75F-4CE9-BCCE-992326308AF0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{371383BA-F75F-4CE9-BCCE-992326308AF0}.Debug|x86.Build.0 = Debug|Any CPU
+		{371383BA-F75F-4CE9-BCCE-992326308AF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{371383BA-F75F-4CE9-BCCE-992326308AF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{371383BA-F75F-4CE9-BCCE-992326308AF0}.Release|x64.ActiveCfg = Release|Any CPU
+		{371383BA-F75F-4CE9-BCCE-992326308AF0}.Release|x64.Build.0 = Release|Any CPU
+		{371383BA-F75F-4CE9-BCCE-992326308AF0}.Release|x86.ActiveCfg = Release|Any CPU
+		{371383BA-F75F-4CE9-BCCE-992326308AF0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

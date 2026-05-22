@@ -1,4 +1,4 @@
-﻿namespace SpaceKatHIDWrapper.Models;
+namespace SpaceKatHIDWrapper.Models;
 
 public record KatDeviceData(DateTimeOffset Timestamp, double[] AxesData, bool[] Buttons)
 {

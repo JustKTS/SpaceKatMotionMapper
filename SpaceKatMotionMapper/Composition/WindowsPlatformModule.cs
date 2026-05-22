@@ -6,6 +6,7 @@ using Win32Helpers.Services.Input;
 using Win32Helpers.Windows;
 using Win32Helpers.Services.SingletonInstance;
 using WindowsInput;
+using SpaceKatMotionMapper.Services;
 using SpaceKatMotionMapper.Services.Generic;
 
 namespace SpaceKatMotionMapper.Composition;
@@ -19,5 +20,6 @@ namespace SpaceKatMotionMapper.Composition;
 [Singleton<IInputSimulator, InputSimulator>]
 [Singleton<IFileExplorerService, WindowsFileExplorerService>]
 [Singleton<ISingletonInstanceService, WindowsSingletonInstanceService>]
+[Singleton<IPlatformAutostartService, WindowsAutostartService>]
 public interface IWindowsPlatformModule { }
 #endif

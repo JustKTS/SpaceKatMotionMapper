@@ -32,6 +32,7 @@ public partial class SettingsViewModel : ObservableObject
     private readonly TransparentInfoViewModel _transparentInfoViewModel;
     private readonly IOfficialMapperHotKeyService _officialMapperHotKeyService;
     private readonly ILocalSettingsService _localSettingsService;
+    private readonly IPlatformAutostartService _platformAutostartService;
     private readonly AutoDisableViewModel _autoDisableViewModel;
     private readonly MainWindow _mainWindow;
     private readonly PresetsEditorMainWindow _presetsEditorMainWindow;
@@ -46,6 +47,7 @@ public partial class SettingsViewModel : ObservableObject
         TransparentInfoViewModel transparentInfoViewModel,
         IOfficialMapperHotKeyService officialMapperHotKeyService,
         ILocalSettingsService localSettingsService,
+        IPlatformAutostartService platformAutostartService,
         AutoDisableViewModel autoDisableViewModel,
         MainWindow mainWindow,
         PresetsEditorMainWindow presetsEditorMainWindow,
@@ -59,6 +61,7 @@ public partial class SettingsViewModel : ObservableObject
         _transparentInfoViewModel = transparentInfoViewModel;
         _officialMapperHotKeyService = officialMapperHotKeyService;
         _localSettingsService = localSettingsService;
+        _platformAutostartService = platformAutostartService;
         _autoDisableViewModel = autoDisableViewModel;
         _mainWindow = mainWindow;
         _presetsEditorMainWindow = presetsEditorMainWindow;
@@ -277,6 +280,39 @@ public partial class SettingsViewModel : ObservableObject
 
     # endregion
     
+    #region 开机自启动
+
+    [ObservableProperty] private bool _isAutostartEnabled;
+    [ObservableProperty] private bool _isAutostartAvailable;
+
+    partial void OnIsAutostartEnabledChanged(bool value)
+    {
+        _ = _localSettingsService.SaveSettingAsync(nameof(IsAutostartEnabled), value);
+        _platformAutostartService.IsAutostartEnabled = value;
+    }
+
+    private void LoadAutostartSetting()
+    {
+        IsAutostartAvailable = _platformAutostartService.IsAvailable;
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                var enabled = await _localSettingsService.ReadSettingAsync<bool>(nameof(IsAutostartEnabled));
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    IsAutostartEnabled = enabled;
+                });
+            }
+            catch (Exception)
+            {
+            }
+        });
+    }
+
+    #endregion
+
     # region 启动时加载
 
     public void LoadInStart()
@@ -284,6 +320,7 @@ public partial class SettingsViewModel : ObservableObject
         LoadHotKey();
         AutoDisableViewModel.LoadInfos();
         LoadThreeDConnexionSetting();
+        LoadAutostartSetting();
     }
 
     #endregion

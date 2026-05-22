@@ -58,6 +58,8 @@ public class App : Application
 
     public App()
     {
+        GlobalPaths.Initialize("MetaKeyPresetsEditor");
+
         if (!Directory.Exists(GlobalPaths.AppLogPath))
             Directory.CreateDirectory(GlobalPaths.AppLogPath);
 
