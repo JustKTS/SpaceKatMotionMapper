@@ -120,7 +120,10 @@ public partial class MainWindow : UrsaWindow
 
         if (Program.ShouldMinimizeToTray)
         {
-            _minimizeService.HideToBackground(this);
+            Dispatcher.UIThread.Post(() =>
+            {
+                _minimizeService.HideToBackground(this);
+            }, DispatcherPriority.Background);
         }
     }
 
