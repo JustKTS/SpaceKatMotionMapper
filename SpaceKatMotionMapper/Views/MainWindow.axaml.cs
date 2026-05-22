@@ -120,7 +120,7 @@ public partial class MainWindow : UrsaWindow
 
         if (Program.ShouldMinimizeToTray)
         {
-            WindowState = WindowState.Minimized;
+            _minimizeService.HideToBackground(this);
         }
     }
 
